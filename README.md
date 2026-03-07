@@ -160,10 +160,59 @@ CachyOS-Workstation-Setup/
 │   ├── 13-waybar.sh          # Status bar config + CSS
 │   ├── 14-nexus-guide.sh     # Installs Nexus + Guide
 │   └── 15-ecosystem.sh       # Installs Living Ecosystem Utilities
-├── README.md
-├── LICENSE
+├── CONTRIBUTING.md
+├── SECURITY.md
+├── CODE_OF_CONDUCT.md
 ├── .gitignore
 └── .gitattributes            # Enforce LF line endings for .sh files
+```
+
+### Architecture
+
+```mermaid
+flowchart TB
+    subgraph Entry["Entry Points"]
+        CURL["curl \| bash<br/>install.sh"] --> SETUP
+        MANUAL["git clone + ./setup.sh"] --> SETUP
+        SETUP["setup.sh"] --> TUI["installer.sh<br/>TUI Module Selector"]
+    end
+
+    subgraph Modules["15 Independent Modules"]
+        direction LR
+        M00["00-common.sh<br/>Shared Helpers"] -.-> M01 & M06 & M09
+        M01["01-05<br/>Base · Kernel · Security<br/>Dev Tools · Mobile"]
+        M06["06-08<br/>Dotfiles · Editors<br/>Desktop"]
+        M09["09-13<br/>Hyprland · Apps<br/>Gaming · VM · Waybar"]
+        M14["14-15<br/>Nexus+Guide · Ecosystem"]
+    end
+
+    TUI --> Modules
+
+    subgraph Ecosystem["Living Ecosystem — /usr/local/bin/"]
+        direction LR
+        TS["🎨 theme-switch"]
+        CR["🛡️ config-rollback"]
+        DS["☁️ dotfiles-sync"]
+        AT["🧠 ai-tuner"]
+        AS["🏪 app-store"]
+        HC["🩺 health-check"]
+    end
+
+    M14 --> Ecosystem
+
+    subgraph Runtime["Runtime Layer"]
+        NEXUS["Nexus v2<br/>Super+X Command Center"] --> Ecosystem
+        GUIDE["Guide v3<br/>160+ bilingual entries"]
+        HOOK["Pacman Hook<br/>Auto health-check"]
+    end
+
+    M14 --> NEXUS & GUIDE
+    HC --> HOOK
+
+    style Entry fill:#1e1e2e,stroke:#89b4fa,color:#cdd6f4
+    style Modules fill:#1e1e2e,stroke:#a6e3a1,color:#cdd6f4
+    style Ecosystem fill:#1e1e2e,stroke:#cba6f7,color:#cdd6f4
+    style Runtime fill:#1e1e2e,stroke:#f9e2af,color:#cdd6f4
 ```
 
 ### Module Details
@@ -473,6 +522,8 @@ After `pacman -Syu`, the health check automatically runs and detects issues. Rec
 
 ## 🤝 Contributing
 
+We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+
 ```bash
 git checkout -b feature/your-idea
 # Edit any module in modules/
@@ -482,6 +533,14 @@ git push origin feature/your-idea
 ```
 
 Each module is **independent** — you can edit one without touching others.
+
+### Community
+
+| Document | Description |
+|----------|-------------|
+| [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute, coding conventions, testing |
+| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Community behavior standards |
+| [SECURITY.md](SECURITY.md) | Vulnerability reporting & security policy |
 
 ---
 
