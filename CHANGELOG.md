@@ -6,6 +6,18 @@
 
 <hr>
 
+## [v1.5.1] - The Final Polish (2026-03-08)
+
+Minor bugfixes and code quality enforcement following the v1.5.0 milestone.
+
+### 🟡 Bug Fixes
+- **VM Compatibility (`health-check`)**: The GPU driver section no longer produces zero output on Headless/VMs lacking PCI GPUs; it now explicitly warns "No GPU detected".
+- **Dotfile Deployment**: `deploy_dotfile()` now tracks failures via `DOTFILE_FAILURES` counter and returns `1` if a source file is missing, enabling callers to detect partial deployments.
+- **Dynamic CI Validation**: Replaced the hardcoded '150+' stale check in CI with a dynamic pipeline that counts actual entries in `guide.sh` and validates all repository documentation limits against it.
+- **Global LF Enforcement**: Fixed an irony where `.editorconfig`, `README.md`, and 30 other files had CRLF line endings. Converted all 32 files to LF and added a strict `* text=auto eol=lf` rule to `.gitattributes` to permanently prevent CRLF cross-platform issues.
+
+---
+
 ## [v1.5.0] - The Perfect Score (2026-03-08)
 
 Final 11 audit items resolved. **All 53+ findings from both internal and external audits are now fixed.** Audit score: **10/10**.
