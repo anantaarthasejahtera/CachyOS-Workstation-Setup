@@ -2,6 +2,24 @@
 
 Step-by-step guide to install CachyOS and then run the workstation setup.
 
+<details>
+<summary><b>📑 Table of Contents</b></summary>
+
+- [Prerequisites](#prerequisites)
+- [Step 1: Create CachyOS USB](#step-1-create-cachyos-usb)
+- [Step 2: Boot and Install CachyOS](#step-2-boot-and-install-cachyos)
+  - [BIOS/UEFI Settings](#biosuefi-settings)
+  - [Calamares Installer Settings](#calamares-installer-settings)
+  - [Partition Layout (NVMe SSD)](#partition-layout-nvme-ssd)
+  - [User Setup](#user-setup)
+- [Step 3: First Boot — Run Setup Script](#step-3-first-boot--run-setup-script)
+- [Step 4: After Setup](#step-4-after-setup)
+- [Troubleshooting](#troubleshooting)
+
+</details>
+
+---
+
 ## Prerequisites
 
 - USB drive (8 GB+)
