@@ -85,9 +85,10 @@ MODULE_SCRIPTS[11]="11-gaming.sh";    MODULE_SIZES[11]="~3 GB"
 MODULE_SCRIPTS[12]="12-vm.sh";        MODULE_SIZES[12]="~2 GB"
 MODULE_SCRIPTS[13]="13-waybar.sh";    MODULE_SIZES[13]="~5 MB"
 MODULE_SCRIPTS[14]="14-nexus-guide.sh"; MODULE_SIZES[14]="~1 MB"
+MODULE_SCRIPTS[15]="15-ecosystem.sh"; MODULE_SIZES[15]="~1 MB"
 
 # Module order for execution
-MODULE_ORDER=(01 02 03 04 05 06 07 08 09 10 11 12 13 14)
+MODULE_ORDER=(01 02 03 04 05 06 07 08 09 10 11 12 13 14 15)
 
 # ─── Welcome Screen ─────────────────────────────────────
 show_welcome() {
@@ -97,7 +98,7 @@ show_welcome() {
     ║  🚀  CachyOS Workstation Installer  ║\n\
     ║  ──────────────────────────────────  ║\n\
     ║  Theme: Catppuccin Mocha            ║\n\
-    ║  Modules: 14 (fully modular)        ║\n\
+    ║  Modules: 15 (fully modular)        ║\n\
     ║  Tools: 50+ pre-configured          ║\n\
     ║  Guide: 150+ searchable entries     ║\n\
     ║                                      ║\n\
@@ -127,6 +128,7 @@ select_modules() {
         "12" "Windows VM & Bottles       [${MODULE_SIZES[12]}]" OFF \
         "13" "Waybar Status Bar          [${MODULE_SIZES[13]}]" ON \
         "14" "Nexus & Guide System       [${MODULE_SIZES[14]}]" ON \
+        "15" "Living Ecosystem Utils     [${MODULE_SIZES[15]}]" ON \
         3>&1 1>&2 2>&3)
 
     echo "$result"
