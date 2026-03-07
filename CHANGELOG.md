@@ -6,6 +6,18 @@
 
 <hr>
 
+## [v1.1.0] - The Enterprise God-Tier Update (2026-03-07)
+
+This release implements three highly requested enterprise-tier features, completing the transition of this project into a top-tier open-source repository format.
+
+### ✨ New Features
+
+- **Automated GitHub Releases (CI/CD)**: Added `.github/workflows/release.yml`. Pushing a semantic version tag (e.g., `v1.1.0`) now automatically triggers a GitHub Actions workflow that zips the repository, auto-generates a changelog from commits, and publishes an official GitHub Release.
+- **The Ultimate Uninstaller (`uninstall.sh`)**: Added a graceful uninstall script. Running `./uninstall.sh` safely removes the Nexus command center, Guide CLI, ecosystem tools from `/usr/local/bin`, deletes GUI themes, removes Pacman hooks, and restores default Hyprland configurations without touching your personal files or un-installing essential system packages.
+- **Bilingual TUI Installer (EN/ID)**: The TUI installer (`setup.sh` / `installer.sh`) now features a language selection dialog on launch. Choosing English or Bahasa Indonesia dynamically translates all ensuing setup menus, warnings, progress bars, and completion summaries natively.
+
+---
+
 ## [v1.0.0] - The Ecosystem Update (2026-03-07)
 
 This is a massive architectural and feature release that transforms the setup script into a continuous ecosystem, introducing post-install health checks, custom app stores, and robust disaster recovery mechanisms.
