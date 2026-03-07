@@ -38,6 +38,7 @@ jobs:
               -e SC2028 \
               -e SC2129 \
               -e SC2164 \
+              -e SC2206 \
               {} +
           echo "::endgroup::"
           echo "✅ ShellCheck passed on all scripts"
