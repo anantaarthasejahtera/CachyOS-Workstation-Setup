@@ -412,6 +412,53 @@ cat ~/cachy-setup.log | grep "Installing"
 
 ---
 
+## ⚠️ Known Limitations & Maintenance
+
+> Transparency builds trust. Here's what you should know before deploying.
+
+### 🖥️ Hardware Edge Cases
+
+The setup script auto-detects hardware via `lspci` and `/proc/cpuinfo`, but some edge cases exist:
+
+| Scenario | How We Handle It | Risk |
+|----------|------------------|------|
+| **Different GPU** (Intel → AMD → NVIDIA) | `01-base.sh` auto-detects and installs correct drivers | ✅ Handled |
+| **CPU core count varies** (2→4→16 cores) | CPU pinning in `12-vm.sh` checks `nproc` first | ✅ Handled |
+| **Low RAM** (4-8 GB) | Hugepages scale dynamically: 2GB/1GB/skip based on available RAM | ✅ Handled |
+| **Multi-monitor setup** | Hyprland auto-detects monitors — no hardcoded resolutions | ✅ Handled |
+| **PCSX2 GPU-specific settings** | Configured for integrated graphics — discrete GPUs may want higher settings | 🟡 Manual tweak |
+| **Secure Boot enabled** | NVIDIA DKMS may need MOK key enrollment | 🟡 Manual step |
+
+### 🔄 Rolling Release Maintenance
+
+CachyOS (Arch-based) uses rolling releases. System updates **can** break configs. Our defense layers:
+
+```
+Layer 1: safe_config()  → Auto-backup before every config change
+Layer 2: config-rollback → Rofi GUI to restore any backup (Super+X → Time Machine)
+Layer 3: dotfiles-sync  → Cloud Git sync for disaster recovery
+Layer 4: Idempotent     → Re-run any module to re-apply: bash modules/09-hyprland.sh
+```
+
+**What CAN break after `pacman -Syu`:**
+
+| Component | Risk | Recovery |
+|-----------|------|----------|
+| Hyprland config syntax change | 🟡 Rare, ~1x/year | Re-run `bash modules/09-hyprland.sh` |
+| Waybar widget API change | 🟡 Rare | Re-run `bash modules/13-waybar.sh` |
+| Package renamed/removed | 🟡 Moderate | Edit module, replace package name |
+| Kernel module breakage | 🟠 Post-kernel update | `sudo pacman -S linux-cachyos-headers` |
+
+**What will NOT break:**
+- Your backed-up configs (`~/.config-backup/`)
+- Cloud-synced dotfiles
+- Package installations (pacman tracks everything)
+- The setup script itself (it's idempotent)
+
+> 💡 **Pro tip**: Run `sudo pacman -Syu` regularly (or via Nexus → System Update). Small, frequent updates are safer than waiting months.
+
+---
+
 ## 🤝 Contributing
 
 ```bash
