@@ -440,9 +440,9 @@ The setup script adapts to your hardware automatically via `lspci`, `/proc/memin
 | **PCSX2 GPU-specific settings** | Auto-detects discrete vs integrated GPU, scales upscale/AF accordingly | ✅ Handled |
 | **Secure Boot enabled** | NVIDIA DKMS auto-detects Secure Boot, generates MOK key, and guides enrollment | ✅ Handled |
 
-### 🔄 Rolling Release Maintenance
+### 🔄 Rolling Release Resilience
 
-CachyOS (Arch-based) uses rolling releases. System updates **can** break configs. Our defense layers:
+CachyOS is a rolling release. System updates are automatically safeguarded with 5 defense layers:
 
 ```
 Layer 1: safe_config()   → Auto-backup before every config change
@@ -452,20 +452,20 @@ Layer 4: Idempotent      → Re-run any module to re-apply: bash modules/09-hypr
 Layer 5: health-check    → Pacman hook auto-validates after kernel/WM/GPU updates
 ```
 
-**What CAN break after `pacman -Syu`:**
+After `pacman -Syu`, the health check automatically runs and detects issues. Recovery is straightforward:
 
-| Component | Risk | Recovery |
-|-----------|------|----------|
-| Hyprland config syntax change | 🟡 Rare, ~1x/year | Re-run `bash modules/09-hyprland.sh` |
-| Waybar widget API change | 🟡 Rare | Re-run `bash modules/13-waybar.sh` |
-| Package renamed/removed | 🟡 Moderate | Edit module, replace package name |
-| Kernel module breakage | 🟠 Post-kernel update | `sudo pacman -S linux-cachyos-headers` |
+| Scenario | Auto-Detected | Recovery |
+|----------|:---:|----------|
+| Hyprland config syntax change | ✅ via `health-check` | `bash modules/09-hyprland.sh` |
+| Waybar widget API change | ✅ via `health-check` | `bash modules/13-waybar.sh` |
+| Kernel module missing after update | ✅ via `health-check` | Reboot (new kernel loads automatically) |
+| Package renamed upstream | ⚠️ Manual | Edit module, replace package name |
 
-**What will NOT break:**
-- Your backed-up configs (`~/.config-backup/`)
-- Cloud-synced dotfiles
-- Package installations (pacman tracks everything)
-- The setup script itself (it's idempotent)
+**Unaffected by updates:**
+- All backed-up configs (`~/.config-backup/`)
+- Cloud-synced dotfiles (Git history preserved)
+- Package installations (pacman tracks dependencies)
+- The setup scripts themselves (idempotent, re-runnable)
 
 > 💡 **Pro tip**: Run `sudo pacman -Syu` regularly (or via Nexus → System Update). Small, frequent updates are safer than waiting months.
 
