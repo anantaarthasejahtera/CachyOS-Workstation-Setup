@@ -361,11 +361,11 @@ Each module is **independent** — you can edit one without touching others.
 
 ## 📄 License
 
-MIT © 2025 [PT Ananta Artha Sejahtera](https://github.com/anantaarthasejahtera) — see [LICENSE](LICENSE).
+MIT © 2025 [PT Ananta Artha Sejahtera](https://anartha.com) — see [LICENSE](LICENSE).
 
 ---
 
 <p align="center">
-  <sub>Built with ❤️ by <a href="https://github.com/anantaarthasejahtera">PT Ananta Artha Sejahtera</a></sub><br/>
+  <sub>Built with ❤️ by <a href="https://anartha.com">PT Ananta Artha Sejahtera</a></sub><br/>
   <sub><a href="https://github.com/catppuccin/catppuccin">Catppuccin</a> · <a href="https://cachyos.org">CachyOS</a> · <a href="https://hyprland.org">Hyprland</a></sub>
 </p>
