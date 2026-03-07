@@ -652,6 +652,35 @@ build_guide_data() {
         "Full screen capture saved to ~/Pictures/Screenshots/" "Tangkap layar penuh disimpan ke ~/Pictures/Screenshots/" \
         "grim ~/Pictures/Screenshots/\$(date +%Y%m%d-%H%M%S).png" "grim"
 
+    # ══════════════════════════════════════════════════════
+    # ECOSYSTEM — Living Ecosystem Utilities (Phase 4)
+    # ══════════════════════════════════════════════════════
+    add "ecosystem" "theme-switch" \
+        "Dynamic Theme Switcher" "Pengubah Tema Dinamis" \
+        "Hot-swap between 7 themes: Catppuccin (Mocha/Macchiato/Frappe/Latte), Dracula, Tokyo Night, Rosé Pine|Instantly reloads: Hyprland borders, Waybar CSS, Rofi, Kitty, Dunst|Run from Nexus (Super+X) or terminal" \
+        "Ganti antar 7 tema secara instan: Catppuccin (Mocha/Macchiato/Frappe/Latte), Dracula, Tokyo Night, Rosé Pine|Reload otomatis: border Hyprland, CSS Waybar, Rofi, Kitty, Dunst|Jalankan dari Nexus (Super+X) atau terminal" \
+        "theme-switch" ""
+    add "ecosystem" "config-rollback" \
+        "Time Machine (Config Rollback)" "Mesin Waktu (Rollback Konfigurasi)" \
+        "Browse timestamped backups from ~/.config-backup/ via Rofi|Restore single files (e.g., waybar/style.css) or ALL at once|Auto-reloads Waybar and Hyprland after restore" \
+        "Jelajahi backup bertimestamp dari ~/.config-backup/ via Rofi|Restore file tunggal (misal waybar/style.css) atau SEMUA sekaligus|Auto-reload Waybar dan Hyprland setelah restore" \
+        "config-rollback" ""
+    add "ecosystem" "dotfiles-sync" \
+        "Dotfiles Cloud Sync" "Sinkronisasi Cloud Dotfiles" \
+        "Push ~/.config/ to a private Git repository safely|Smart .gitignore skips: Code/, Chrome, Discord, Spotify, tokens|First run: prompts for repo URL. Subsequent runs: auto-push" \
+        "Push ~/.config/ ke repositori Git privat dengan aman|.gitignore pintar melewati: Code/, Chrome, Discord, Spotify, token|Jalankan pertama: minta URL repo. Selanjutnya: auto-push" \
+        "dotfiles-sync" ""
+    add "ecosystem" "ai-tuner" \
+        "AI Auto-Tuner (System Optimizer)" "AI Auto-Tuner (Optimasi Sistem)" \
+        "Gathers real-time telemetry: top, free, vmstat|Pipes data to local qwen2.5-coder:7b via Ollama|Displays 3 actionable sysctl/optimization tips via Rofi popup" \
+        "Kumpulkan telemetri real-time: top, free, vmstat|Kirim data ke qwen2.5-coder:7b lokal via Ollama|Tampilkan 3 tips optimasi sysctl yang actionable via popup Rofi" \
+        "ai-tuner" "ollama"
+    add "ecosystem" "app-store" \
+        "GUI App Store (Rofi)" "Toko Aplikasi GUI (Rofi)" \
+        "Curated app browser: Browsers, Dev Tools, Gaming, Media, Utilities|Multi-tier Rofi menu: Category → App → Confirm → Install|Supports: pacman, paru (AUR), and flatpak backends" \
+        "Peramban aplikasi terkurasi: Browser, Dev Tools, Gaming, Media, Utilitas|Menu Rofi multi-tingkat: Kategori → Aplikasi → Konfirmasi → Install|Mendukung: pacman, paru (AUR), dan backend flatpak" \
+        "app-store" ""
+
     echo -e "$data"
 }
 
