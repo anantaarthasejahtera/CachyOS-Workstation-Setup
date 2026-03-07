@@ -5,7 +5,7 @@
 <h1 align="center">🚀 CachyOS Workstation Setup</h1>
 
 <p align="center">
-  <strong>Modular, aesthetic, fully-configurable CachyOS development workstation installer.</strong>
+  <strong>Modular, aesthetic, bilingual CachyOS development workstation installer.</strong>
 </p>
 
 <p align="center">
@@ -13,6 +13,8 @@
   <img src="https://img.shields.io/badge/Theme-Catppuccin%20Mocha-cba6f7?style=for-the-badge" alt="Catppuccin"/>
   <img src="https://img.shields.io/badge/Modules-14-a6e3a1?style=for-the-badge" alt="Modules"/>
   <img src="https://img.shields.io/badge/Tools-50+-89b4fa?style=for-the-badge" alt="Tools"/>
+  <img src="https://img.shields.io/badge/Guide-150+%20entries-f5c2e7?style=for-the-badge" alt="Guide"/>
+  <img src="https://img.shields.io/badge/Language-EN%20%7C%20ID-f9e2af?style=for-the-badge" alt="Bilingual"/>
   <img src="https://img.shields.io/badge/License-MIT-f9e2af?style=for-the-badge" alt="License"/>
 </p>
 
@@ -20,7 +22,13 @@
 
 ## ✨ Overview
 
-A **modular installer** that transforms a fresh CachyOS installation into a fully configured, aesthetically stunning developer workstation. Features a **TUI (Terminal UI) module selector** — choose exactly what you need, skip what you don't.
+A **modular installer** that transforms a fresh CachyOS installation into a fully configured, aesthetically stunning developer workstation. Features:
+
+- **TUI installer** — Catppuccin-themed module selector with progress bars
+- **Nexus v2** — Smart command center popup with live system stats
+- **Guide v3** — 150+ searchable entries, executable, bilingual (EN/ID)
+- **14 modules** — each independently runnable
+- **50+ tools** — dev, AI, gaming, VM, productivity
 
 ### 🎯 Who Is This For?
 
@@ -84,10 +92,11 @@ When you run `./setup.sh`, a Catppuccin-themed TUI appears:
 ## 🏗️ Project Structure
 
 ```
-dekstop/
+CachyOS-Workstation-Setup/
 ├── setup.sh                  # Main entry point (edit config here)
 ├── installer.sh              # TUI installer (dialog-based)
-├── nexus.sh                  # Nexus Command Center (Super+X popup)
+├── nexus.sh                  # Nexus v2 Command Center (Super+X)
+├── guide.sh                  # Guide v3 — bilingual reference (EN/ID)
 ├── modules/
 │   ├── 00-common.sh          # Shared functions & helpers
 │   ├── 01-base.sh            # GPU auto-detect, paru, makepkg
@@ -103,8 +112,7 @@ dekstop/
 │   ├── 11-gaming.sh          # Steam, PCSX2, Minecraft, MangoHud
 │   ├── 12-vm.sh              # QEMU/KVM, Bottles, LibreOffice
 │   ├── 13-waybar.sh          # Status bar config + CSS
-│   └── 14-nexus-guide.sh     # Nexus install + Guide system
-├── cachy-setup.sh            # Legacy monolith (kept for reference)
+│   └── 14-nexus-guide.sh     # Installs Nexus + Guide
 ├── README.md
 ├── LICENSE
 └── .gitignore
@@ -114,48 +122,107 @@ dekstop/
 
 | # | Module | Size | Key Tools |
 |---|--------|------|-----------|
-| 01 | Base & GPU | ~2 GB | GPU auto-detect, paru, base-devel |
-| 02 | Kernel | ~0 MB | sysctl tuning, NVMe, THP, GuC/HuC |
-| 03 | Security | ~50 MB | UFW, SSH key, Cloudflare DNS, Zram |
-| 04 | Dev Tools | ~4 GB | Docker, Node/fnm, Python/uv, Rust, Go |
-| 05 | Mobile | ~5 GB | Flutter, Android SDK, Kotlin, JDK 17 |
-| 06 | Dotfiles | ~100 MB | Kitty, Zsh, Starship, fzf, bottom |
-| 07 | Editors | ~700 MB | Antigravity, Neovim (lazy.nvim) |
-| 08 | Desktop | ~300 MB | KDE Catppuccin, GRUB theme, fonts |
-| 09 | Hyprland | ~200 MB | Tiling WM, keybinds, Rofi, lock screen |
-| 10 | Apps | ~500 MB | Zen Browser, tmux, Flatpak apps |
-| 11 | Gaming | ~3 GB | Steam, PCSX2, Minecraft, Roblox |
-| 12 | VM | ~2 GB | QEMU/KVM, Bottles, LibreOffice |
-| 13 | Waybar | ~5 MB | Status bar + glass CSS |
-| 14 | Nexus | ~1 MB | Command Center + 130-entry Guide |
+| 01 | Base & GPU | ~2 GB | GPU auto-detect (Intel/AMD/NVIDIA), paru, base-devel |
+| 02 | Kernel | ~0 MB | sysctl tuning, NVMe optimization, THP, GuC/HuC |
+| 03 | Security | ~50 MB | UFW, SSH key (ed25519), Cloudflare DNS, Zram, Timeshift |
+| 04 | Dev Tools | ~4 GB | Docker, Node/fnm/pnpm, Python/uv, Rust, Go, CLI power tools |
+| 05 | Mobile | ~5 GB | Flutter, Android SDK (API 34), Kotlin, JDK 17, scrcpy |
+| 06 | Dotfiles | ~100 MB | Kitty, Zsh/Oh-My-Zsh, Starship prompt, fzf-tab |
+| 07 | Editors | ~700 MB | Antigravity (AI VS Code), Neovim (lazy.nvim) |
+| 08 | Desktop | ~300 MB | KDE Catppuccin theme, GRUB theme, Inter + Nerd Fonts |
+| 09 | Hyprland | ~200 MB | Tiling WM, keybinds, Rofi, Hyprlock, Hypridle |
+| 10 | Apps | ~500 MB | Zen Browser, tmux, Spotify/Telegram/Discord (Flatpak) |
+| 11 | Gaming | ~3 GB | Steam (Proton), PCSX2, PrismLauncher, Roblox, MangoHud |
+| 12 | VM | ~2 GB | QEMU/KVM (hugepages, CPU pinning), Bottles, LibreOffice |
+| 13 | Waybar | ~5 MB | Glassmorphism status bar with gradient CSS |
+| 14 | Nexus + Guide | ~1 MB | Smart command center + 150-entry bilingual guide |
 
 ---
 
-## 🎮 Nexus Command Center
+## 🎮 Nexus v2 — Command Center
 
-Press **`Super+X`** for an instant popup with 35+ actions:
+Press **`Super+X`** for a smart popup with **live system stats**:
 
 ```
-╭── 🔍 Nexus ──────────────────────────────╮
-│  Search...                                │
-│                                           │
-│    System Update                         │
-│    Screenshot (Region)                   │
-│  󰧑  AI Chat (Reasoning)                  │
-│    Antigravity                           │
-│    VM Manager                            │
-│  ...                                      │
-╰───────────────────────────────────────────╯
+╭── 🔍 Nexus ───────────────────────────────────╮
+│  Super+X · 󰁹 87% · 󰍛 4.2/16GB               │
+│────────────────────────────────────────────────│
+│  ── 󰁹 87%  │  󰍛 4.2/16GB  │  󰋊 420G free ── │
+│  ────────────────────────────────────────────  │
+│    System Update (pacman + flatpak)           │
+│    Cleanup Packages & Cache                   │
+│  ────────────────────────────────────────────  │
+│    Screenshot — Region                        │
+│    Record Screen (or ⏹ Stop if recording)     │
+│  ────────────────────────────────────────────  │
+│  󰧑  AI Chat — Reasoning (qwen3) 🟢           │
+│    Docker Manager 🟢                          │
+│    VM Manager 🔴                              │
+│  ────────────────────────────────────────────  │
+│    Guide Popup (150+ entries)                 │
+╰────────────────────────────────────────────────╯
 ```
 
-## 📖 Guide System
+### Nexus Features
+
+| Feature | Description |
+|---------|-------------|
+| **Live system stats** | Battery %, RAM usage, disk free, CPU temp in header |
+| **Smart recording** | Auto-detects if recording → shows Stop instead of Record |
+| **Service status** | 🟢/🔴 indicators for Docker, Ollama, VMs |
+| **Dynamic detection** | Only shows apps that are actually installed |
+| **35+ actions** | Quick actions, AI, dev tools, apps, gaming, system |
+| **Zero RAM idle** | Only runs when invoked |
+
+---
+
+## 📖 Guide v3 — Bilingual Reference
 
 ```bash
-guide              # Interactive fzf search
+# Interactive mode (fzf + preview pane + executable)
+guide
+
+# Filter by keyword
 guide docker       # Docker commands
-guide flutter      # Flutter commands  
+guide flutter      # Flutter commands
 guide hyprland     # Keyboard shortcuts
 guide ai           # Ollama commands
+
+# Popup mode (rofi, integrated with Nexus)
+guide --popup
+
+# Online reference (cheat.sh)
+guide --web tar
+
+# Switch language
+guide --lang id    # 🇮🇩 Bahasa Indonesia
+guide --lang en    # 🇬🇧 English
+```
+
+### Guide Features
+
+| Feature | Description |
+|---------|-------------|
+| **150+ entries** | 15 categories (hyprland, shell, git, docker, node, python, rust, go, flutter, editor, ai, gaming, vm, apps, system) |
+| **Executable** | Press Enter on any ▶ entry to run the command directly |
+| **Preview pane** | fzf right panel shows detailed explanation + examples |
+| **Bilingual** | Full English and Indonesian translations (auto-detected from locale) |
+| **Popup mode** | Rofi popup via `guide --popup` or from Nexus |
+| **cheat.sh** | Online fallback via `guide --web <topic>` |
+| **Language persist** | Choice saved to `~/.config/guide-lang` |
+
+### Example (Bahasa Indonesia)
+
+```
+━━━ Guide: docker ━━━  [bahasa: Indonesia]
+
+  [docker] ▶ docker ps
+         → Daftar container berjalan
+         Tampilkan container berjalan dengan port, nama, status
+
+  [docker] ▶ lazydocker
+         → Manajer Docker TUI
+         UI terminal cantik: container, image, volume, log
 ```
 
 ---
@@ -164,14 +231,29 @@ guide ai           # Ollama commands
 
 | Shortcut | Action |
 |----------|--------|
-| `Super + X` | **Nexus Command Center** |
+| `Super + X` | **Nexus Command Center** (smart popup) |
 | `Super + Return` | Terminal (Kitty) |
 | `Super + D` | App launcher (Rofi) |
 | `Super + Q` | Close window |
 | `Super + F` | Fullscreen |
-| `Super + L` | Lock screen |
+| `Super + L` | Lock screen (Hyprlock) |
+| `Super + E` | File manager (Thunar) |
+| `Super + V` | Clipboard history |
 | `Super + /` | Keybind cheatsheet |
-| `Super + Shift + S` | Screenshot (region) |
+| `Super + Shift+S` | Screenshot (region) |
+| `Super + 1-9` | Switch workspace |
+
+---
+
+## 🤖 AI Tools Included
+
+| Model | Purpose | RAM | Command |
+|-------|---------|-----|---------|
+| `qwen3:30b-a3b` | Reasoning, debate, philosophy | ~16GB | `ollama run qwen3:30b-a3b` |
+| `deepseek-r1:7b` | Math & logic | ~5GB | `ollama run deepseek-r1:7b` |
+| `qwen2.5-coder:7b` | Code generation & refactoring | ~5GB | `ollama run qwen2.5-coder:7b` |
+
+All accessible via **Nexus** → AI section, or terminal `ollama run <model>`.
 
 ---
 
@@ -179,10 +261,10 @@ guide ai           # Ollama commands
 
 Each module sources `modules/00-common.sh` which provides:
 
-- **Idempotent configs**: Existing configs backed up to `~/.config-backup/` before overwriting
-- **Smart installs**: Packages checked before install (no reinstalling)
-- **Logging**: Everything logged to `~/cachy-setup.log`
-- **Run individual modules**: `bash modules/04-dev.sh` (test one module)
+- **Idempotent configs** — Existing configs backed up to `~/.config-backup/` before overwriting
+- **Smart installs** — Packages checked before install (no reinstalling)
+- **Logging** — Everything logged to `~/cachy-setup.log`
+- **Run individual modules** — `bash modules/04-dev.sh` (test one module)
 
 ---
 
