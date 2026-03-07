@@ -6,6 +6,24 @@
 
 <hr>
 
+## [v1.2.0] - The Legendary Polish Update (2026-03-07)
+
+This massive update focuses on bringing absolute enterprise repository cleanliness, native Linux development standards, and world-class documentation to the ecosystem.
+
+### ✨ New Features
+
+- **Official VitePress Documentation Site**: Built a highly comprehensive, Catppuccin-themed static website hosted automatically via GitHub Actions (Pages). Explains the deep architecture of the `safe_config` paradigm, troubleshooting flows, and AI local model usage.
+- **Native Development `Makefile`**: Implemented a `Makefile` making routine interactions universally standard (e.g. `make install`, `make uninstall`, `make lint`, `make init`).
+- **Git Pre-Commit Hooks**: Added `.githooks/pre-commit` to automatically block commits utilizing ShellCheck if Bash syntax errors are detected locally, guaranteeing 100% CI pipeline purity.
+
+### ♻️ Architecture Reforms
+
+- **Root Directory Cleanup**: Moved all standard GitHub health files (`SECURITY.md`, `CONTRIBUTING.md`, etc.) to the `.github/` folder.
+- **Ecosystem UI Isolation**: Migrated `nexus.sh` and `guide.sh` out of the root project into their native `ecosystem/` folder to achieve maximum repository cleanliness.
+- **Node Isolation**: Encapsulated `package.json` and `pnpm-lock.yaml` entirely within the `/docs` routing tree to separate web components from core Linux scripting.
+
+---
+
 ## [v1.1.0] - The Enterprise God-Tier Update (2026-03-07)
 
 This release implements three highly requested enterprise-tier features, completing the transition of this project into a top-tier open-source repository format.
