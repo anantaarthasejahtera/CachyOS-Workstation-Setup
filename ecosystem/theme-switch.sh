@@ -79,9 +79,21 @@ if [ -f "$DUNST_CONF" ]; then
     killall dunst 2>/dev/null || true
 fi
 
-# --- 8. Notification ---
-command -v notify-send >/dev/null && \
-    notify-send -a "Theme Switcher" -i "preferences-desktop-theme" \
-    "Theme Applied: $chosen" "Hyprland, Waybar, Rofi, and Kitty updated!"
+# --- 8. Verification & Notification ---
+# Count how many targets were actually modified
+changes=0
+[ -f "$ROFI_CONF" ] && grep -q "${bg:0:7}" "$ROFI_CONF" 2>/dev/null && ((changes++)) || true
+[ -f "$HYPR_CONF" ] && grep -q "$b1" "$HYPR_CONF" 2>/dev/null && ((changes++)) || true
+[ -f "$WAYBAR_CSS" ] && grep -q "${bg:0:7}" "$WAYBAR_CSS" 2>/dev/null && ((changes++)) || true
 
-echo "Theme changed to $chosen"
+if [ "$changes" -gt 0 ]; then
+    command -v notify-send >/dev/null && \
+        notify-send -a "Theme Switcher" -i "preferences-desktop-theme" \
+        "Theme Applied: $chosen" "$changes config files updated successfully!"
+    echo "Theme changed to $chosen ($changes files updated)"
+else
+    command -v notify-send >/dev/null && \
+        notify-send -a "Theme Switcher" -i "dialog-warning" \
+        "Theme Change Warning" "Selected '$chosen' but no config files were modified. Check your config paths."
+    echo "Warning: Theme '$chosen' selected but no files were modified"
+fi

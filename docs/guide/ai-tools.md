@@ -58,5 +58,7 @@ ollama run qwen2.5-coder:7b
 
 ## Editor Integration (Antigravity)
 
-Module 07 installs **Antigravity** (Google's AI-focused fork of VS Code).
-Antigravity automatically searches for local Ollama instances on port `11434`. By simply starting Ollama, you get inline code completions, chat interfaces, and refactoring commands powered entirely by your local hardware.
+Module 07 installs **Antigravity**, an AI-powered code editor (see [antigravity.google](https://antigravity.google) for official docs).
+If Antigravity is not available on Arch Linux via AUR, the installer will attempt to extract it from the official Debian package or fall back to **Cursor** (`cursor-bin` from AUR) as an alternative AI-powered editor.
+
+Both editors support AI-assisted coding features. For local model integration, start Ollama separately and configure the editor to connect to `http://localhost:11434`.

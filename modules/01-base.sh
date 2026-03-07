@@ -35,13 +35,24 @@ if echo "$GPU_VENDOR" | grep -qi 'nvidia'; then
         warn "  After reboot, you may see a blue MOK Manager screen."
         warn "  Select 'Enroll MOK' → confirm → enter your root password → reboot."
         warn "  Or disable Secure Boot in BIOS for the simplest fix."
-        log "  Attempting to generate MOK key..."
+        log "  Generating MOK signing key for NVIDIA DKMS..."
         if [ ! -f /root/mok.der ]; then
-            sudo openssl req -new -x509 -newkey rsa:2048 -keyout /root/mok.priv \
-                -outform DER -out /root/mok.der -nodes -days 36500 \
-                -subj "/CN=NVIDIA DKMS Signing Key/" 2>/dev/null || true
-            sudo mokutil --import /root/mok.der 2>/dev/null || true
-            warn "  MOK key generated. Enroll it on next reboot (blue screen prompt)."
+            # Ask for user confirmation before generating cryptographic keys
+            local mok_confirm="y"
+            if [ -t 0 ]; then
+                echo -n "  Generate MOK signing key for Secure Boot NVIDIA? [Y/n]: "
+                read -r mok_confirm
+                mok_confirm="${mok_confirm:-y}"
+            fi
+            if [[ "$mok_confirm" =~ ^[Yy] ]]; then
+                sudo openssl req -new -x509 -newkey rsa:2048 -keyout /root/mok.priv \
+                    -outform DER -out /root/mok.der -nodes -days 36500 \
+                    -subj "/CN=NVIDIA DKMS Signing Key/" 2>/dev/null || true
+                sudo mokutil --import /root/mok.der 2>/dev/null || true
+                warn "  MOK key generated. Enroll it on next reboot (blue screen prompt)."
+            else
+                warn "  MOK key generation skipped. NVIDIA may not work with Secure Boot."
+            fi
         fi
     fi
 elif echo "$GPU_VENDOR" | grep -qi 'intel'; then

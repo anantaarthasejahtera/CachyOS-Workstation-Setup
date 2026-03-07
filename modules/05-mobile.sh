@@ -36,9 +36,21 @@ if [ ! -d "$ANDROID_HOME/cmdline-tools/latest" ]; then
     cd ~
 fi
 
-# Add to PATH
+# Add to PATH for current session
 export ANDROID_HOME="$HOME/Android/Sdk"
 export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
+
+# Persist PATH to .zshrc if it exists (Module 06 will rewrite it later, but this covers
+# the case where user runs Module 05 standalone without Module 06)
+if [ -f "$HOME/.zshrc" ] && ! grep -q 'ANDROID_HOME' "$HOME/.zshrc" 2>/dev/null; then
+    cat >> "$HOME/.zshrc" << 'ANDROIDPATH'
+
+# Android SDK (added by Module 05)
+export ANDROID_HOME="$HOME/Android/Sdk"
+export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
+ANDROIDPATH
+    log "Android PATH persisted to .zshrc"
+fi
 
 # Accept licenses & install SDK components
 yes | sdkmanager --licenses 2>/dev/null || true

@@ -16,7 +16,12 @@ Did you edit your `waybar/style.css` and now the bar won't load? Did you add an 
 **If you are trapped in a TTY (Black screen, no UI):**
 1. Switch to TTY2 via `Ctrl + Alt + F2`.
 2. Login with your username.
-3. Run `config-rollback --cli` to trigger the restoration logic directly from the command line.
+3. List available backups: `ls ~/.config-backup/`
+4. Pick the latest timestamp and restore manually:
+   ```bash
+   cp ~/.config-backup/YYYYMMDD-HHMMSS/__home__USER__.config__hypr__hyprland.conf ~/.config/hypr/hyprland.conf
+   ```
+5. Return to Hyprland: `Ctrl + Alt + F1` or `Hyprland` from TTY.
 
 ## 🛠️ Package Update Failures (Pacman Hooks)
 

@@ -5,37 +5,42 @@ set -euo pipefail
 header "Editors — Antigravity, Neovim, VS Code Config"
 
 # ─── Antigravity (AI Coding Agent) ───────────────────────
-log "Installing Antigravity from source tarball..."
-AG_TMP="/tmp/antigravity-install"
-mkdir -p "$AG_TMP"
+# Antigravity is distributed via Debian/RPM repos at antigravity.google
+# On Arch, we try AUR first, then extract from .deb, then offer cursor-bin as alternative
+log "Installing Antigravity..."
 
-AG_TARBALL_URL="https://us-central1-apt.pkg.dev/projects/antigravity-auto-updater-dev/antigravity-debian/pool/antigravity_latest.tar.gz"
-if curl -fsSL -o "$AG_TMP/antigravity.tar.gz" "$AG_TARBALL_URL" 2>/dev/null; then
-    cd "$AG_TMP"
-    tar xzf antigravity.tar.gz 2>/dev/null || true
-    if [ -f "$AG_TMP/usr/bin/antigravity" ]; then
-        sudo cp "$AG_TMP/usr/bin/antigravity" /usr/local/bin/
-        sudo chmod +x /usr/local/bin/antigravity
-        ok "Antigravity installed from tarball"
-    elif [ -f "$AG_TMP/antigravity" ]; then
-        sudo cp "$AG_TMP/antigravity" /usr/local/bin/
-        sudo chmod +x /usr/local/bin/antigravity
-        ok "Antigravity installed from tarball"
-    else
-        warn "Antigravity tarball structure unknown. Trying npm..."
-        npm install -g @anthropic-ai/claude-code 2>/dev/null || \
-        npm install -g @anthropic/antigravity 2>/dev/null || \
-        warn "Antigravity needs manual install. Check: https://docs.anthropic.com/claude-code"
-    fi
+if command -v antigravity &>/dev/null; then
+    ok "Antigravity already installed"
+elif install_aur antigravity-bin 2>/dev/null; then
+    ok "Antigravity installed from AUR"
 else
-    warn "Could not download Antigravity tarball. Trying alternative..."
-    install_aur antigravity-bin 2>/dev/null || \
-    warn "Antigravity needs manual install after reboot. Check official site."
+    # Try extracting from official Debian package
+    AG_TMP="/tmp/antigravity-install"
+    mkdir -p "$AG_TMP"
+    AG_DEB_URL="https://us-central1-apt.pkg.dev/projects/antigravity-auto-updater-dev/antigravity-debian/pool/antigravity_latest_amd64.deb"
+    if curl -fsSL -o "$AG_TMP/antigravity.deb" "$AG_DEB_URL" 2>/dev/null; then
+        cd "$AG_TMP"
+        ar x antigravity.deb 2>/dev/null || true
+        tar xf data.tar.* 2>/dev/null || true
+        if [ -f "$AG_TMP/usr/bin/antigravity" ]; then
+            sudo cp "$AG_TMP/usr/bin/antigravity" /usr/local/bin/
+            sudo chmod +x /usr/local/bin/antigravity
+            ok "Antigravity installed from official .deb extract"
+        else
+            warn "Antigravity .deb structure unknown. Trying cursor-bin as alternative..."
+            install_aur cursor-bin 2>/dev/null || \
+            warn "Antigravity/Cursor install failed. Visit: https://antigravity.google for manual install"
+        fi
+        rm -rf "$AG_TMP"
+        cd ~
+    else
+        warn "Could not download Antigravity. Trying cursor-bin as alternative..."
+        install_aur cursor-bin 2>/dev/null || \
+        warn "No AI editor installed. Visit https://antigravity.google or https://cursor.sh"
+    fi
 fi
-rm -rf "$AG_TMP"
-cd ~
 
-ok "Antigravity module done"
+ok "AI editor module done"
 
 # ─── VS Code / Antigravity Catppuccin Settings ───────────
 log "Configuring editor aesthetic (Catppuccin Mocha)..."
