@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+# Git pre-commit hook
+# Validates all modified or added .sh files using ShellCheck before allowing the commit.
+
+set -e
+
+# Find all changed files that end with .sh
+changed_scripts=$(git diff --cached --name-only --diff-filter=ACM | grep '\.sh$' || true)
+
+if [ -z "$changed_scripts" ]; then
+    exit 0
+fi
+
+if ! command -v shellcheck &> /dev/null; then
+    echo "⚠️  [Warning] shellcheck is not installed. Skipping bash linting."
+    echo "To install: sudo pacman -S shellcheck"
+    exit 0
+fi
+
+echo "🔍 Running ShellCheck on modified scripts..."
+errors=0
+
+for script in $changed_scripts; do
+    echo "   Linting: $script"
+    if ! shellcheck -x "$script"; then
+        echo "❌ ShellCheck failed for: $script"
+        errors=1
+    fi
+done
+
+if [ $errors -ne 0 ]; then
+    echo "🛑 COMMIT ABORTED. Please fix the ShellCheck errors above."
+    echo "If you must bypass this (not recommended), use: git commit --no-verify"
+    exit 1
+fi
+
+echo "✅ ShellCheck passed. Proceeding with commit..."
+exit 0
