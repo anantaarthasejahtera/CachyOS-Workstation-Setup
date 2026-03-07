@@ -272,7 +272,7 @@ execute_action() {
         *"Zen Browser"*)     zen-browser & ;;
         *"Firefox"*)         firefox & ;;
         *"File Manager"*)    thunar & ;;
-        *"Obsidian"*)        obsidian &>/dev/null & || flatpak run md.obsidian.Obsidian & ;;
+        *"Obsidian"*)        (obsidian || flatpak run md.obsidian.Obsidian) &>/dev/null & ;;
         *"Password"*)        keepassxc & ;;
         
         # Gaming

@@ -76,12 +76,12 @@ jobs:
         run: |
           errors=0
           while IFS= read -r f; do
-            first_line=$(head -n 1 "$f")
+            first_line=$(head -n 1 "$f" | tr -d '\r')
             if [[ "$first_line" != "#!/"* ]]; then
               echo "❌ Missing shebang: $f (got: $first_line)"
               errors=$((errors + 1))
             fi
-          done < <(find . -name '*.sh' -not -path './.git/*' -maxdepth 1; find ./modules -name '*.sh'; find ./ecosystem -name '*.sh')
+          done < <(find . -name '*.sh' -not -path './.git/*')
           [ "$errors" -eq 0 ] && echo "✅ All scripts have shebangs" || exit 1
 
       - name: All modules source 00-common.sh
