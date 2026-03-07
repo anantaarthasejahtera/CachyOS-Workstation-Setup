@@ -130,6 +130,7 @@ When you run `./setup.sh`, a Catppuccin-themed TUI appears:
 
 ```
 CachyOS-Workstation-Setup/
+├── install.sh                # One-liner bootstrap (curl | bash)
 ├── setup.sh                  # Main entry point (edit config here)
 ├── installer.sh              # TUI installer (dialog-based)
 ├── nexus.sh                  # Nexus v2 Command Center (Super+X)
@@ -284,7 +285,7 @@ guide --lang en    # 🇬🇧 English
 
 | Feature | Description |
 |---------|-------------|
-| **160+ entries** | 16 categories (hyprland, shell, git, docker, node, python, rust, go, flutter, editor, ai, gaming, vm, apps, system, ecosystem) |
+| **160+ entries** | 18 categories (hyprland, shell, git, docker, node, python, rust, go, flutter, editor, ai, gaming, vm, apps, system, ecosystem, terminal, record) |
 | **Executable** | Press Enter on any ▶ entry to run the command directly |
 | **Preview pane** | fzf right panel shows detailed explanation + examples |
 | **Bilingual** | Full English and Indonesian translations (auto-detected from locale) |
