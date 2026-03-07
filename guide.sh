@@ -555,8 +555,8 @@ build_guide_data() {
         "prismlauncher" "prismlauncher"
     add "gaming" "pcsx2" \
         "PS2 Emulator" "Emulator PS2" \
-        "Play PS2 games. Config pre-optimized for Intel|Supports: ISO and compressed formats|BIOS required (place in ~/.config/PCSX2/bios/)" \
-        "Main game PS2. Config sudah dioptimasi untuk Intel|Mendukung: format ISO dan terkompresi|BIOS diperlukan (taruh di ~/.config/PCSX2/bios/)" \
+        "Play PS2 games. GPU-aware config: discrete GPUs get 3x upscale, integrated stays native|Supports: ISO and compressed formats|BIOS required (place in ~/.config/PCSX2/bios/)" \
+        "Main game PS2. Config sadar GPU: GPU diskrit 3x upscale, terintegrasi tetap native|Mendukung: format ISO dan terkompresi|BIOS diperlukan (taruh di ~/.config/PCSX2/bios/)" \
         "pcsx2" "pcsx2"
 
     # ══════════════════════════════════════════════════════
@@ -653,7 +653,7 @@ build_guide_data() {
         "grim ~/Pictures/Screenshots/\$(date +%Y%m%d-%H%M%S).png" "grim"
 
     # ══════════════════════════════════════════════════════
-    # ECOSYSTEM — Living Ecosystem Utilities (Phase 4)
+    # ECOSYSTEM — Living Ecosystem (6 Integrated Tools)
     # ══════════════════════════════════════════════════════
     add "ecosystem" "theme-switch" \
         "Dynamic Theme Switcher" "Pengubah Tema Dinamis" \
@@ -680,6 +680,11 @@ build_guide_data() {
         "Curated app browser: Browsers, Dev Tools, Gaming, Media, Utilities|Multi-tier Rofi menu: Category → App → Confirm → Install|Supports: pacman, paru (AUR), and flatpak backends" \
         "Peramban aplikasi terkurasi: Browser, Dev Tools, Gaming, Media, Utilitas|Menu Rofi multi-tingkat: Kategori → Aplikasi → Konfirmasi → Install|Mendukung: pacman, paru (AUR), dan backend flatpak" \
         "app-store" ""
+    add "ecosystem" "health-check" \
+        "System Health Check (Doctor)" "Pemeriksaan Kesehatan Sistem (Dokter)" \
+        "Validates: GPU drivers, Hyprland/Waybar config, critical packages, kernel modules, services, backups, disk space|Auto-runs via pacman hook after kernel/Hyprland/Waybar/NVIDIA updates|Run from Nexus (Super+X → Health Check) or terminal" \
+        "Validasi: driver GPU, config Hyprland/Waybar, paket kritis, modul kernel, layanan, backup, ruang disk|Otomatis jalan via hook pacman setelah update kernel/Hyprland/Waybar/NVIDIA|Jalankan dari Nexus (Super+X → Health Check) atau terminal" \
+        "health-check" ""
 
     echo -e "$data"
 }
