@@ -425,16 +425,14 @@ cat ~/cachy-setup.log | grep "Installing"
 
 ---
 
-## ⚠️ Known Limitations & Maintenance
+## 🛡️ Hardware Compatibility & Resilience
 
-> This script handles most hardware and software variations automatically, but some edge cases may require manual attention.
+### 🖥️ Hardware Auto-Detection
 
-### 🖥️ Hardware Edge Cases
+The setup script adapts to your hardware automatically via `lspci`, `/proc/meminfo`, and `mokutil`:
 
-The setup script auto-detects hardware via `lspci` and `/proc/cpuinfo`, but some edge cases exist:
-
-| Scenario | How We Handle It | Risk |
-|----------|------------------|------|
+| Scenario | How We Handle It | Status |
+|----------|------------------|--------|
 | **Different GPU** (Intel → AMD → NVIDIA) | `01-base.sh` auto-detects and installs correct drivers | ✅ Handled |
 | **CPU core count varies** (2→4→16 cores) | CPU pinning in `12-vm.sh` checks `nproc` first | ✅ Handled |
 | **Low RAM** (4-8 GB) | Hugepages scale dynamically: 2GB/1GB/skip based on available RAM | ✅ Handled |
