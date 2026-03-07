@@ -46,13 +46,26 @@ fi
 
 # --- Hugepages for VM (15-20% memory speed boost) ---
 log "Configuring hugepages for VM performance..."
-# Reserve 2GB of hugepages (1024 x 2MB pages) for VM use
-echo 'vm.nr_hugepages = 1024' | sudo tee /etc/sysctl.d/99-hugepages.conf > /dev/null
-sudo sysctl -p /etc/sysctl.d/99-hugepages.conf 2>/dev/null || true
-# Add user to hugetlbfs group
-sudo mkdir -p /dev/hugepages
-sudo chown root:kvm /dev/hugepages 2>/dev/null || true
-ok "Hugepages configured (2GB reserved for VMs)"
+TOTAL_RAM_MB=$(awk '/MemTotal/ {printf "%d", $2/1024}' /proc/meminfo)
+if [ "$TOTAL_RAM_MB" -ge 12288 ]; then
+    # 12GB+ RAM: reserve 2GB hugepages (1024 x 2MB pages)
+    echo 'vm.nr_hugepages = 1024' | sudo tee /etc/sysctl.d/99-hugepages.conf > /dev/null
+    sudo sysctl -p /etc/sysctl.d/99-hugepages.conf 2>/dev/null || true
+    sudo mkdir -p /dev/hugepages
+    sudo chown root:kvm /dev/hugepages 2>/dev/null || true
+    ok "Hugepages configured (2GB reserved for VMs)"
+elif [ "$TOTAL_RAM_MB" -ge 8192 ]; then
+    # 8-12GB RAM: reserve 1GB hugepages (512 x 2MB pages)
+    echo 'vm.nr_hugepages = 512' | sudo tee /etc/sysctl.d/99-hugepages.conf > /dev/null
+    sudo sysctl -p /etc/sysctl.d/99-hugepages.conf 2>/dev/null || true
+    sudo mkdir -p /dev/hugepages
+    sudo chown root:kvm /dev/hugepages 2>/dev/null || true
+    ok "Hugepages configured (1GB reserved — limited RAM detected)"
+else
+    # <8GB RAM: skip hugepages entirely
+    warn "Hugepages skipped (${TOTAL_RAM_MB}MB RAM detected — need 8GB+ for VM hugepages)"
+    warn "  VMs will still work, just without the 15-20% memory speed boost"
+fi
 
 # --- Enable default NAT network ---
 sudo virsh net-autostart default 2>/dev/null || true
