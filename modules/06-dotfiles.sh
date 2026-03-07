@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Module 06: Shell, Terminal & Dotfiles
 source "$(dirname "$0")/00-common.sh"
+set -euo pipefail
 # Shell, Terminal & Dotfiles Configuration
 # =====================================================================
 header "Shell & Terminal Aesthetic"
@@ -397,6 +398,8 @@ ok ".zshrc written"
 # --- Set zsh as default shell ---
 log "Setting zsh as default shell..."
 if [ "$SHELL" != "$(which zsh)" ]; then
+    # Ensure zsh is in /etc/shells before changing
+    grep -q "$(which zsh)" /etc/shells 2>/dev/null || echo "$(which zsh)" | sudo tee -a /etc/shells
     chsh -s "$(which zsh)"
 fi
 

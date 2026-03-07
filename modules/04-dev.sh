@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Module 04: Development Environment (Docker, Node, Python, Rust, Go)
 source "$(dirname "$0")/00-common.sh"
+set -euo pipefail
 header "Docker & Container Environment"
 
 install_pkg docker docker-compose docker-buildx
@@ -41,7 +42,8 @@ git config --global rerere.enabled true
 # --- Node.js via fnm ---
 log "Installing fnm (Fast Node Manager)..."
 install_aur fnm
-eval "$(fnm env --use-on-cd)"
+hash -r  # Refresh PATH cache so fnm is found immediately
+command -v fnm &>/dev/null && eval "$(fnm env --use-on-cd)" || warn "fnm not found in PATH after install"
 fnm install --lts
 fnm default lts-latest
 ok "Node.js $(node --version) installed"

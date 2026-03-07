@@ -15,7 +15,7 @@ This module forms the bedrock of your CachyOS installation.
 Unleashes the full power of the Linux kernel tailored for raw, low-latency performance.
 * Injects finely-tuned `sysctl` rules tailored for Zen/CachyOS kernels.
 * Enables NVMe queue polling for Gen4/Gen5 SSDs.
-* Disables Transparent Huge Pages (THP) for database and JVM performance.
+* Sets Transparent Huge Pages (THP) to `madvise` for optimal database and JVM performance.
 * Enables hardware video acceleration (GuC/HuC) on Intel systems.
 
 ## 03: Security & Maintenance
@@ -87,8 +87,8 @@ The glassy top panel for Hyprland.
 * Custom scripts for live Bluetooth, Audio, and internet toggles.
 
 ## 14: Nexus & Guide
-* Deploys the monolithic `~/.local/bin/nexus` dashboard.
+* Deploys the monolithic `/usr/local/bin/nexus` dashboard.
 * Creates `guide`, the bilingual (EN/ID) interactive searchable database of all core terminal commands utilized in the setup.
 
 ## 15: Living Ecosystem
-* Installs the 5 utilities: `theme-switch`, `config-rollback`, `dotfiles-sync`, `ai-tuner`, `app-store`, and `health-check`.
+* Installs the 7 utilities: `theme-switch`, `config-rollback`, `dotfiles-sync`, `ai-tuner`, `app-store`, `health-check`, and `post-install`.

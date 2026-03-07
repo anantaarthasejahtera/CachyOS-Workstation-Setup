@@ -3,6 +3,7 @@
 #  Module 01: System Foundation & Hardware
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 source "$(dirname "$0")/00-common.sh"
+set -euo pipefail
 
 header "System Foundation & Hardware Optimization"
 

@@ -44,6 +44,10 @@ elif grep -qi 'amd' /proc/cpuinfo; then
     ok "AMD nested virtualization enabled"
 fi
 
+# --- Default VM storage pool path (defined here, used by hugepages and later) ---
+VM_POOL="$HOME/VMs"
+mkdir -p "$VM_POOL"
+
 # --- Hugepages for VM (15-20% memory speed boost) ---
 log "Configuring hugepages for VM performance..."
 TOTAL_RAM_MB=$(awk '/MemTotal/ {printf "%d", $2/1024}' /proc/meminfo)
@@ -66,8 +70,6 @@ sudo virsh net-start default 2>/dev/null || true
 
 # --- Default storage pool ---
 log "Creating default VM storage pool..."
-VM_POOL="$HOME/VMs"
-mkdir -p "$VM_POOL"
 sudo virsh pool-define-as default dir --target "$VM_POOL" 2>/dev/null || true
 sudo virsh pool-autostart default 2>/dev/null || true
 sudo virsh pool-start default 2>/dev/null || true
