@@ -4,72 +4,72 @@ source "$(dirname "$0")/00-common.sh"
 header "Phase 4: Living Ecosystem Utilities"
 
 REPO_DIR="$(dirname "$0")/.."
-mkdir -p "$HOME/.local/bin"
+INSTALL_DIR="/usr/local/bin"
 
 # 1. Theme Engine
 log "Installing Theme Switcher..."
 if [ -f "$REPO_DIR/ecosystem/theme-switch.sh" ]; then
-    cp "$REPO_DIR/ecosystem/theme-switch.sh" "$HOME/.local/bin/theme-switch"
+    sudo cp "$REPO_DIR/ecosystem/theme-switch.sh" "$INSTALL_DIR/theme-switch"
 else
-    curl -fsSL -o "$HOME/.local/bin/theme-switch" \
+    sudo curl -fsSL -o "$INSTALL_DIR/theme-switch" \
         "https://raw.githubusercontent.com/anantaarthasejahtera/CachyOS-Workstation-Setup/main/ecosystem/theme-switch.sh" 2>/dev/null || true
 fi
-chmod +x "$HOME/.local/bin/theme-switch"
+sudo chmod +x "$INSTALL_DIR/theme-switch"
 ok "Theme Switcher installed"
 
 # 2. Config Rollback
 log "Installing Config Rollback Time Machine..."
 if [ -f "$REPO_DIR/ecosystem/config-rollback.sh" ]; then
-    cp "$REPO_DIR/ecosystem/config-rollback.sh" "$HOME/.local/bin/config-rollback"
+    sudo cp "$REPO_DIR/ecosystem/config-rollback.sh" "$INSTALL_DIR/config-rollback"
 else
-    curl -fsSL -o "$HOME/.local/bin/config-rollback" \
+    sudo curl -fsSL -o "$INSTALL_DIR/config-rollback" \
         "https://raw.githubusercontent.com/anantaarthasejahtera/CachyOS-Workstation-Setup/main/ecosystem/config-rollback.sh" 2>/dev/null || true
 fi
-chmod +x "$HOME/.local/bin/config-rollback"
+sudo chmod +x "$INSTALL_DIR/config-rollback"
 ok "Config Rollback installed"
 
 # 3. Dotfiles Cloud Sync
 log "Installing Dotfiles Cloud Sync..."
 if [ -f "$REPO_DIR/ecosystem/dotfiles-sync.sh" ]; then
-    cp "$REPO_DIR/ecosystem/dotfiles-sync.sh" "$HOME/.local/bin/dotfiles-sync"
+    sudo cp "$REPO_DIR/ecosystem/dotfiles-sync.sh" "$INSTALL_DIR/dotfiles-sync"
 else
-    curl -fsSL -o "$HOME/.local/bin/dotfiles-sync" \
+    sudo curl -fsSL -o "$INSTALL_DIR/dotfiles-sync" \
         "https://raw.githubusercontent.com/anantaarthasejahtera/CachyOS-Workstation-Setup/main/ecosystem/dotfiles-sync.sh" 2>/dev/null || true
 fi
-chmod +x "$HOME/.local/bin/dotfiles-sync"
+sudo chmod +x "$INSTALL_DIR/dotfiles-sync"
 ok "Cloud Sync installed"
 
 # 4. AI Auto-Tuner
 log "Installing AI Auto-Tuner..."
 if [ -f "$REPO_DIR/ecosystem/ai-tuner.sh" ]; then
-    cp "$REPO_DIR/ecosystem/ai-tuner.sh" "$HOME/.local/bin/ai-tuner"
+    sudo cp "$REPO_DIR/ecosystem/ai-tuner.sh" "$INSTALL_DIR/ai-tuner"
 else
-    curl -fsSL -o "$HOME/.local/bin/ai-tuner" \
+    sudo curl -fsSL -o "$INSTALL_DIR/ai-tuner" \
         "https://raw.githubusercontent.com/anantaarthasejahtera/CachyOS-Workstation-Setup/main/ecosystem/ai-tuner.sh" 2>/dev/null || true
 fi
-chmod +x "$HOME/.local/bin/ai-tuner"
+sudo chmod +x "$INSTALL_DIR/ai-tuner"
 ok "AI Auto-Tuner installed"
 
 # 5. Aesthetic GUI App Store
 log "Installing Aesthetic GUI App Store..."
 if [ -f "$REPO_DIR/ecosystem/app-store.sh" ]; then
-    cp "$REPO_DIR/ecosystem/app-store.sh" "$HOME/.local/bin/app-store"
+    sudo cp "$REPO_DIR/ecosystem/app-store.sh" "$INSTALL_DIR/app-store"
 else
-    curl -fsSL -o "$HOME/.local/bin/app-store" \
+    sudo curl -fsSL -o "$INSTALL_DIR/app-store" \
         "https://raw.githubusercontent.com/anantaarthasejahtera/CachyOS-Workstation-Setup/main/ecosystem/app-store.sh" 2>/dev/null || true
 fi
-chmod +x "$HOME/.local/bin/app-store"
+sudo chmod +x "$INSTALL_DIR/app-store"
 ok "GUI App Store installed"
 
 # 6. Health Check (Post-Update Doctor)
 log "Installing System Health Check..."
 if [ -f "$REPO_DIR/ecosystem/health-check.sh" ]; then
-    cp "$REPO_DIR/ecosystem/health-check.sh" "$HOME/.local/bin/health-check"
+    sudo cp "$REPO_DIR/ecosystem/health-check.sh" "$INSTALL_DIR/health-check"
 else
-    curl -fsSL -o "$HOME/.local/bin/health-check" \
+    sudo curl -fsSL -o "$INSTALL_DIR/health-check" \
         "https://raw.githubusercontent.com/anantaarthasejahtera/CachyOS-Workstation-Setup/main/ecosystem/health-check.sh" 2>/dev/null || true
 fi
-chmod +x "$HOME/.local/bin/health-check"
+sudo chmod +x "$INSTALL_DIR/health-check"
 ok "Health Check installed"
 
 # 7. Pacman hook — auto health check after system updates
