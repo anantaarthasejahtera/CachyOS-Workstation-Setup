@@ -61,4 +61,35 @@ fi
 chmod +x "$HOME/.local/bin/app-store"
 ok "GUI App Store installed"
 
+# 6. Health Check (Post-Update Doctor)
+log "Installing System Health Check..."
+if [ -f "$REPO_DIR/ecosystem/health-check.sh" ]; then
+    cp "$REPO_DIR/ecosystem/health-check.sh" "$HOME/.local/bin/health-check"
+else
+    curl -fsSL -o "$HOME/.local/bin/health-check" \
+        "https://raw.githubusercontent.com/anantaarthasejahtera/CachyOS-Workstation-Setup/main/ecosystem/health-check.sh" 2>/dev/null || true
+fi
+chmod +x "$HOME/.local/bin/health-check"
+ok "Health Check installed"
+
+# 7. Pacman hook — auto health check after system updates
+log "Installing pacman post-update hook..."
+sudo mkdir -p /etc/pacman.d/hooks
+sudo tee /etc/pacman.d/hooks/99-health-check.hook > /dev/null << 'HOOKEOF'
+[Trigger]
+Operation = Upgrade
+Type = Package
+Target = linux*
+Target = hyprland*
+Target = waybar*
+Target = nvidia*
+
+[Action]
+Description = Running CachyOS Workstation Health Check...
+When = PostTransaction
+Exec = /bin/bash -c 'if command -v health-check &>/dev/null; then health-check; fi'
+NeedsTargets
+HOOKEOF
+ok "Pacman hook installed (auto health check after kernel/WM/GPU updates)"
+
 log "Ecosystem utilities installed. Accessible via Nexus (Super+X)"

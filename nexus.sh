@@ -121,6 +121,7 @@ build_menu() {
         entries+="  🧠 AI Auto-Tuner (Suggest Optimizations) $ollama_status\n"
     fi
     entries+="─────────────────────────────────────────\n"
+    command -v health-check &>/dev/null && entries+="  🩺 System Health Check\n"
 
     # ── Development (dynamic detection) ──
     command -v antigravity &>/dev/null && entries+="  Antigravity (AI Editor)\n"
@@ -208,6 +209,9 @@ execute_action() {
             ;;
         *"AI Auto-Tuner"*)
             ~/.local/bin/ai-tuner &
+            ;;
+        *"Health Check"*)
+            kitty -e bash -c 'health-check; echo ""; echo "Press Enter to close..."; read' &
             ;;
         *"Dotfiles Cloud Sync"*)
             ~/.local/bin/dotfiles-sync &
