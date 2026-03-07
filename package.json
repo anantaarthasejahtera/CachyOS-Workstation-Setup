@@ -1,0 +1,14 @@
+{
+    "name": "cachyos-workstation-setup-docs",
+    "version": "1.1.0",
+    "description": "Documentation for CachyOS Workstation Setup",
+    "scripts": {
+        "docs:dev": "vitepress dev docs",
+        "docs:build": "vitepress build docs",
+        "docs:preview": "vitepress preview docs"
+    },
+    "devDependencies": {
+        "vitepress": "^1.5.0",
+        "vue": "^3.5.0"
+    }
+}
