@@ -17,7 +17,14 @@ ok "Firewall & backup tools configured"
 # --- SSH key auto-generate ---
 log "Generating SSH key..."
 if [ ! -f "$HOME/.ssh/id_ed25519" ]; then
-    ssh-keygen -t ed25519 -C "$GIT_EMAIL" -f "$HOME/.ssh/id_ed25519" -N "" -q
+    # Let ssh-keygen prompt for passphrase interactively (more secure)
+    # If running non-interactively (piped stdin), use empty passphrase as fallback
+    if [ -t 0 ]; then
+        ssh-keygen -t ed25519 -C "$GIT_EMAIL" -f "$HOME/.ssh/id_ed25519"
+    else
+        warn "Non-interactive mode: generating SSH key without passphrase"
+        ssh-keygen -t ed25519 -C "$GIT_EMAIL" -f "$HOME/.ssh/id_ed25519" -N "" -q
+    fi
     eval "$(ssh-agent -s)" 2>/dev/null
     ssh-add "$HOME/.ssh/id_ed25519" 2>/dev/null
     ok "SSH key generated (add to GitHub: cat ~/.ssh/id_ed25519.pub)"

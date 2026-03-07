@@ -327,14 +327,16 @@ main() {
     # Setup Catppuccin theme for dialog
     setup_dialog_theme
 
-    # Check for --all flag (skip selector, install everything)
+    # Check for --all flag (skip selector, install everything via run_modules)
     if [[ "${1:-}" == "--all" ]]; then
-        log "Installing ALL modules..."
+        log "Installing ALL modules via run_modules()..."
+        # Build selection string matching what dialog outputs
+        local all_modules=""
         for mod in "${MODULE_ORDER[@]}"; do
-            local script="${MODULE_SCRIPTS[$mod]}"
-            log "━━━ Running: $script ━━━"
-            bash "$MODULES_DIR/$script"
+            all_modules+="\"$mod\" "
         done
+        run_modules "$all_modules"
+        show_summary
         return
     fi
 

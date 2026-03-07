@@ -12,7 +12,7 @@ curl -fsSL https://raw.githubusercontent.com/anantaarthasejahtera/CachyOS-Workst
 
 This will:
 1. Install base dependencies (like `git` and `dialog`).
-2. Clone the repository into `~/Desktop/CachyOS-Workstation-Setup`.
+2. Clone the repository into `~/.cache/cachy-workstation-setup`.
 3. Prompt you for your Git identity (Name & Email).
 4. Launch the **Bilingual TUI Installer**.
 
@@ -38,7 +38,7 @@ chmod +x setup.sh
 We provide a **Graceful Uninstaller** that removes Nexus, Guide, Ecosystem utilities, and Hooks without deleting your personal files or uninstalling core system packages:
 
 ```bash
-cd ~/Desktop/CachyOS-Workstation-Setup
+cd ~/.cache/cachy-workstation-setup
 make uninstall
 # OR
 ./uninstall.sh

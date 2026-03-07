@@ -5,6 +5,9 @@
 #  Usage: health-check  (or via Nexus → System Health Check)
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+# NOTE: We intentionally use `set -uo pipefail` WITHOUT `-e` here.
+# Individual health checks are expected to fail (e.g., missing packages, disabled services)
+# and we want to continue running all remaining checks rather than aborting on the first failure.
 set -uo pipefail
 
 # ── Colors ──

@@ -6,6 +6,9 @@
 
 set -euo pipefail
 
+# NOTE: This script uses `declare -n` (nameref), which requires bash 4.3+.
+# CachyOS ships with bash 5.x so this is safe, but will fail on older systems.
+
 # ─── Categories & Apps ───
 # Format: "App Name|package_name|manager"
 
