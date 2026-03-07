@@ -20,7 +20,7 @@ uninstall: ## Remove ecosystem tools, UI themes, and hooks gracefully
 
 lint: ## Run ShellCheck to validate all bash scripts
 	@echo "Running ShellCheck on all bash scripts..."
-	@find . -type f -name "*.sh" -not -path "*/\.*" -exec shellcheck -x {} +
+	@find . -type f -name "*.sh" -not -path "*/\.*" -not -path "*/node_modules/*" -exec shellcheck -x {} +
 	@echo "✅ All scripts passed ShellCheck!"
 
 init: ## Initialize development environment (setup git hooks)

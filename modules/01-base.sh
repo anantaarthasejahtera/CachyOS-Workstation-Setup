@@ -22,7 +22,9 @@ if echo "$GPU_VENDOR" | grep -qi 'nvidia'; then
     install_pkg nvidia-dkms nvidia-utils lib32-nvidia-utils \
         nvidia-settings vulkan-icd-loader lib32-vulkan-icd-loader \
         mesa lib32-mesa libva-nvidia-driver
-    sudo sed -i 's/^MODULES=(/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm /' /etc/mkinitcpio.conf 2>/dev/null || true
+    if ! grep -q 'nvidia' /etc/mkinitcpio.conf 2>/dev/null; then
+        sudo sed -i 's/^MODULES=(/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm /' /etc/mkinitcpio.conf 2>/dev/null || true
+    fi
     sudo mkinitcpio -P 2>/dev/null || true
     ok "NVIDIA drivers installed (DRM KMS enabled)"
 

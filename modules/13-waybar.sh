@@ -65,7 +65,7 @@ WBCONF
 # Waybar Catppuccin style
 cat > "$HOME/.config/waybar/style.css" << 'WBSTYLE'
 /* — Waybar — Catppuccin Mocha Glass — */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap");
+/* Uses locally installed Inter & JetBrainsMono Nerd Font (no internet needed) */
 
 * {
     font-family: "Inter", "JetBrainsMono Nerd Font", sans-serif;

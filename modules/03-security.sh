@@ -39,9 +39,13 @@ ok "DNS set to Cloudflare 1.1.1.1 (encrypted)"
 # --- Zram tuning ---
 log "Optimizing Zram..."
 if [ -f /sys/block/zram0/comp_algorithm ]; then
-    # CachyOS already has zram, just optimize compression
-    echo 'zstd' | sudo tee /sys/block/zram0/comp_algorithm > /dev/null 2>&1 || true
-    ok "Zram compression set to zstd (best ratio)"
+    # CachyOS already has zram, just optimize compression if not in use
+    if ! swapon --show | grep -q zram0 2>/dev/null; then
+        echo 'zstd' | sudo tee /sys/block/zram0/comp_algorithm > /dev/null 2>&1 || true
+        ok "Zram compression set to zstd (best ratio)"
+    else
+        ok "Zram already active (compression change requires reboot)"
+    fi
 else
     install_pkg zram-generator
     sudo mkdir -p /etc/systemd

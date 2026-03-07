@@ -75,7 +75,7 @@ ok "Health Check installed"
 # 7. Pacman hook — auto health check after system updates
 log "Installing pacman post-update hook..."
 sudo mkdir -p /etc/pacman.d/hooks
-sudo tee /etc/pacman.d/hooks/99-health-check.hook > /dev/null << 'HOOKEOF'
+sudo tee /etc/pacman.d/hooks/99-cachy-health.hook > /dev/null << 'HOOKEOF'
 [Trigger]
 Operation = Upgrade
 Type = Package
