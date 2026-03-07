@@ -186,7 +186,7 @@ build_menu() {
     entries+="─────────────────────────────────────────\n"
     
     # ── Search ──
-    entries+="  Guide Popup (130+ entries)\n"
+    entries+="  Guide Popup (150+ entries)\n"
     entries+="  Guide in Terminal (fzf + preview)\n"
     entries+="  cheat.sh Web Lookup\n"
 
