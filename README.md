@@ -48,6 +48,32 @@ Features:
 
 ---
 
+<details>
+<summary><b>📑 Table of Contents</b></summary>
+
+- [✨ Overview](#-overview)
+  - [🎯 Who Is This For?](#-who-is-this-for)
+- [💻 System Requirements](#-system-requirements)
+- [📦 Quick Start](#-quick-start)
+- [🏗️ Project Structure](#-project-structure)
+  - [Architecture](#architecture)
+  - [Module Details](#module-details)
+- [🌍 The Living Ecosystem (v4)](#-the-living-ecosystem-v4)
+- [🎮 Nexus v2 — Command Center](#-nexus-v2--command-center)
+- [📖 Guide v3 — Bilingual Reference](#-guide-v3--bilingual-reference)
+- [⌨️ Key Shortcuts](#️-key-shortcuts)
+- [🤖 AI Tools Included](#-ai-tools-included)
+- [🔧 Configuration](#-configuration)
+- [🔄 How to Revert / Uninstall](#-how-to-revert--uninstall)
+- [🛡️ Hardware Compatibility & Resilience](#️-hardware-compatibility--resilience)
+- [🤝 Contributing \& Support](#-contributing--support)
+- [🙌 Acknowledgements](#-acknowledgements)
+- [📄 License](#-license)
+
+</details>
+
+---
+
 ## 💻 System Requirements
 
 | Tier | CPU | RAM | Storage | Use Case |
@@ -534,13 +560,24 @@ git push origin feature/your-idea
 
 Each module is **independent** — you can edit one without touching others.
 
-### Community
+### Community & Support
 
 | Document | Description |
 |----------|-------------|
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute, coding conventions, testing |
+| [SUPPORT.md](SUPPORT.md) | Where to get help, report bugs, ask questions |
 | [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Community behavior standards |
 | [SECURITY.md](SECURITY.md) | Vulnerability reporting & security policy |
+
+---
+
+## 🙌 Acknowledgements
+
+This ecosystem stands on the shoulders of giants. We would like to express our profound gratitude to:
+- The [CachyOS Team](https://cachyos.org) for creating an incredibly performant Arch-based foundation.
+- [Vaxry](https://github.com/vaxerski) and the [Hyprland Community](https://hyprland.org) for redefining Linux window management.
+- The [Catppuccin](https://github.com/catppuccin/catppuccin) team for providing the aesthetic color palettes that define this ecosystem's visuals.
+- The [Ollama](https://ollama.com) community for making local AI inference accessible on consumer hardware.
 
 ---
 
