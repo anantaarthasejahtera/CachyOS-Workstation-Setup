@@ -1,0 +1,166 @@
+name: "🔍 CI Pipeline"
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ──────────────────────────────────────────────────────
+  # 1. ShellCheck — Static analysis for all .sh files
+  # ──────────────────────────────────────────────────────
+  shellcheck:
+    name: "🛡️ ShellCheck Lint"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ShellCheck
+        run: sudo apt-get install -y shellcheck
+
+      - name: Run ShellCheck on all scripts
+        run: |
+          echo "::group::Finding shell scripts"
+          find . -name '*.sh' -not -path './.git/*' | sort
+          echo "::endgroup::"
+
+          echo "::group::Running ShellCheck"
+          find . -name '*.sh' -not -path './.git/*' \
+            -exec shellcheck -x -s bash \
+              -e SC2034 \
+              -e SC2155 \
+              -e SC1091 \
+              {} +
+          echo "::endgroup::"
+          echo "✅ ShellCheck passed on all scripts"
+
+  # ──────────────────────────────────────────────────────
+  # 2. Bash Syntax — Verify all scripts parse correctly
+  # ──────────────────────────────────────────────────────
+  syntax:
+    name: "🔧 Bash Syntax Check"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate bash syntax
+        run: |
+          errors=0
+          while IFS= read -r f; do
+            if ! bash -n "$f" 2>/dev/null; then
+              echo "❌ SYNTAX ERROR: $f"
+              bash -n "$f"
+              errors=$((errors + 1))
+            else
+              echo "✅ $f"
+            fi
+          done < <(find . -name '*.sh' -not -path './.git/*' | sort)
+
+          if [ "$errors" -gt 0 ]; then
+            echo "::error::$errors file(s) have syntax errors"
+            exit 1
+          fi
+          echo "✅ All scripts have valid syntax"
+
+  # ──────────────────────────────────────────────────────
+  # 3. Structure Tests — Cross-reference & consistency
+  # ──────────────────────────────────────────────────────
+  structure:
+    name: "🧪 Structure & Consistency Tests"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: All .sh files have shebangs
+        run: |
+          errors=0
+          while IFS= read -r f; do
+            first_line=$(head -n 1 "$f")
+            if [[ "$first_line" != "#!/"* ]]; then
+              echo "❌ Missing shebang: $f (got: $first_line)"
+              errors=$((errors + 1))
+            fi
+          done < <(find . -name '*.sh' -not -path './.git/*' -maxdepth 1; find ./modules -name '*.sh'; find ./ecosystem -name '*.sh')
+          [ "$errors" -eq 0 ] && echo "✅ All scripts have shebangs" || exit 1
+
+      - name: All modules source 00-common.sh
+        run: |
+          errors=0
+          for f in modules/[0-1][0-9]-*.sh; do
+            [ "$f" = "modules/00-common.sh" ] && continue
+            if ! grep -q 'source.*00-common.sh' "$f"; then
+              echo "❌ $f does not source 00-common.sh"
+              errors=$((errors + 1))
+            fi
+          done
+          [ "$errors" -eq 0 ] && echo "✅ All modules source 00-common.sh" || exit 1
+
+      - name: Line endings are LF (not CRLF)
+        run: |
+          errors=0
+          while IFS= read -r f; do
+            if grep -Plr '\r\n' "$f" > /dev/null 2>&1; then
+              echo "❌ CRLF found: $f"
+              errors=$((errors + 1))
+            fi
+          done < <(find . -name '*.sh' -not -path './.git/*')
+          [ "$errors" -eq 0 ] && echo "✅ All .sh files use LF line endings" || exit 1
+
+      - name: No stale cross-references
+        run: |
+          errors=0
+
+          # Check guide entry count is synced
+          for f in README.md installer.sh nexus.sh; do
+            count=$(grep -oP '\d+\+' "$f" | grep -c '160' || true)
+            if grep -q '150+' "$f"; then
+              echo "❌ Stale '150+' reference in $f"
+              errors=$((errors + 1))
+            fi
+          done
+
+          # Check no broken Unicode replacement chars
+          if grep -rP '\xEF\xBF\xBD' --include='*.md' --include='*.sh' .; then
+            echo "❌ Broken Unicode (U+FFFD) found"
+            errors=$((errors + 1))
+          fi
+
+          [ "$errors" -eq 0 ] && echo "✅ No stale cross-references" || exit 1
+
+      - name: Module count matches
+        run: |
+          module_count=$(find modules/ -name '[0-9]*.sh' -not -name '00-common.sh' | wc -l)
+          readme_count=$(grep -oP 'Modules-\K\d+' README.md || echo "0")
+          if [ "$module_count" -ne "$readme_count" ]; then
+            echo "❌ Module count mismatch: $module_count files vs $readme_count in README"
+            exit 1
+          fi
+          echo "✅ Module count matches: $module_count"
+
+  # ──────────────────────────────────────────────────────
+  # 4. Security Scan — No credentials or secrets
+  # ──────────────────────────────────────────────────────
+  security:
+    name: "🔐 Security Scan"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: No hardcoded secrets or tokens
+        run: |
+          errors=0
+          # Check for common secret patterns
+          patterns=(
+            'AKIA[0-9A-Z]{16}'           # AWS Access Key
+            'ghp_[a-zA-Z0-9]{36}'        # GitHub Personal Token
+            'sk-[a-zA-Z0-9]{48}'         # OpenAI API Key
+            'password\s*=\s*"[^"]{8,}"'  # Hardcoded passwords
+          )
+          for pat in "${patterns[@]}"; do
+            if grep -rPn "$pat" --include='*.sh' --include='*.md' . 2>/dev/null; then
+              echo "❌ Potential secret found matching: $pat"
+              errors=$((errors + 1))
+            fi
+          done
+          [ "$errors" -eq 0 ] && echo "✅ No hardcoded secrets detected" || exit 1
