@@ -19,7 +19,7 @@ FONT_MONO="JetBrainsMono Nerd Font"
 NODE_VERSION="lts"
 
 LOGFILE="$HOME/cachy-setup.log"
-BACKUP_DIR="$HOME/.config-backup/$(date +%Y%m%d-%H%M%S)"
+BACKUP_BASE="$HOME/.config-backup"
 
 # ─── Colors ───────────────────────────────────────────────
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
@@ -67,13 +67,19 @@ install_aur() {
 }
 
 # ─── Idempotent Config Helper ────────────────────────────
-# Backs up existing config before overwriting
+# Backs up existing config before overwriting.
+# Uses per-call timestamp + module name to avoid backup collisions
+# when multiple modules run within the same second.
 safe_config() {
     local target="$1"
     if [ -f "$target" ]; then
-        mkdir -p "$BACKUP_DIR"
+        # Generate unique backup dir: timestamp + calling module name
+        local caller_module
+        caller_module=$(basename "${BASH_SOURCE[1]:-unknown}" .sh)
+        local backup_dir="$BACKUP_BASE/$(date +%Y%m%d-%H%M%S)-${caller_module}"
+        mkdir -p "$backup_dir"
         local backup_name
-        backup_name="$BACKUP_DIR/$(echo "$target" | sed 's|/|__|g')"
+        backup_name="$backup_dir/$(echo "$target" | sed 's|/|__|g')"
         cp "$target" "$backup_name"
         log "  Backed up: $target → $backup_name"
     fi
