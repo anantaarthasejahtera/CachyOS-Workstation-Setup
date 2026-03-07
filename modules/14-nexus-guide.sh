@@ -12,7 +12,7 @@ if [ -f "$REPO_DIR/nexus.sh" ]; then
     cp "$REPO_DIR/nexus.sh" "$HOME/.local/bin/nexus"
 else
     curl -fsSL -o "$HOME/.local/bin/nexus" \
-        "https://raw.githubusercontent.com/rixzkiye/CachyOS-Workstation-Setup/main/nexus.sh" 2>/dev/null || true
+        "https://raw.githubusercontent.com/anantaarthasejahtera/CachyOS-Workstation-Setup/main/nexus.sh" 2>/dev/null || true
 fi
 chmod +x "$HOME/.local/bin/nexus"
 ok "Nexus installed (Super+X to open)"
@@ -24,7 +24,7 @@ if [ -f "$REPO_DIR/guide.sh" ]; then
     cp "$REPO_DIR/guide.sh" "$HOME/.local/bin/guide"
 else
     curl -fsSL -o "$HOME/.local/bin/guide" \
-        "https://raw.githubusercontent.com/rixzkiye/CachyOS-Workstation-Setup/main/guide.sh" 2>/dev/null || true
+        "https://raw.githubusercontent.com/anantaarthasejahtera/CachyOS-Workstation-Setup/main/guide.sh" 2>/dev/null || true
 fi
 chmod +x "$HOME/.local/bin/guide"
 ok "Guide v2 installed"
