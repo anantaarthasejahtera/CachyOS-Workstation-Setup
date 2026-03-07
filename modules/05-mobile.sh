@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Module 05: Flutter & Android Development
 source "$(dirname "$0")/00-common.sh"
+set -euo pipefail
 header "Flutter & Android Development"
 
 # --- JDK 17 (required by Gradle/Android) ---

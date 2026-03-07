@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Module 07: Editors (Antigravity, Neovim, VS Code Catppuccin)
 source "$(dirname "$0")/00-common.sh"
+set -euo pipefail
 header "Editors — Antigravity, Neovim, VS Code Config"
 
 # ─── Antigravity (AI Coding Agent) ───────────────────────

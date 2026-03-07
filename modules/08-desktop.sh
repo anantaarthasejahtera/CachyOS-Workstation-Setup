@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Module 08: Desktop Aesthetic (KDE + Catppuccin)
 source "$(dirname "$0")/00-common.sh"
+set -euo pipefail
 header "Desktop Aesthetic — Catppuccin Mocha Rice"
 
 # --- Catppuccin KDE Theme ---

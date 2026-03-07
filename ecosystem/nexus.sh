@@ -68,11 +68,6 @@ get_cpu_temp() {
     fi
 }
 
-# ─── Service Status Indicators ────────────────────────────
-status_icon() {
-    if "$@" &>/dev/null; then echo "🟢"; else echo "🔴"; fi
-}
-
 # ─── Build Dynamic Menu ──────────────────────────────────
 build_menu() {
     local entries=""

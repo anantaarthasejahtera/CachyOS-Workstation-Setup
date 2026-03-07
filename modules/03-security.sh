@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Module 03: Security & Maintenance
 source "$(dirname "$0")/00-common.sh"
+set -euo pipefail
 header "Security & Maintenance"
 
 install_pkg ufw timeshift
@@ -67,8 +68,9 @@ cat << 'CLEANEOF' | sudo tee /etc/systemd/system/pacman-cleanup.service > /dev/n
 Description=Clean pacman cache and orphan packages
 [Service]
 Type=oneshot
+User=root
 ExecStart=/usr/bin/paccache -rk 2
-ExecStart=/bin/bash -c 'pacman -Qdtq | xargs -r sudo pacman -Rns --noconfirm 2>/dev/null || true'
+ExecStart=/bin/bash -c 'pacman -Qdtq | xargs -r pacman -Rns --noconfirm 2>/dev/null || true'
 CLEANEOF
 cat << 'TIMEREOF' | sudo tee /etc/systemd/system/pacman-cleanup.timer > /dev/null
 [Unit]

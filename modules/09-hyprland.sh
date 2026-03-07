@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Module 09: Hyprland Window Manager
 source "$(dirname "$0")/00-common.sh"
+set -euo pipefail
 header "Hyprland — Tiling Window Manager + Cheatsheet"
 
 log "Installing Hyprland ecosystem..."

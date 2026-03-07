@@ -36,6 +36,12 @@ gh/
 op/
 Nextcloud/
 dconf/
+gnupg/
+**/credentials
+**/token*
+**/secret*
+**/*.key
+**/*.pem
 
 # Temp files
 *.log

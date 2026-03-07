@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Module 02: Kernel & Performance Tuning
 source "$(dirname "$0")/00-common.sh"
+set -euo pipefail
 header "Performance & Deep System Tuning"
 
 # --- Power management ---

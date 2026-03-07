@@ -52,6 +52,8 @@ if [[ "$chosen_file" == *"Restore ALL"* ]]; then
     count=0
     for display_path in "${!FILE_MAP[@]}"; do
         actual_path="${FILE_MAP[$display_path]}"
+        # Expand tilde to $HOME (display_path uses ~ but cp needs full path)
+        actual_path="${actual_path/#\~/$HOME}"
         bname=$(echo "$actual_path" | sed 's|/|__|g')
         mkdir -p "$(dirname "$actual_path")"
         cp "$BACKUP_DIR/$bname" "$actual_path"
@@ -61,6 +63,8 @@ if [[ "$chosen_file" == *"Restore ALL"* ]]; then
 else
     # Restore single file
     actual_path="${FILE_MAP[$chosen_file]}"
+    # Expand tilde to $HOME
+    actual_path="${actual_path/#\~/$HOME}"
     bname=$(echo "$actual_path" | sed 's|/|__|g')
     mkdir -p "$(dirname "$actual_path")"
     cp "$BACKUP_DIR/$bname" "$actual_path"

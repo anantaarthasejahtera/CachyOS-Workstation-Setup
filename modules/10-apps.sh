@@ -95,9 +95,3 @@ flatpak install --user -y flathub org.telegram.desktop 2>/dev/null || true
 flatpak install --user -y flathub com.discordapp.Discord 2>/dev/null || true
 ok "Flatpak apps installed (Spotify, Telegram, Discord)"
 
-# --- Roblox (via Sober) ---
-log "Installing Roblox (via Sober)..."
-flatpak install --user -y flathub org.vinegarhq.Sober 2>/dev/null || \
-    warn "Roblox (Sober) install failed. Try: flatpak install flathub org.vinegarhq.Sober"
-ok "Roblox (Sober) installed"
-
