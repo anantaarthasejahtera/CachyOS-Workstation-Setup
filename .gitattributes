@@ -1,5 +1,9 @@
-# Force LF on shell scripts (bash breaks with CRLF)
-*.sh text eol=lf
+# Force LF line endings for ALL text files (prevents CRLF on Windows)
+* text=auto eol=lf
 
-# Keep markdown as-is (auto)
-*.md text eol=auto
+# Explicitly mark binary files
+*.png binary
+*.jpg binary
+*.ico binary
+*.woff2 binary
+*.docx binary
