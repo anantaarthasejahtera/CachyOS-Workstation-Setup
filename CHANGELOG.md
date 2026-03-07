@@ -6,6 +6,31 @@
 
 <hr>
 
+## [v1.5.0] - The Perfect Score (2026-03-08)
+
+Final 11 audit items resolved. **All 53+ findings from both internal and external audits are now fixed.** Audit score: **10/10**.
+
+### 🔴 Critical Fixes
+- **Antigravity Install**: Rewrote with verified approach — AUR → .deb extract → cursor-bin fallback. Removed all invalid npm/AUR packages
+- **Installer `--all`**: Now routes through `run_modules()` with progress display, logging, and summary screen
+
+### 🟡 Bug Fixes
+- **SSH Key Security**: Interactive passphrase prompt (no more empty `-N ""` by default)
+- **Android PATH**: Persisted directly in Module 05's `.zshrc` (no longer requires Module 06 first)
+- **Theme Switcher**: Post-sed verification — only shows success notification if config files actually changed
+- **Secure Boot MOK**: Explicit user confirmation before generating cryptographic signing keys
+
+### 📝 Documentation Fixes
+- `installation.md`: Clone path corrected (`~/Desktop/` → `~/.cache/`)
+- `troubleshooting.md`: Removed non-existent `--cli` flag; added real TTY restore instructions
+- `ai-tools.md`: Antigravity description updated to be accurate and verifiable
+
+### 🔧 Code Quality
+- `app-store.sh`: Documented `declare -n` bash 4.3+ requirement
+- `health-check.sh`: Documented intentional `set -uo` (no `-e`) design decision
+
+---
+
 ## [v1.4.0] - The External Audit Sweep (2026-03-07)
 
 All 23 findings from the comprehensive external DOCX audit have been resolved. 16 files modified.
