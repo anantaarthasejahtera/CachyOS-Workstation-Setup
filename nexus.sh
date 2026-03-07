@@ -186,7 +186,9 @@ build_menu() {
     entries+="─────────────────────────────────────────\n"
     
     # ── Search ──
-    entries+="  Search Guide (130+ entries)\n"
+    entries+="  Guide Popup (130+ entries)\n"
+    entries+="  Guide in Terminal (fzf + preview)\n"
+    entries+="  cheat.sh Web Lookup\n"
 
     echo -e "$entries"
 }
@@ -272,7 +274,9 @@ execute_action() {
         *"Audio"*)           pavucontrol & ;;
         *"WiFi"*)            kitty --hold -e nmtui ;;
         *"Bluetooth"*)       blueman-manager & ;;
-        *"Search Guide"*)    kitty -e guide ;;
+        *"Guide Popup"*)     guide --popup ;;
+        *"Guide in Terminal"*) kitty -e guide ;;
+        *"cheat.sh"*)        kitty -e bash -c 'echo -n "🔍 Enter topic: "; read q; guide --web "$q"' ;;
     esac
 }
 
