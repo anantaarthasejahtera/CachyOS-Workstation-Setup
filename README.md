@@ -33,7 +33,7 @@ Features:
 - **TUI installer** — Catppuccin-themed module selector with progress bars
 - **Nexus v2** — Smart command center popup with live system stats
 - **Guide v3** — 160+ searchable entries, executable, bilingual (EN/ID)
-- **Living Ecosystem (v4)** — Dynamic theming, config rollback, cloud sync, AI auto-tuning, GUI app store
+- **Living Ecosystem (v4)** — Dynamic theming, config rollback, cloud sync, AI auto-tuning, GUI app store, health check
 - **15 modules** — each independently runnable, fully idempotent
 - **50+ tools** — dev, AI, gaming, VM, productivity
 
@@ -182,7 +182,7 @@ CachyOS-Workstation-Setup/
 | 12 | VM | ~2 GB | QEMU/KVM (hugepages, CPU pinning), Bottles, LibreOffice |
 | 13 | Waybar | ~5 MB | Glassmorphism status bar with gradient CSS |
 | 14 | Nexus + Guide | ~1 MB | Smart command center + 160-entry bilingual guide |
-| 15 | Ecosystem | ~1 MB | Theme Engine, Config Rollback, Dotfiles Sync, AI Tuner, App Store |
+| 15 | Ecosystem | ~1 MB | Theme Engine, Config Rollback, Dotfiles Sync, AI Tuner, App Store, Health Check |
 
 ---
 
@@ -260,7 +260,7 @@ Press **`Super+X`** for a smart popup with **live system stats**:
 | **Smart recording** | Auto-detects if recording → shows Stop instead of Record |
 | **Service status** | 🟢/🔴 indicators for Docker, Ollama, VMs |
 | **Dynamic detection** | Only shows apps that are actually installed |
-| **35+ actions** | Quick actions, AI, dev tools, apps, gaming, system |
+| **45+ actions** | Quick actions, AI, dev tools, apps, gaming, system, health check |
 | **Zero RAM idle** | Only runs when invoked |
 
 ---
