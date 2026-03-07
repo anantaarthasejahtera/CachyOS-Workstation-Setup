@@ -140,7 +140,8 @@ CachyOS-Workstation-Setup/
 │   ├── config-rollback.sh    # Time Machine config restoration GUI
 │   ├── dotfiles-sync.sh      # Cloud Git sync for ~/.config
 │   ├── ai-tuner.sh           # Local AI system telemetry analysis
-│   └── app-store.sh          # Curated GUI App Store (Pacman/AUR/Flatpak)
+│   ├── app-store.sh          # Curated GUI App Store (Pacman/AUR/Flatpak)
+│   └── health-check.sh       # Post-update system integrity validator
 ├── modules/
 │   ├── 00-common.sh          # Shared functions & helpers
 │   ├── 01-base.sh            # GPU auto-detect, paru, makepkg
@@ -187,7 +188,7 @@ CachyOS-Workstation-Setup/
 
 ## 🌍 The Living Ecosystem (v4)
 
-The project has evolved into a "Living Ecosystem" with 5 integrated pillars, completely transforming how you manage your Arch setup. All features are natively integrated into the **Nexus Command Center (`Super+X`)**.
+The project has evolved into a "Living Ecosystem" with 6 integrated pillars, completely transforming how you manage your Arch setup. All features are natively integrated into the **Nexus Command Center (`Super+X`)**.
 
 ### 1. 🎨 Dynamic Theming Engine (`theme-switch`)
 Ditch hardcoded palettes. Seamlessly swap between Catppuccin flavors (Mocha, Macchiato, Frappe, Latte), Dracula, Tokyo Night, and Rosé Pine.
@@ -212,6 +213,12 @@ Local AI system telemetry auditing.
 Visual package management elevated.
 - A curated multi-tiered Rofi menu categorized by Browsers, Development, Gaming, Design, and Utilities.
 - Automates the backend execution of `sudo pacman`, `paru`, or `flatpak install` intelligently for each app without forcing the user to touch the terminal.
+
+### 6. 🩺 System Health Check (`health-check`)
+Post-update system integrity validator.
+- Checks GPU driver status, Hyprland/Waybar config syntax, critical packages, kernel module integrity, services, backups, and disk space.
+- **Pacman hook**: Auto-runs after kernel, Hyprland, Waybar, or NVIDIA updates — you'll see the health report right in your terminal after `pacman -Syu`.
+- Also available via **Nexus** → System Health Check, or terminal: `health-check`.
 
 ---
 
