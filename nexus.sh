@@ -122,6 +122,7 @@ build_menu() {
     fi
     entries+="─────────────────────────────────────────\n"
     command -v health-check &>/dev/null && entries+="  🩺 System Health Check\n"
+    entries+="  📊 System Dashboard\n"
 
     # ── Development (dynamic detection) ──
     command -v antigravity &>/dev/null && entries+="  Antigravity (AI Editor)\n"
@@ -212,6 +213,18 @@ execute_action() {
             ;;
         *"Health Check"*)
             kitty -e bash -c 'health-check; echo ""; echo "Press Enter to close..."; read' &
+            ;;
+        *"System Dashboard"*)
+            kitty --hold -e bash -c '
+                echo -e "\033[1;35m━━━ 📊 System Dashboard ━━━\033[0m"; echo ""
+                fastfetch 2>/dev/null || echo "(fastfetch not installed)"
+                echo ""; echo -e "\033[1;36m━━━ Disk Usage ━━━\033[0m"
+                duf 2>/dev/null || df -h
+                echo ""; echo -e "\033[1;36m━━━ Top 10 Processes (by CPU) ━━━\033[0m"
+                ps aux --sort=-%cpu | head -11
+                echo ""; echo -e "\033[1;36m━━━ Memory ━━━\033[0m"
+                free -h
+            ' &
             ;;
         *"Dotfiles Cloud Sync"*)
             dotfiles-sync &

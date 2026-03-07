@@ -93,3 +93,38 @@ deploy_dotfile() {
         warn "Dotfile not found: $src"
     fi
 }
+
+# ─── Module Versioning ───────────────────────────────────
+# Tracks which modules have been run via checksum of the script
+MODULE_VERSION_DIR="$HOME/.config/cachy-setup/versions"
+mkdir -p "$MODULE_VERSION_DIR"
+
+# Record that a module has been run (call at end of each module)
+mark_module_done() {
+    local module_name
+    module_name="$(basename "${BASH_SOURCE[1]}" .sh)"
+    local script_path="${BASH_SOURCE[1]}"
+    local checksum
+    checksum=$(md5sum "$script_path" 2>/dev/null | cut -d' ' -f1 || echo "unknown")
+    echo "$checksum" > "$MODULE_VERSION_DIR/$module_name"
+}
+
+# Check if module needs to be re-run (returns 0 if needs update, 1 if current)
+module_needs_update() {
+    local module_name
+    module_name="$(basename "${BASH_SOURCE[1]}" .sh)"
+    local script_path="${BASH_SOURCE[1]}"
+    local version_file="$MODULE_VERSION_DIR/$module_name"
+    if [ ! -f "$version_file" ]; then
+        return 0  # Never run
+    fi
+    local stored_checksum
+    stored_checksum=$(cat "$version_file")
+    local current_checksum
+    current_checksum=$(md5sum "$script_path" 2>/dev/null | cut -d' ' -f1 || echo "unknown")
+    if [ "$stored_checksum" = "$current_checksum" ]; then
+        return 1  # Up to date
+    fi
+    return 0  # Needs update
+}
+

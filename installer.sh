@@ -134,6 +134,38 @@ select_modules() {
     echo "$result"
 }
 
+# ─── Module Dependencies ─────────────────────────────────
+# Warn about missing pairings (soft dependency — not blocking)
+check_dependencies() {
+    local selected="$1"
+    local warnings=""
+
+    # 13-waybar needs 09-hyprland (waybar config needs hyprland installed)
+    if echo "$selected" | grep -q '"13"' && ! echo "$selected" | grep -q '"09"'; then
+        warnings+="  ⚠ Module 13 (Waybar) works best with Module 09 (Hyprland)\n"
+    fi
+
+    # 15-ecosystem needs 14-nexus-guide (ecosystem tools are accessed via Nexus)
+    if echo "$selected" | grep -q '"15"' && ! echo "$selected" | grep -q '"14"'; then
+        warnings+="  ⚠ Module 15 (Ecosystem) needs Module 14 (Nexus) for GUI access\n"
+    fi
+
+    # 06-dotfiles needs module 04-dev for fnm/pnpm/rustup referenced in .zshrc
+    if echo "$selected" | grep -q '"06"' && ! echo "$selected" | grep -q '"04"'; then
+        warnings+="  ⚠ Module 06 (Dotfiles) .zshrc references tools from Module 04 (Dev)\n"
+    fi
+
+    # 11-gaming benefits from 02-kernel for gamemode/performance tuning
+    if echo "$selected" | grep -q '"11"' && ! echo "$selected" | grep -q '"02"'; then
+        warnings+="  ⚠ Module 11 (Gaming) benefits from Module 02 (Kernel tuning)\n"
+    fi
+
+    if [ -n "$warnings" ]; then
+        dialog --title " ⚠ Dependency Hints " \
+            --msgbox "\nSome selected modules have dependencies:\n\n$warnings\nThese are recommendations, not requirements.\nYou may continue without them." 16 60
+    fi
+}
+
 # ─── Confirmation ────────────────────────────────────────
 confirm_install() {
     local selected="$1"
@@ -249,6 +281,7 @@ main() {
         exit 0
     fi
 
+    check_dependencies "$selected"
     confirm_install "$selected" || exit 0
 
     # Clear dialog and run

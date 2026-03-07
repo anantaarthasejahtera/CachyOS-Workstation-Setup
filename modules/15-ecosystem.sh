@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Module 15: Living Ecosystem (Theme Switcher, Rollback, Cloud Sync)
 source "$(dirname "$0")/00-common.sh"
-header "Phase 4: Living Ecosystem Utilities"
+header "Living Ecosystem (7 Integrated Tools)"
 
 REPO_DIR="$(dirname "$0")/.."
 INSTALL_DIR="/usr/local/bin"
@@ -91,5 +91,16 @@ Exec = /bin/bash -c 'if command -v health-check &>/dev/null; then health-check; 
 NeedsTargets
 HOOKEOF
 ok "Pacman hook installed (auto health check after kernel/WM/GPU updates)"
+
+# 8. Post-Install First-Boot Wizard
+log "Installing Post-Install Wizard..."
+if [ -f "$REPO_DIR/ecosystem/post-install.sh" ]; then
+    sudo cp "$REPO_DIR/ecosystem/post-install.sh" "$INSTALL_DIR/post-install-wizard"
+else
+    sudo curl -fsSL -o "$INSTALL_DIR/post-install-wizard" \
+        "https://raw.githubusercontent.com/anantaarthasejahtera/CachyOS-Workstation-Setup/main/ecosystem/post-install.sh" 2>/dev/null || true
+fi
+sudo chmod +x "$INSTALL_DIR/post-install-wizard"
+ok "Post-Install Wizard installed (runs once on first boot)"
 
 log "Ecosystem utilities installed. Accessible via Nexus (Super+X)"
