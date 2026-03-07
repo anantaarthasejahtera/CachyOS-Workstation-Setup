@@ -108,7 +108,6 @@ build_menu() {
     entries+="─────────────────────────────────────────\n"
 
     # ── AI Tools (only show if ollama installed) ──
-    # ── AI Tools ──
     if command -v ollama &>/dev/null; then
         local ollama_status=""
         if pgrep -x ollama &>/dev/null; then
@@ -139,6 +138,7 @@ build_menu() {
     
     command -v flutter &>/dev/null && entries+="  Flutter Doctor\n"
     command -v scrcpy &>/dev/null && entries+="  Phone Mirror (scrcpy)\n"
+    entries+="  🏪 GUI App Store (Browse & Install)\n"
     entries+="─────────────────────────────────────────\n"
 
     # ── Apps (dynamic detection) ──
@@ -178,7 +178,7 @@ build_menu() {
     entries+="─────────────────────────────────────────\n"
 
     # ── System Tools ──
-    entries+="  🛡️ Time Machine (Config Rollback)\n" # Added entry
+    entries+="  🛡️ Time Machine (Config Rollback)\n"
     entries+="  ☁️ Dotfiles Cloud Sync\n"
     entries+="  System Monitor (btm)\n"
     entries+="  Disk Usage\n"
@@ -251,13 +251,13 @@ execute_action() {
             notify-send "🎥 Recording region" "Super+X → Stop to end" ;;
         
         # AI
-        *"Reasoning"*|*"qwen3"*)
+        *"AI Chat"*"Reasoning"*|*"qwen3"*)
             if ! pgrep -x ollama &>/dev/null; then ollama serve &>/dev/null & sleep 1; fi
             kitty -e ollama run qwen3:30b-a3b ;;
-        *"Code Assistant"*|*"qwen-coder"*)
+        *"AI Chat"*"Code"*|*"qwen2.5-coder"*)
             if ! pgrep -x ollama &>/dev/null; then ollama serve &>/dev/null & sleep 1; fi
             kitty -e ollama run qwen2.5-coder:7b ;;
-        *"Math"*|*"deepseek"*)
+        *"AI Chat"*"Math"*|*"deepseek-r1"*)
             if ! pgrep -x ollama &>/dev/null; then ollama serve &>/dev/null & sleep 1; fi
             kitty -e ollama run deepseek-r1:7b ;;
         

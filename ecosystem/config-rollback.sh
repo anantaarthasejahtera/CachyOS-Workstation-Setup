@@ -44,7 +44,7 @@ entries="[Restore ALL files from $timestamp]\n$entries"
 chosen_file=$(echo -e "$entries" | rofi -dmenu -i -p "📄 File to Restore" -width 800)
 [ -z "$chosen_file" ] && exit 0
 
-if [[ "$chosen_file" == "\[Restore ALL"* ]]; then
+if [[ "$chosen_file" == *"Restore ALL"* ]]; then
     # Confirmation
     ans=$(echo -e "Yes\nNo" | rofi -dmenu -i -p "⚠️ Restore ALL files? Current configs will be overwritten!")
     [ "$ans" != "Yes" ] && exit 0

@@ -39,7 +39,6 @@ dconf/
 
 # Temp files
 *.log
-.git/
 .git-sync-remote
 IGNEOF
 
