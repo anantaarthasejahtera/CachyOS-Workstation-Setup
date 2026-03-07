@@ -44,6 +44,7 @@ jobs:
           files: cachyos-workstation.zip
           fail_on_unmatched_files: true
           body_path: release_body.txt
+          generate_release_notes: true
           draft: false
           prerelease: false
         env:

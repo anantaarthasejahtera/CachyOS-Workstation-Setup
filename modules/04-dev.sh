@@ -14,7 +14,7 @@ install_aur lazydocker
 ok "Docker installed (group change takes effect after reboot)"
 
 # =====================================================================
-# MODULE 3: Development Environment
+# Node.js, Python, Rust, Go, CLI tools
 # =====================================================================
 header "Development Environment"
 
@@ -71,7 +71,7 @@ ok "Go installed"
 # --- Editors ---
 log "Installing editors..."
 install_pkg neovim
-# NOTE: Antigravity (VS Code fork) is installed in Module 9.
+# NOTE: Antigravity (VS Code fork) is installed in Module 07.
 # No need for separate VS Code — saves ~400MB RAM + disk.
 
 # --- CLI Power Tools ---

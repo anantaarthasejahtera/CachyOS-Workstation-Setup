@@ -33,7 +33,7 @@ Features:
 - **TUI installer** — Catppuccin-themed module selector with bilingual support (EN/ID) and progress bars
 - **Nexus v2** — Smart command center popup with 45+ actions and live system stats
 - **Guide v3** — 160+ searchable entries, executable, bilingual (EN/ID)
-- **Living Ecosystem (v4)** — 6 integrated tools: theming, rollback, cloud sync, AI tuning, app store, health check
+- **Living Ecosystem (v4)** — 7 integrated tools: theming, rollback, cloud sync, AI tuning, app store, health check, post-install wizard
 - **15 modules** — each independently runnable, fully idempotent
 - **Hardware-aware** — GPU auto-detect, dynamic hugepages, Secure Boot MOK, GPU-scaled configs
 - **Automated CI/CD** — Secure branch protection, Dependabot, and Automated GitHub Releases pipeline
@@ -161,7 +161,10 @@ CachyOS-Workstation-Setup/
 ├── install.sh                # One-liner bootstrap (curl | bash)
 ├── setup.sh                  # Main entry point (edit config here)
 ├── installer.sh              # TUI installer (dialog-based)
-├── ecosystem/                # Living Ecosystem (8 integrated tools)
+├── uninstall.sh              # Safe ecosystem remover
+├── Makefile                  # Dev commands (install, lint, init)
+├── CHANGELOG.md              # Release history
+├── ecosystem/                # Living Ecosystem (9 tools)
 │   ├── nexus.sh              # Nexus v2 Command Center (Super+X)
 │   ├── guide.sh              # Guide v3 — bilingual reference (EN/ID)
 │   ├── theme-switch.sh       # Dynamic Catppuccin flavor hot-swapper
@@ -169,7 +172,8 @@ CachyOS-Workstation-Setup/
 │   ├── dotfiles-sync.sh      # Cloud Git sync for ~/.config
 │   ├── ai-tuner.sh           # Local AI system telemetry analysis
 │   ├── app-store.sh          # Curated GUI App Store (Pacman/AUR/Flatpak)
-│   └── health-check.sh       # Post-update system integrity validator
+│   ├── health-check.sh       # Post-update system integrity validator
+│   └── post-install.sh       # First-boot post-install wizard
 ├── modules/
 │   ├── 00-common.sh          # Shared functions & helpers
 │   ├── 01-base.sh            # GPU auto-detect, paru, makepkg
@@ -178,11 +182,11 @@ CachyOS-Workstation-Setup/
 │   ├── 04-dev.sh             # Docker, Node, Python, Rust, Go
 │   ├── 05-mobile.sh          # Flutter, Android SDK, Kotlin
 │   ├── 06-dotfiles.sh        # Kitty, Zsh, Starship, fzf
-│   ├── 07-editors.sh         # Antigravity, Neovim
+│   ├── 07-editors.sh         # Antigravity, Neovim, Ollama
 │   ├── 08-desktop.sh         # KDE Catppuccin, GRUB theme
 │   ├── 09-hyprland.sh        # WM config, keybinds, lock screen
 │   ├── 10-apps.sh            # Browser, tmux, Flatpak, Bluetooth
-│   ├── 11-gaming.sh          # Steam, PCSX2, PrismLauncher, Roblox, MangoHud
+│   ├── 11-gaming.sh          # Steam, PCSX2, PrismLauncher, MangoHud
 │   ├── 12-vm.sh              # QEMU/KVM, Bottles, LibreOffice
 │   ├── 13-waybar.sh          # Status bar config + CSS
 │   ├── 14-nexus-guide.sh     # Installs Nexus + Guide
@@ -193,6 +197,8 @@ CachyOS-Workstation-Setup/
 │   ├── INSTALL_GUIDE.md
 │   ├── SECURITY.md
 │   └── SUPPORT.md
+├── .githooks/                # Local development Git hooks
+│   └── pre-commit            # Pre-commit checks (ShellCheck, syntax)
 ├── docs/                     # Official VitePress documentation source
 ├── .gitignore
 └── .gitattributes            # Enforce LF line endings for .sh files

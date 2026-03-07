@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Module 06: Shell, Terminal & Dotfiles
 source "$(dirname "$0")/00-common.sh"
-# MODULE 4: Shell & Terminal Aesthetic
+# Shell, Terminal & Dotfiles Configuration
 # =====================================================================
 header "Shell & Terminal Aesthetic"
 
@@ -55,6 +55,7 @@ mkdir -p "$HOME/projects" "$HOME/scripts" "$HOME/docker" "$HOME/.config"
 # --- Kitty config (Catppuccin Mocha) ---
 log "Writing Kitty config..."
 mkdir -p "$HOME/.config/kitty"
+safe_config "$HOME/.config/kitty/kitty.conf"
 cat > "$HOME/.config/kitty/kitty.conf" << 'KITTYEOF'
 # — Kitty — Catppuccin Mocha —
 font_family      JetBrainsMono Nerd Font
@@ -137,6 +138,7 @@ ok "Kitty config written"
 # --- Starship config ---
 log "Writing Starship config..."
 mkdir -p "$HOME/.config"
+safe_config "$HOME/.config/starship.toml"
 cat > "$HOME/.config/starship.toml" << 'STAREOF'
 # — Starship — Catppuccin Mocha —
 palette = "catppuccin_mocha"
@@ -276,6 +278,7 @@ ok "Starship config written"
 
 # --- Zshrc ---
 log "Writing .zshrc..."
+safe_config "$HOME/.zshrc"
 cat > "$HOME/.zshrc" << 'ZSHEOF'
 # — CachyOS Zsh Config — Aesthetic + Productive —
 export ZSH="$HOME/.oh-my-zsh"
@@ -299,10 +302,10 @@ source $ZSH/oh-my-zsh.sh
 # — Starship Prompt —
 eval "$(starship init zsh)"
 
-# — Tool Initialization —
-eval "$(fnm env --use-on-cd)"
-eval "$(zoxide init zsh)"
-eval "$(direnv hook zsh)"      # auto-load .envrc per project
+# — Tool Initialization (only if installed) —
+command -v fnm &>/dev/null && eval "$(fnm env --use-on-cd)"
+command -v zoxide &>/dev/null && eval "$(zoxide init zsh)"
+command -v direnv &>/dev/null && eval "$(direnv hook zsh)"
 
 # Cargo/Rust
 [ -f "$HOME/.cargo/env" ] && source "$HOME/.cargo/env"
@@ -387,7 +390,7 @@ export FZF_DEFAULT_OPTS=" \
   --border rounded --margin 1 --padding 1"
 
 # — Greeting —
-fastfetch 2>/dev/null || true
+command -v fastfetch &>/dev/null && fastfetch || true
 ZSHEOF
 ok ".zshrc written"
 
@@ -406,7 +409,7 @@ echo '--theme="Catppuccin Mocha"' > "$HOME/.config/bat/config"
 mkdir -p "$HOME/.config/bottom"
 cat > "$HOME/.config/bottom/bottom.toml" << 'BTMEOF'
 [flags]
-color = "gruvbox"
+color = "default"
 dot_marker = true
 group_processes = true
 hide_table_gap = true

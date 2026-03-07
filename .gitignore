@@ -28,3 +28,7 @@ _temp_script.ps1
 node_modules/
 __pycache__/
 *.pyc
+
+# VitePress build artifacts
+docs/.vitepress/dist/
+docs/.vitepress/cache/

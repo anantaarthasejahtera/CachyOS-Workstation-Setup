@@ -48,19 +48,12 @@ fi
 log "Configuring hugepages for VM performance..."
 TOTAL_RAM_MB=$(awk '/MemTotal/ {printf "%d", $2/1024}' /proc/meminfo)
 if [ "$TOTAL_RAM_MB" -ge 12288 ]; then
-    # 12GB+ RAM: reserve 2GB hugepages (1024 x 2MB pages)
-    echo 'vm.nr_hugepages = 1024' | sudo tee /etc/sysctl.d/99-hugepages.conf > /dev/null
-    sudo sysctl -p /etc/sysctl.d/99-hugepages.conf 2>/dev/null || true
-    sudo mkdir -p /dev/hugepages
-    sudo chown root:kvm /dev/hugepages 2>/dev/null || true
-    ok "Hugepages configured (2GB reserved for VMs)"
+    # 12GB+ RAM: recommend hugepages (configured per-VM in libvirt XML, not globally)
+    # Global reservation removed to avoid starving host. Use <memoryBacking><hugepages/></memoryBacking> in VM XML.
+    ok "Hugepages available (enable per-VM in libvirt XML — see $VM_POOL/README-vm-tips.txt)"
 elif [ "$TOTAL_RAM_MB" -ge 8192 ]; then
-    # 8-12GB RAM: reserve 1GB hugepages (512 x 2MB pages)
-    echo 'vm.nr_hugepages = 512' | sudo tee /etc/sysctl.d/99-hugepages.conf > /dev/null
-    sudo sysctl -p /etc/sysctl.d/99-hugepages.conf 2>/dev/null || true
-    sudo mkdir -p /dev/hugepages
-    sudo chown root:kvm /dev/hugepages 2>/dev/null || true
-    ok "Hugepages configured (1GB reserved — limited RAM detected)"
+    # 8-12GB RAM: hugepages available but not reserved globally
+    ok "Hugepages available (enable per-VM in libvirt XML for 15-20% speed boost)"
 else
     # <8GB RAM: skip hugepages entirely
     warn "Hugepages skipped (${TOTAL_RAM_MB}MB RAM detected — need 8GB+ for VM hugepages)"

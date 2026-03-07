@@ -24,7 +24,7 @@ if curl -fsSL -o "$AG_TMP/antigravity.tar.gz" "$AG_TARBALL_URL" 2>/dev/null; the
         warn "Antigravity tarball structure unknown. Trying npm..."
         npm install -g @anthropic-ai/claude-code 2>/dev/null || \
         npm install -g @anthropic/antigravity 2>/dev/null || \
-        warn "Antigravity needs manual install. Download from: https://developers.google.com/gemini"
+        warn "Antigravity needs manual install. Check: https://docs.anthropic.com/claude-code"
     fi
 else
     warn "Could not download Antigravity tarball. Trying alternative..."

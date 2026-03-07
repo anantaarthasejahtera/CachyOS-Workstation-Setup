@@ -72,10 +72,8 @@ fi
 # --- 7. Apply to Dunst ---
 DUNST_CONF="$HOME/.config/dunst/dunstrc"
 if [ -f "$DUNST_CONF" ]; then
-    sed -i -E "s|background = \"#[0-9a-fA-F]+\"|background = \"${bg:0:7}ee\"|g" "$DUNST_CONF"
-    sed -i -E "s|foreground = \"#[0-9a-fA-F]+\"|foreground = \"${fg:0:7}\"|g" "$DUNST_CONF"
-    sed -i -E "s|frame_color = \"#[0-9a-fA-F]+\"|frame_color = \"${accent:0:7}\"|g" "$DUNST_CONF"
-    sed -i -E "s|highlight = \"#[0-9a-fA-F]+\"|highlight = \"${accent:0:7}\"|g" "$DUNST_CONF"
+    # Only update urgency_normal section colors (preserve low/critical distinction)
+    sed -i -E "/\[urgency_normal\]/,/^\[/{s|background = \"#[0-9a-fA-F]+\"|background = \"${bg:0:7}ee\"|; s|foreground = \"#[0-9a-fA-F]+\"|foreground = \"${fg:0:7}\"|; s|frame_color = \"#[0-9a-fA-F]+\"|frame_color = \"${accent:0:7}\"|; s|highlight = \"#[0-9a-fA-F]+\"|highlight = \"${accent:0:7}\"|}" "$DUNST_CONF"
     
     # Reload dunst (it auto-restarts via D-Bus when killed)
     killall dunst 2>/dev/null || true

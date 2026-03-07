@@ -16,6 +16,14 @@ install_pkg thunar nwg-look
 
 ok "Hyprland packages installed"
 
+# --- KDE/Hyprland session conflict resolution ---
+# If KDE portal is installed, remove it to avoid portal conflicts with Hyprland
+if pacman -Qi xdg-desktop-portal-kde &>/dev/null; then
+    warn "Removing xdg-desktop-portal-kde to avoid Hyprland portal conflicts..."
+    sudo pacman -Rdd --noconfirm xdg-desktop-portal-kde 2>/dev/null || true
+    ok "KDE portal removed (Hyprland portal takes precedence)"
+fi
+
 # --- Hyprland keybinding cheatsheet ---
 log "Creating Hyprland cheatsheet helper..."
 mkdir -p "$HOME/.config/hypr"
@@ -179,7 +187,7 @@ bind = $mainMod, Q, killactive
 bind = $mainMod, M, exit
 bind = $mainMod, E, exec, thunar
 bind = $mainMod, D, exec, rofi -show drun -show-icons
-bind = $mainMod, X, exec, ~/.local/bin/nexus
+bind = $mainMod, X, exec, /usr/local/bin/nexus
 bind = $mainMod, F, fullscreen
 bind = $mainMod, Space, togglefloating
 bind = $mainMod, P, pseudo
