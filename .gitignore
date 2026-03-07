@@ -16,5 +16,3 @@ cachy-setup.log
 # Temp / extraction helpers
 *.tmp
 _temp_script.ps1
-_extract.ps1
-_module_map.txt

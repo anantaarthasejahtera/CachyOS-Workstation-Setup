@@ -18,8 +18,8 @@ chmod +x "$HOME/.local/bin/nexus"
 ok "Nexus installed (Super+X to open)"
 log "  Dynamic stats, smart toggles, live service detection"
 
-# --- Guide v2 (Executable Interactive Reference) ---
-log "Installing Guide v2..."
+# --- Guide v3 (Bilingual Interactive Reference) ---
+log "Installing Guide v3..."
 if [ -f "$REPO_DIR/guide.sh" ]; then
     cp "$REPO_DIR/guide.sh" "$HOME/.local/bin/guide"
 else

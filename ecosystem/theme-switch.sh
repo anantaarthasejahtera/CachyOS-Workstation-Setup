@@ -54,16 +54,10 @@ fi
 # --- 5. Apply to Waybar ---
 WAYBAR_CSS="$HOME/.config/waybar/style.css"
 if [ -f "$WAYBAR_CSS" ]; then
-    # We look for standard hex colors in Waybar and replace them.
-    # Assuming standard Mocha colors were used initially, we replace them globally.
-    # To be safe, we replace specific class colors
-    
-    # Backgrounds
-    sed -i -E "s|background-color: #[0-9a-fA-F]+;|background-color: ${bg:0:7};|g" "$WAYBAR_CSS"
-    # Text
-    sed -i -E "s|color: #[0-9a-fA-F]+;|color: ${fg:0:7};|g" "$WAYBAR_CSS"
-    # Gradient text (assuming it uses standard hex matching)
-    sed -i -E "s|#[0-9a-fA-F]{6} 0%, #[0-9a-fA-F]{6}|${accent:0:7} 0%, #${b2:0:6}|g" "$WAYBAR_CSS"
+    # Replace background-color on the main window/tooltip (targeted, not global)
+    sed -i -E "/^window|^tooltip/,/\}/{s|background-color: #[0-9a-fA-F]+;|background-color: ${bg:0:7};|}" "$WAYBAR_CSS"
+    # Replace the main text color in root * selector
+    sed -i -E "/^\* \{/,/\}/{s|color: #[0-9a-fA-F]+;|color: ${fg:0:7};|}" "$WAYBAR_CSS"
     
     # Soft reload waybar
     killall -SIGUSR2 waybar 2>/dev/null || true
@@ -83,9 +77,8 @@ if [ -f "$DUNST_CONF" ]; then
     sed -i -E "s|frame_color = \"#[0-9a-fA-F]+\"|frame_color = \"${accent:0:7}\"|g" "$DUNST_CONF"
     sed -i -E "s|highlight = \"#[0-9a-fA-F]+\"|highlight = \"${accent:0:7}\"|g" "$DUNST_CONF"
     
-    # Reload dunst
+    # Reload dunst (it auto-restarts via D-Bus when killed)
     killall dunst 2>/dev/null || true
-    disown dunst &>/dev/null || true
 fi
 
 # --- 8. Notification ---
