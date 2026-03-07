@@ -15,4 +15,16 @@ cachy-setup.log
 
 # Temp / extraction helpers
 *.tmp
+*.bak
 _temp_script.ps1
+
+# Environment / Secrets
+.env
+.env.*
+*.pem
+*.key
+
+# Common package caches (if used)
+node_modules/
+__pycache__/
+*.pyc
