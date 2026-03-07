@@ -29,7 +29,7 @@ echo -e "  - Uninstall packages (Docker, Steam, etc.)"
 echo -e "  - Delete your personal files or dotfiles backups"
 echo -e "  - Remove Ollama AI models you downloaded"
 
-read -p "$(echo -e "\n${C_RED}Are you sure you want to proceed? (y/N): ${NC}")" confirm
+read -r -p "$(echo -e "\n${C_RED}Are you sure you want to proceed? (y/N): ${NC}")" confirm
 if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
     echo -e "${C_YELLOW}Uninstallation aborted.${NC}"
     exit 0
