@@ -51,11 +51,13 @@ Features:
 
 | Tier | CPU | RAM | Storage | Use Case |
 |------|-----|-----|---------|----------|
-| **Minimum** | Any x86_64 | 4 GB | 20 GB free | Base system + shell + editors |
-| **Recommended** | 4+ cores | 16 GB | 50 GB free | Full install + AI models + Docker + Android SDK |
-| **AI Powerhouse** | 8+ cores | 32 GB | 80 GB free | Qwen3:30b + DeepSeek-R1 + multiple AI models running |
+| **Minimum** | Any x86_64 | 4 GB | 20 GB free | Base system + shell + editors (no AI) |
+| **Recommended** | 4+ cores | 16 GB | 50 GB free | Full install + 7B AI models + Docker + Android SDK |
+| **AI Powerhouse** | 8+ cores | 32 GB | 80 GB free | Qwen3:30b MoE + DeepSeek-R1 + multiple models simultaneously |
 
 > **Storage breakdown** (if all modules installed): Base ~2GB, Dev ~4GB, Mobile ~5GB, Gaming ~3GB, VM ~2GB, AI models ~20GB+, other modules ~2GB.
+>
+> **AI note**: The 7B models (qwen2.5-coder, deepseek-r1) run fine on 16GB RAM. The 30B Qwen3 model uses **Mixture of Experts (MoE)** — only ~3B parameters activate per inference, so it runs on 16GB but is more comfortable with 32GB.
 
 ---
 
@@ -68,6 +70,8 @@ curl -fsSL https://raw.githubusercontent.com/anantaarthasejahtera/CachyOS-Workst
 ```
 
 > Auto-installs dependencies, prompts for your identity, and launches the TUI module selector.
+>
+> ⚠️ **Security note**: It is always a good practice to [inspect the install.sh script](https://github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/blob/main/install.sh) before piping `curl` to `bash`. We encourage you to review the source first.
 
 ### 🔧 Manual Install
 
@@ -324,11 +328,25 @@ guide --lang en    # 🇬🇧 English
 
 ## 🤖 AI Tools Included
 
-| Model | Purpose | RAM | Command |
-|-------|---------|-----|---------|
-| `qwen3:30b-a3b` | Reasoning, debate, philosophy | ~16GB | `ollama run qwen3:30b-a3b` |
-| `deepseek-r1:7b` | Math & logic | ~5GB | `ollama run deepseek-r1:7b` |
-| `qwen2.5-coder:7b` | Code generation & refactoring | ~5GB | `ollama run qwen2.5-coder:7b` |
+All models run **100% locally** via [Ollama](https://ollama.com) — no cloud, no API keys, no data leaving your machine.
+
+| Model | Type | Purpose | RAM Required | Disk | Command |
+|-------|------|---------|-------------|------|---------|
+| `qwen3:30b-a3b` | **MoE** (3B active / 30B total) | Reasoning, debate, strategy, philosophy | 16GB min, 32GB ideal | ~18GB | `ollama run qwen3:30b-a3b` |
+| `deepseek-r1:7b` | Dense 7B | Chain-of-thought math & logic reasoning | 8GB min | ~5GB | `ollama run deepseek-r1:7b` |
+| `qwen2.5-coder:7b` | Dense 7B | Code generation, refactoring, debugging | 8GB min | ~5GB | `ollama run qwen2.5-coder:7b` |
+
+<details>
+<summary>💡 What is MoE (Mixture of Experts)?</summary>
+
+Qwen3:30b uses a **Mixture of Experts** architecture — the model has 30 billion total parameters, but only ~3 billion activate per inference. This means:
+- **Speed**: Generates at near-7B speed despite being a 30B model
+- **Quality**: Produces 30B-quality outputs (comparable to GPT-4o in reasoning tasks)
+- **RAM**: Only loads the active expert parameters, so it fits in 16GB RAM
+- **Trade-off**: Needs ~18GB disk space for the full model weights
+
+This is why we chose it over a regular 30B dense model — you get flagship-tier reasoning on consumer hardware.
+</details>
 
 All accessible via **Nexus** → AI section, or terminal `ollama run <model>`.
 
@@ -342,6 +360,54 @@ Each module sources `modules/00-common.sh` which provides:
 - **Smart installs** — Packages checked before install (no reinstalling)
 - **Logging** — Everything logged to `~/cachy-setup.log`
 - **Run individual modules** — `bash modules/04-dev.sh` (test one module)
+
+---
+
+## 🔄 How to Revert / Uninstall
+
+Every configuration change made by the setup script is automatically backed up before overwriting. You can restore your system at any time.
+
+### Via GUI (Time Machine)
+
+Launch from **Nexus** (`Super+X` → Time Machine) or terminal:
+
+```bash
+config-rollback
+```
+
+### Via CLI (Manual)
+
+```bash
+# 1. List available backups (sorted by date)
+ls -lt ~/.config-backup/
+
+# 2. Restore a specific backup
+cp ~/.config-backup/20250307-143025/waybar__style.css ~/.config/waybar/style.css
+
+# 3. Or restore everything from a snapshot
+for f in ~/.config-backup/20250307-143025/*; do
+    real_path=$(basename "$f" | sed 's|__|/|g')
+    cp "$f" "$real_path"
+done
+
+# 4. Reload affected services
+killall -SIGUSR2 waybar 2>/dev/null
+hyprctl reload 2>/dev/null
+```
+
+### Uninstalling packages
+
+The setup script uses standard `pacman` and `paru`. To remove any installed package:
+
+```bash
+# Remove a package and its unused dependencies
+sudo pacman -Rns <package-name>
+
+# Check the install log for what was installed
+cat ~/cachy-setup.log | grep "Installing"
+```
+
+> 💡 The setup script **never modifies system partitions, bootloaders (beyond GRUB theme), or critical system files**. All changes are confined to user-space configs (`~/.config/`) and standard package installation.
 
 ---
 
