@@ -161,9 +161,9 @@ CachyOS-Workstation-Setup/
 ├── install.sh                # One-liner bootstrap (curl | bash)
 ├── setup.sh                  # Main entry point (edit config here)
 ├── installer.sh              # TUI installer (dialog-based)
-├── nexus.sh                  # Nexus v2 Command Center (Super+X)
-├── guide.sh                  # Guide v3 — bilingual reference (EN/ID)
-├── ecosystem/                # Living Ecosystem (6 integrated tools)
+├── ecosystem/                # Living Ecosystem (8 integrated tools)
+│   ├── nexus.sh              # Nexus v2 Command Center (Super+X)
+│   ├── guide.sh              # Guide v3 — bilingual reference (EN/ID)
 │   ├── theme-switch.sh       # Dynamic Catppuccin flavor hot-swapper
 │   ├── config-rollback.sh    # Time Machine config restoration GUI
 │   ├── dotfiles-sync.sh      # Cloud Git sync for ~/.config
@@ -187,9 +187,13 @@ CachyOS-Workstation-Setup/
 │   ├── 13-waybar.sh          # Status bar config + CSS
 │   ├── 14-nexus-guide.sh     # Installs Nexus + Guide
 │   └── 15-ecosystem.sh       # Installs Living Ecosystem Utilities
-├── CONTRIBUTING.md
-├── SECURITY.md
-├── CODE_OF_CONDUCT.md
+├── .github/                  # Community Health & CI Workflows
+│   ├── CODE_OF_CONDUCT.md
+│   ├── CONTRIBUTING.md
+│   ├── INSTALL_GUIDE.md
+│   ├── SECURITY.md
+│   └── SUPPORT.md
+├── docs/                     # Official VitePress documentation source
 ├── .gitignore
 └── .gitattributes            # Enforce LF line endings for .sh files
 ```
