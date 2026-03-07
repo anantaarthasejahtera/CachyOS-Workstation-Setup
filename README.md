@@ -22,13 +22,15 @@
 
 ## ✨ Overview
 
-A **modular installer** that transforms a fresh CachyOS installation into a fully configured, aesthetically stunning developer workstation. Features:
+A **modular installer** that transforms a fresh CachyOS installation into a fully configured, aesthetically stunning developer workstation. **Also safe on existing systems** — all configs are automatically backed up to `~/.config-backup/` before any changes, so nothing is ever lost.
+
+Features:
 
 - **TUI installer** — Catppuccin-themed module selector with progress bars
 - **Nexus v2** — Smart command center popup with live system stats
 - **Guide v3** — 160+ searchable entries, executable, bilingual (EN/ID)
 - **Living Ecosystem (v4)** — Dynamic theming, config rollback, cloud sync, AI auto-tuning, GUI app store
-- **15 modules** — each independently runnable
+- **15 modules** — each independently runnable, fully idempotent
 - **50+ tools** — dev, AI, gaming, VM, productivity
 
 ### 🎯 Who Is This For?
@@ -41,9 +43,24 @@ A **modular installer** that transforms a fresh CachyOS installation into a full
 
 ---
 
-## 📦 Quick Start
+## � System Requirements
+
+| Tier | CPU | RAM | Storage | Use Case |
+|------|-----|-----|---------|----------|
+| **Minimum** | Any x86_64 | 4 GB | 20 GB free | Base system + shell + editors |
+| **Recommended** | 4+ cores | 16 GB | 50 GB free | Full install + AI models + Docker + Android SDK |
+| **AI Powerhouse** | 8+ cores | 32 GB | 80 GB free | Qwen3:30b + DeepSeek-R1 + multiple AI models running |
+
+> **Storage breakdown** (if all modules installed): Base ~2GB, Dev ~4GB, Mobile ~5GB, Gaming ~3GB, VM ~2GB, AI models ~20GB+, other modules ~2GB.
+
+---
+
+## �📦 Quick Start
 
 ```bash
+# Prerequisite: git must be installed (CachyOS ships with it by default)
+# If not: sudo pacman -S git
+
 # Clone
 git clone https://github.com/rixzkiye/CachyOS-Workstation-Setup.git
 cd CachyOS-Workstation-Setup
@@ -137,14 +154,14 @@ CachyOS-Workstation-Setup/
 | 04 | Dev Tools | ~4 GB | Docker, Node/fnm/pnpm, Python/uv, Rust, Go, CLI power tools |
 | 05 | Mobile | ~5 GB | Flutter, Android SDK (API 34), Kotlin, JDK 17, scrcpy |
 | 06 | Dotfiles | ~100 MB | Kitty, Zsh/Oh-My-Zsh, Starship prompt, fzf-tab |
-| 07 | Editors | ~700 MB | Antigravity (AI VS Code), Neovim (lazy.nvim) |
+| 07 | Editors | ~700 MB | [Antigravity](https://docs.google.com/antigravity) (Google's AI-powered VS Code fork), Neovim (lazy.nvim) |
 | 08 | Desktop | ~300 MB | KDE Catppuccin theme, GRUB theme, Inter + Nerd Fonts |
 | 09 | Hyprland | ~200 MB | Tiling WM, keybinds, Rofi, Hyprlock, Hypridle |
 | 10 | Apps | ~500 MB | Zen Browser, tmux, Spotify/Telegram/Discord (Flatpak) |
 | 11 | Gaming | ~3 GB | Steam (Proton), PCSX2, PrismLauncher, Roblox, MangoHud |
 | 12 | VM | ~2 GB | QEMU/KVM (hugepages, CPU pinning), Bottles, LibreOffice |
 | 13 | Waybar | ~5 MB | Glassmorphism status bar with gradient CSS |
-| 14 | Nexus + Guide | ~1 MB | Smart command center + 150-entry bilingual guide |
+| 14 | Nexus + Guide | ~1 MB | Smart command center + 160-entry bilingual guide |
 | 15 | Ecosystem | ~1 MB | Theme Engine, Config Rollback, Dotfiles Sync, AI Tuner, App Store |
 
 ---
