@@ -426,8 +426,8 @@ The setup script auto-detects hardware via `lspci` and `/proc/cpuinfo`, but some
 | **CPU core count varies** (2→4→16 cores) | CPU pinning in `12-vm.sh` checks `nproc` first | ✅ Handled |
 | **Low RAM** (4-8 GB) | Hugepages scale dynamically: 2GB/1GB/skip based on available RAM | ✅ Handled |
 | **Multi-monitor setup** | Hyprland auto-detects monitors — no hardcoded resolutions | ✅ Handled |
-| **PCSX2 GPU-specific settings** | Configured for integrated graphics — discrete GPUs may want higher settings | 🟡 Manual tweak |
-| **Secure Boot enabled** | NVIDIA DKMS may need MOK key enrollment | 🟡 Manual step |
+| **PCSX2 GPU-specific settings** | Auto-detects discrete vs integrated GPU, scales upscale/AF accordingly | ✅ Handled |
+| **Secure Boot enabled** | NVIDIA DKMS auto-detects Secure Boot, generates MOK key, and guides enrollment | ✅ Handled |
 
 ### 🔄 Rolling Release Maintenance
 
