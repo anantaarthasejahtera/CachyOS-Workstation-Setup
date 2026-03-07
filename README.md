@@ -11,7 +11,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/CachyOS-Arch%20Based-1793D1?style=for-the-badge&logo=arch-linux&logoColor=white" alt="CachyOS"/>
   <img src="https://img.shields.io/badge/Theme-Catppuccin%20Mocha-cba6f7?style=for-the-badge" alt="Catppuccin"/>
-  <img src="https://img.shields.io/badge/Modules-14-a6e3a1?style=for-the-badge" alt="Modules"/>
+  <img src="https://img.shields.io/badge/Modules-15-a6e3a1?style=for-the-badge" alt="Modules"/>
   <img src="https://img.shields.io/badge/Tools-50+-89b4fa?style=for-the-badge" alt="Tools"/>
   <img src="https://img.shields.io/badge/Guide-150+%20entries-f5c2e7?style=for-the-badge" alt="Guide"/>
   <img src="https://img.shields.io/badge/Language-EN%20%7C%20ID-f9e2af?style=for-the-badge" alt="Bilingual"/>
@@ -27,7 +27,8 @@ A **modular installer** that transforms a fresh CachyOS installation into a full
 - **TUI installer** — Catppuccin-themed module selector with progress bars
 - **Nexus v2** — Smart command center popup with live system stats
 - **Guide v3** — 150+ searchable entries, executable, bilingual (EN/ID)
-- **14 modules** — each independently runnable
+- **Living Ecosystem (v4)** — Dynamic theming, config rollback, cloud sync, AI auto-tuning, GUI app store
+- **15 modules** — each independently runnable
 - **50+ tools** — dev, AI, gaming, VM, productivity
 
 ### 🎯 Who Is This For?
@@ -82,6 +83,7 @@ When you run `./setup.sh`, a Catppuccin-themed TUI appears:
 ║  [ ] 12  Windows VM & Bottles       [~2 GB]         ║
 ║  [x] 13  Waybar Status Bar          [~5 MB]         ║
 ║  [x] 14  Nexus & Guide              [~1 MB]         ║
+║  [x] 15  Living Ecosystem Utils     [~1 MB]         ║
 ║                                                      ║
 ║  Space = toggle  ·  Enter = confirm                  ║
 ╚══════════════════════════════════════════════════════╝
@@ -97,6 +99,12 @@ CachyOS-Workstation-Setup/
 ├── installer.sh              # TUI installer (dialog-based)
 ├── nexus.sh                  # Nexus v2 Command Center (Super+X)
 ├── guide.sh                  # Guide v3 — bilingual reference (EN/ID)
+├── ecosystem/                # Phase 4 Living Ecosystem Utilities
+│   ├── theme-switch.sh       # Dynamic Catppuccin flavor hot-swapper
+│   ├── config-rollback.sh    # Time Machine config restoration GUI
+│   ├── dotfiles-sync.sh      # Cloud Git sync for ~/.config
+│   ├── ai-tuner.sh           # Local AI system telemetry analysis
+│   └── app-store.sh          # Curated GUI App Store (Pacman/AUR/Flatpak)
 ├── modules/
 │   ├── 00-common.sh          # Shared functions & helpers
 │   ├── 01-base.sh            # GPU auto-detect, paru, makepkg
@@ -109,10 +117,11 @@ CachyOS-Workstation-Setup/
 │   ├── 08-desktop.sh         # KDE Catppuccin, GRUB theme
 │   ├── 09-hyprland.sh        # WM config, keybinds, lock screen
 │   ├── 10-apps.sh            # Browser, tmux, Flatpak, Bluetooth
-│   ├── 11-gaming.sh          # Steam, PCSX2, Minecraft, MangoHud
+│   ├── 11-gaming.sh          # Steam, PCSX2, PrismLauncher, Roblox, MangoHud
 │   ├── 12-vm.sh              # QEMU/KVM, Bottles, LibreOffice
 │   ├── 13-waybar.sh          # Status bar config + CSS
-│   └── 14-nexus-guide.sh     # Installs Nexus + Guide
+│   ├── 14-nexus-guide.sh     # Installs Nexus + Guide
+│   └── 15-ecosystem.sh       # Installs Living Ecosystem Utilities
 ├── README.md
 ├── LICENSE
 └── .gitignore
@@ -136,6 +145,37 @@ CachyOS-Workstation-Setup/
 | 12 | VM | ~2 GB | QEMU/KVM (hugepages, CPU pinning), Bottles, LibreOffice |
 | 13 | Waybar | ~5 MB | Glassmorphism status bar with gradient CSS |
 | 14 | Nexus + Guide | ~1 MB | Smart command center + 150-entry bilingual guide |
+| 15 | Ecosystem | ~1 MB | Theme Engine, Config Rollback, Dotfiles Sync, AI Tuner, App Store |
+
+---
+
+## 🌍 The Living Ecosystem (v4)
+
+The project has evolved into a "Living Ecosystem" with 5 integrated pillars, completely transforming how you manage your Arch setup. All features are natively integrated into the **Nexus Command Center (`Super+X`)**.
+
+### 1. 🎨 Dynamic Theming Engine (`theme-switch`)
+Ditch hardcoded palettes. Seamlessly swap between Catppuccin flavors (Mocha, Macchiato, Frappe, Latte), Dracula, Tokyo Night, and Rosé Pine.
+- Automatically hot-reloads Hyprland window borders, Rofi UI, Waybar CSS, Kitty terminals, and Dunst notifications **instantly**.
+
+### 2. 🛡️ Time Machine (`config-rollback`)
+Never fear breaking your config. 
+- Using a beautiful Rofi UI, browse timestamped backups automatically created by the `safe_config()` macro.
+- Restore single file overrides (e.g., `waybar/style.css`) or revert entire snapshots.
+
+### 3. ☁️ Dotfiles Cloud Sync (`dotfiles-sync`)
+Your customizations, instantly portable.
+- Quickly pushes your `~/.config/` directory to a private external Git repository (like GitHub).
+- Features a strict `.gitignore` tailored specifically for CachyOS to omit heavy caches (e.g., `.git/`, `.cache/`, `Nextcloud/`, `op/`).
+
+### 4. 🧠 AI Auto-Tuner (`ai-tuner`)
+Local AI system telemetry auditing.
+- Takes dynamic snapshots of `top`, `free -h`, and `vmstat`.
+- Pipes telemetry via the standard Ollama API directly into `qwen2.5-coder:7b` to get actionable system optimization advice displayed neatly in a Rofi UI.
+
+### 5. 🏪 Aesthetic GUI App Store (`app-store`)
+Visual package management elevated.
+- A curated multi-tiered Rofi menu categorized by Browsers, Development, Gaming, Design, and Utilities.
+- Automates the backend execution of `sudo pacman`, `paru`, or `flatpak install` intelligently for each app without forcing the user to touch the terminal.
 
 ---
 
