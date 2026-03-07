@@ -225,45 +225,81 @@ confirm_install() {
 }
 
 # ─── Run Modules with Progress ───────────────────────────
-# The entire for-loop runs INSIDE the subshell piped to dialog --gauge.
-# This keeps the gauge alive for the full installation, updating the
-# percentage and message text each time a new module starts.
+# Uses a named FIFO so we can update the gauge in real-time:
+#   - Percentage updates between modules
+#   - Live log tailing shows last activity line while module runs
+#   - Spinner animation proves the installer is not hung
 run_modules() {
     local selected="$1"
     local modules=($selected)
     local total=${#modules[@]}
 
-    (
-        local current=0
-        for mod in "${modules[@]}"; do
-            # Remove quotes from dialog output
-            mod=$(echo "$mod" | tr -d '"')
-            current=$((current + 1))
-            local script="${MODULE_SCRIPTS[$mod]}"
-            # Show progress at START of each module (before it runs)
-            local percent=$(( ((current - 1) * 100) / total ))
-            echo "XXX"
-            echo "$percent"
-            echo "\n$(loc 'Installing module' 'Menginstall modul') $current/$total: $script\n$(loc 'This may take several minutes...' 'Proses ini bisa memakan waktu beberapa menit...')"
-            echo "XXX"
+    # Create FIFO for gauge communication
+    local fifo="/tmp/cachy-gauge-$$"
+    mkfifo "$fifo"
 
-            # Actually run the module — gauge stays alive showing current module
-            log "━━━ Running: $script ($current/$total) ━━━"
-            if bash "$MODULES_DIR/$script" >> "$LOGFILE" 2>&1; then
-                ok "Module $script completed"
-            else
-                warn "Module $script had errors (check log)"
-            fi
+    # Start gauge reading from FIFO in background
+    dialog --title " ⚡ $(loc 'Installing...' 'Menginstall...') " \
+        --gauge "\n$(loc 'Preparing modules...' 'Menyiapkan modul...')" 10 70 0 < "$fifo" &
+    local gauge_pid=$!
+
+    # Open FIFO for writing (fd 3) — keeps gauge alive
+    exec 3>"$fifo"
+
+    local current=0
+    for mod in "${modules[@]}"; do
+        # Remove quotes from dialog output
+        mod=$(echo "$mod" | tr -d '"')
+        current=$((current + 1))
+        local script="${MODULE_SCRIPTS[$mod]}"
+        local base_percent=$(( ((current - 1) * 100) / total ))
+
+        # Update gauge: show which module is starting
+        echo "XXX" >&3
+        echo "$base_percent" >&3
+        echo "\n$(loc 'Installing module' 'Menginstall modul') $current/$total: $script\n$(loc 'Starting...' 'Memulai...')" >&3
+        echo "XXX" >&3
+
+        # Run the module in background so we can tail the log
+        log "━━━ Running: $script ($current/$total) ━━━"
+        bash "$MODULES_DIR/$script" >> "$LOGFILE" 2>&1 &
+        local mod_pid=$!
+
+        # While module runs, update gauge with last log activity + spinner
+        local spin=0
+        local spinchars=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
+        while kill -0 "$mod_pid" 2>/dev/null; do
+            # Read last meaningful log line (strip ANSI colors, truncate)
+            local last
+            last=$(tail -1 "$LOGFILE" 2>/dev/null | sed 's/\x1b\[[0-9;]*m//g' | cut -c1-55)
+            local s=${spinchars[$((spin % 10))]}
+            echo "XXX" >&3
+            echo "$base_percent" >&3
+            echo "\n$s [$current/$total] $script\n${last:-$(loc 'Working...' 'Bekerja...')}" >&3
+            echo "XXX" >&3
+            spin=$((spin + 1))
+            sleep 1.5
         done
 
-        # Final 100% completion message
-        echo "XXX"
-        echo "100"
-        echo "\n✅ $(loc 'All modules installed!' 'Semua modul berhasil diinstall!')"
-        echo "XXX"
-        sleep 2
-    ) | dialog --title " ⚡ $(loc 'Installing...' 'Menginstall...') " \
-        --gauge "\n$(loc 'Preparing modules...' 'Menyiapkan modul...')" 10 60 0
+        # Check exit status of the module
+        if wait "$mod_pid"; then
+            ok "Module $script completed"
+        else
+            warn "Module $script had errors (check log)"
+        fi
+    done
+
+    # Final 100% completion message
+    echo "XXX" >&3
+    echo "100" >&3
+    echo "\n✅ $(loc 'All modules installed!' 'Semua modul berhasil diinstall!')" >&3
+    echo "XXX" >&3
+    sleep 2
+
+    # Cleanup: close fd, wait for gauge, remove FIFO
+    exec 3>&-
+    wait "$gauge_pid" 2>/dev/null || true
+    rm -f "$fifo"
 }
 
 # ─── Post-Install Summary ───────────────────────────────

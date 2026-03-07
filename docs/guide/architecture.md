@@ -15,9 +15,9 @@ If you inspect `/modules/00-common.sh`, you will find the architectural DNA of t
 ### The `safe_config` Macro
 Rather than blindly `cp`ing files into `~/.config`, our scripts use `safe_config`.
 ```bash
-safe_config "waybar" "style.css"
+safe_config "$HOME/.config/waybar/style.css"
 ```
-Behind the scenes, this creates a rigorous, timestamped snapshot of the target directory (`~/.config-backup/YYYYMMDD-HHMM/waybar__style.css`) before the symlink or file copy occurs. 
+Behind the scenes, this creates a rigorous, timestamped snapshot of the target file (`~/.config-backup/YYYYMMDD-HHMMSS-06-dotfiles/waybar__style.css`) before any overwrite occurs. Each backup directory is tagged with the calling module name to prevent collisions when multiple modules run in quick succession.
 This is what enables the **Config Rollback (Time Machine)** UI via Rofi to map file dependencies globally across your setup.
 
 ### The Application State File
