@@ -1,7 +1,7 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Module 13: Waybar Status Bar
 source "$(dirname "$0")/00-common.sh"
-header "Waybar â€” Aesthetic Status Bar for Hyprland"
+header "Waybar — Aesthetic Status Bar for Hyprland"
 
 mkdir -p "$HOME/.config/waybar"
 
@@ -55,7 +55,7 @@ cat > "$HOME/.config/waybar/config.jsonc" << 'WBCONF'
         "spacing": 8
     },
     "custom/power": {
-        "format": "â»",
+        "format": "—",
         "on-click": "rofi -show power-menu -modi power-menu:rofi-power-menu",
         "tooltip": false
     }
@@ -64,7 +64,7 @@ WBCONF
 
 # Waybar Catppuccin style
 cat > "$HOME/.config/waybar/style.css" << 'WBSTYLE'
-/* â”€â”€â”€ Waybar â€” Catppuccin Mocha Glass â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* — Waybar — Catppuccin Mocha Glass — */
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap");
 
 * {

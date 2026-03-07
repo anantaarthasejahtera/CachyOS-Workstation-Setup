@@ -1,7 +1,7 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Module 12: Windows Compatibility & Virtualization
 source "$(dirname "$0")/00-common.sh"
-header "Windows Compatibility â€” VM, Bottles, Office"
+header "Windows Compatibility — VM, Bottles, Office"
 
 # --- Check hardware virtualization support ---
 log "Checking virtualization support..."

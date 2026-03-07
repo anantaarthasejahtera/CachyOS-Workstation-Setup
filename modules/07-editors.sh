@@ -1,7 +1,7 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Module 07: Editors (Antigravity, Neovim)
 source "$(dirname "$0")/00-common.sh"
-header "Antigravity â€” AI Coding Agent"
+header "Antigravity — AI Coding Agent"
 
 # CachyOS is Arch-based, no deb/rpm. Install from source tarball.
 log "Installing Antigravity from source tarball..."
@@ -47,9 +47,9 @@ if command -v ollama &>/dev/null; then
     sudo systemctl enable --now ollama.service 2>/dev/null || true
     # Pull 3 optimal models for 16GB RAM in background
     log "Pulling AI models in background (this may take a while)..."
-    log "  1. qwen3:30b-a3b   â†’ MoE reasoning beast (debat, strategi, filosofi)"
-    log "  2. deepseek-r1:7b  â†’ Reasoning & math specialist"
-    log "  3. qwen2.5-coder:7b â†’ Coding specialist (setara GPT-4o)"
+    log "  1. qwen3:30b-a3b   → MoE reasoning beast (debat, strategi, filosofi)"
+    log "  2. deepseek-r1:7b  → Reasoning & math specialist"
+    log "  3. qwen2.5-coder:7b → Coding specialist (setara GPT-4o)"
     (
         ollama pull qwen2.5-coder:7b 2>/dev/null
         ollama pull deepseek-r1:7b 2>/dev/null

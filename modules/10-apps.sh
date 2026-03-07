@@ -1,7 +1,7 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Module 10: Extra Apps (Browser, Flatpak, tmux)
 source "$(dirname "$0")/00-common.sh"
-header "Extra Apps â€” Browser, Multiplexer, Tools"
+header "Extra Apps — Browser, Multiplexer, Tools"
 
 # --- Zen Browser ---
 log "Installing Zen Browser..."
@@ -18,7 +18,7 @@ fi
 
 mkdir -p "$HOME/.config/tmux"
 cat > "$HOME/.config/tmux/tmux.conf" << 'TMUXEOF'
-# â”€â”€â”€ Tmux â€” Catppuccin Mocha â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# — Tmux — Catppuccin Mocha —
 set -g default-terminal "tmux-256color"
 set -ag terminal-overrides ",xterm-256color:RGB"
 
@@ -50,7 +50,7 @@ set -g history-limit 50000
 # Vi mode
 setw -g mode-keys vi
 
-# â”€â”€â”€ Catppuccin Theme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# — Catppuccin Theme —
 set -g @plugin 'tmux-plugins/tpm'
 set -g @plugin 'tmux-plugins/tmux-sensible'
 set -g @plugin 'catppuccin/tmux#v2.1.0'

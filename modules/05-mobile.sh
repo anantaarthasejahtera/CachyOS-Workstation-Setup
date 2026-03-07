@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Module 05: Flutter & Android Development
 source "$(dirname "$0")/00-common.sh"
 header "Flutter & Android Development"
