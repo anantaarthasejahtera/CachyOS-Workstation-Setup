@@ -1,0 +1,47 @@
+# 🆘 Troubleshooting & FAQ
+
+No system is perfectly unbreakable, but the CachyOS Workstation provides the tooling to gracefully recover from the vast majority of Linux desktop issues.
+
+## 🕰️ Recovering from a Bad Configuration
+
+Did you edit your `waybar/style.css` and now the bar won't load? Did you add an invalid hook to `hyprland.conf` and now you're staring at a black screen?
+
+**Solution: Use Time Machine**
+1. Press `SUPER + X` to open the Nexus.
+2. Select the `Time Machine (Config Rollback)` option.
+3. The system will display all recent changes by date and time in a Rofi menu.
+4. Select the snapshot from *before* you broke the config.
+5. The system will restore the files and immediately reload your graphical environment.
+
+**If you are trapped in a TTY (Black screen, no UI):**
+1. Switch to TTY2 via `Ctrl + Alt + F2`.
+2. Login with your username.
+3. Run `config-rollback --cli` to trigger the restoration logic directly from the command line.
+
+## 🛠️ Package Update Failures (Pacman Hooks)
+
+If you run `sudo pacman -Syu` and see a massive block of red text from `99-cachy-health.hook`, **STOP**.
+The Health Check intercepted a dangerous update (usually related to parsing a bad Hyprland config alongside an update, or a DKMS kernel compilation failure).
+
+**Action:**
+Read the explicit error thrown by `health-check`. If it cites an NVIDIA DKMS failure, do not reboot. Run `sudo dkms autoinstall` to force the kernel module to recompile.
+
+## 🐋 Docker Rootless Permission Issues
+
+If you try to run `docker ps` and receive a permission error:
+1. Ensure the docker socket is active: `systemctl --user start docker.socket`
+2. Ensure you have sourced your `~/.zshrc` so the `DOCKER_HOST` environment variable points to the rootless socket (`unix:///run/user/1000/docker.sock`).
+
+## 🧠 Ollama / AI Tuner Too Slow
+
+If `qwen3:30b` is generating text very slowly:
+1. Your VRAM (GPU Memory) might be saturated. The MoE model needs a minimum of 16GB RAM, but prefers 24GB+ to load entirely into VRAM.
+2. **Solution**: Purge background tasks, or switch to the much lighter `deepseek-r1:7b` model via Nexus.
+
+## FAQ
+
+**Q: Can I use this script on Ubuntu or Fedora?**
+A: No. This relies heavily on `pacman`, `paru`, the AUR, and CachyOS's custom kernel repos.
+
+**Q: Does the Dynamic Themer support my custom Kitty config?**
+A: The `theme-switch` script uses `sed` to replace explicit variable names (like `#f5e0dc`). If you manually hardcoded hex codes into your `kitty.conf` instead of `include mocha.conf`, the themer will ignore them. Keep the `include` statements intact!

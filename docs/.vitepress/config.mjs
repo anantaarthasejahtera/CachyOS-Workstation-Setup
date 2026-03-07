@@ -32,6 +32,20 @@ export default defineConfig({
                     { text: 'Living Ecosystem', link: '/guide/living-ecosystem' },
                     { text: 'AI Developer Tools', link: '/guide/ai-tools' }
                 ]
+            },
+            {
+                text: 'Advanced Usage',
+                items: [
+                    { text: 'Configuration & Customization', link: '/guide/configuration' },
+                    { text: 'Master Cheat Sheet (Keybinds)', link: '/guide/keybinds' }
+                ]
+            },
+            {
+                text: 'Deep Dive',
+                items: [
+                    { text: 'Architecture & Design', link: '/guide/architecture' },
+                    { text: 'Troubleshooting & FAQ', link: '/guide/troubleshooting' }
+                ]
             }
         ],
         socialLinks: [
