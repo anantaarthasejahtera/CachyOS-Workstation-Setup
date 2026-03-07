@@ -225,46 +225,45 @@ confirm_install() {
 }
 
 # ─── Run Modules with Progress ───────────────────────────
+# The entire for-loop runs INSIDE the subshell piped to dialog --gauge.
+# This keeps the gauge alive for the full installation, updating the
+# percentage and message text each time a new module starts.
 run_modules() {
     local selected="$1"
     local modules=($selected)
     local total=${#modules[@]}
-    local current=0
 
-    for mod in "${modules[@]}"; do
-        # Remove quotes from dialog output
-        mod=$(echo "$mod" | tr -d '"')
-        current=$((current + 1))
-        local script="${MODULE_SCRIPTS[$mod]}"
-        local percent=$(( (current * 100) / total ))
-
-        # Show progress
-        (
+    (
+        local current=0
+        for mod in "${modules[@]}"; do
+            # Remove quotes from dialog output
+            mod=$(echo "$mod" | tr -d '"')
+            current=$((current + 1))
+            local script="${MODULE_SCRIPTS[$mod]}"
+            # Show progress at START of each module (before it runs)
+            local percent=$(( ((current - 1) * 100) / total ))
             echo "XXX"
             echo "$percent"
-            echo "\n$(loc 'Installing module' 'Menginstall modul') $current/$total: $script\n"
+            echo "\n$(loc 'Installing module' 'Menginstall modul') $current/$total: $script\n$(loc 'This may take several minutes...' 'Proses ini bisa memakan waktu beberapa menit...')"
             echo "XXX"
-        ) | dialog --title " ⚡ $(loc 'Installing...' 'Menginstall...') " \
-            --gauge "\n$(loc 'Starting installation...' 'Memulai instalasi...')" 10 60 0 &
-        local dialog_pid=$!
 
-        # Run the actual module
-        log "━━━ Running: $script ($current/$total) ━━━"
-        if bash "$MODULES_DIR/$script" >> "$LOGFILE" 2>&1; then
-            ok "Module $script completed"
-        else
-            warn "Module $script had errors (check log)"
-        fi
+            # Actually run the module — gauge stays alive showing current module
+            log "━━━ Running: $script ($current/$total) ━━━"
+            if bash "$MODULES_DIR/$script" >> "$LOGFILE" 2>&1; then
+                ok "Module $script completed"
+            else
+                warn "Module $script had errors (check log)"
+            fi
+        done
 
-        # Kill the gauge dialog
-        kill $dialog_pid 2>/dev/null || true
-        wait $dialog_pid 2>/dev/null || true
-    done
-
-    # Final progress
-    dialog --title " ⚡ $(loc 'Installing...' 'Menginstall...') " \
-        --gauge "\n✅ $(loc 'All modules installed!' 'Semua modul berhasil diinstall!')" 10 60 100
-    sleep 2
+        # Final 100% completion message
+        echo "XXX"
+        echo "100"
+        echo "\n✅ $(loc 'All modules installed!' 'Semua modul berhasil diinstall!')"
+        echo "XXX"
+        sleep 2
+    ) | dialog --title " ⚡ $(loc 'Installing...' 'Menginstall...') " \
+        --gauge "\n$(loc 'Preparing modules...' 'Menyiapkan modul...')" 10 60 0
 }
 
 # ─── Post-Install Summary ───────────────────────────────
