@@ -59,6 +59,9 @@ ok "PrismLauncher installed (open & login with Mojang/Microsoft account)"
 log "Installing PCSX2 (PS2 emulator)..."
 install_pkg pcsx2
 
+# Create PCSX2 directories (bios dir for user's BIOS files, inis for config)
+mkdir -p "$HOME/.config/PCSX2/bios" "$HOME/.config/PCSX2/inis"
+
 # Auto-detect GPU class for optimal PCSX2 settings
 GPU_INFO=$(lspci | grep -i 'vga\|3d' | head -1)
 if echo "$GPU_INFO" | grep -qi 'nvidia\|radeon\|rx '; then

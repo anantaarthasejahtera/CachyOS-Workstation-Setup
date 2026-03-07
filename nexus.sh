@@ -205,22 +205,22 @@ execute_action() {
     
     case "$chosen" in
         *"GUI App Store"*)
-            ~/.local/bin/app-store &
+            app-store &
             ;;
         *"AI Auto-Tuner"*)
-            ~/.local/bin/ai-tuner &
+            ai-tuner &
             ;;
         *"Health Check"*)
             kitty -e bash -c 'health-check; echo ""; echo "Press Enter to close..."; read' &
             ;;
         *"Dotfiles Cloud Sync"*)
-            ~/.local/bin/dotfiles-sync &
+            dotfiles-sync &
             ;;
         *"Time Machine"*)
-            ~/.local/bin/config-rollback &
+            config-rollback &
             ;;
         *"Dynamic Theme Switcher"*)
-            ~/.local/bin/theme-switch &
+            theme-switch &
             ;;
         *"System Update"*)
             kitty --hold -e bash -c 'echo "🔄 Updating system..."; sudo pacman -Syu && flatpak update -y 2>/dev/null && rustup update 2>/dev/null; echo ""; echo "✅ Update complete!"' ;;
