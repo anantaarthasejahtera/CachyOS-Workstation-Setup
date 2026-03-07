@@ -108,6 +108,7 @@ build_menu() {
     entries+="─────────────────────────────────────────\n"
 
     # ── AI Tools (only show if ollama installed) ──
+    # ── AI Tools ──
     if command -v ollama &>/dev/null; then
         local ollama_status=""
         if pgrep -x ollama &>/dev/null; then
@@ -115,9 +116,10 @@ build_menu() {
         else
             ollama_status="🔴"
         fi
-        entries+="󰧑  AI Chat — Reasoning (qwen3:30b) $ollama_status\n"
-        entries+="  AI Code Assistant (qwen-coder) $ollama_status\n"
-        entries+="  AI Math & Logic (deepseek-r1) $ollama_status\n"
+        entries+="  󰧑  AI Chat — Reasoning (qwen3) $ollama_status\n"
+        entries+="  󰧑  AI Chat — Code (qwen2.5-coder) $ollama_status\n"
+        entries+="  󰧑  AI Chat — Math/Logic (deepseek-r1) $ollama_status\n"
+        entries+="  🧠 AI Auto-Tuner (Suggest Optimizations) $ollama_status\n"
     fi
     entries+="─────────────────────────────────────────\n"
 
@@ -126,13 +128,13 @@ build_menu() {
     command -v nvim &>/dev/null && entries+="  Neovim\n"
     
     if command -v docker &>/dev/null; then
-        local docker_status=""
+        local DOCKER_STATUS=""
         if systemctl is-active docker &>/dev/null; then
-            docker_status="🟢"
+            DOCKER_STATUS="🟢"
         else
-            docker_status="🔴"  
+            DOCKER_STATUS="🔴"  
         fi
-        entries+="  Docker Manager $docker_status\n"
+        entries+="  Docker Manager (lazydocker) $DOCKER_STATUS\n"
     fi
     
     command -v flutter &>/dev/null && entries+="  Flutter Doctor\n"
@@ -176,6 +178,8 @@ build_menu() {
     entries+="─────────────────────────────────────────\n"
 
     # ── System Tools ──
+    entries+="  🛡️ Time Machine (Config Rollback)\n" # Added entry
+    entries+="  ☁️ Dotfiles Cloud Sync\n"
     entries+="  System Monitor (btm)\n"
     entries+="  Disk Usage\n"
     entries+="  System Info (fastfetch)\n"
@@ -183,6 +187,7 @@ build_menu() {
     entries+="  Audio Settings\n"
     entries+="  WiFi Settings\n"
     command -v blueman-manager &>/dev/null && entries+="  Bluetooth\n"
+    entries+="  🎨 Dynamic Theme Switcher\n"
     entries+="─────────────────────────────────────────\n"
     
     # ── Search ──
@@ -198,6 +203,21 @@ execute_action() {
     local chosen="$1"
     
     case "$chosen" in
+        *"GUI App Store"*)
+            ~/.local/bin/app-store &
+            ;;
+        *"AI Auto-Tuner"*)
+            ~/.local/bin/ai-tuner &
+            ;;
+        *"Dotfiles Cloud Sync"*)
+            ~/.local/bin/dotfiles-sync &
+            ;;
+        *"Time Machine"*)
+            ~/.local/bin/config-rollback &
+            ;;
+        *"Dynamic Theme Switcher"*)
+            ~/.local/bin/theme-switch &
+            ;;
         *"System Update"*)
             kitty --hold -e bash -c 'echo "🔄 Updating system..."; sudo pacman -Syu && flatpak update -y 2>/dev/null && rustup update 2>/dev/null; echo ""; echo "✅ Update complete!"' ;;
         *"Cleanup"*)
