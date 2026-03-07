@@ -6,6 +6,40 @@
 
 <hr>
 
+## [v1.3.0] - The Bulletproof Audit (2026-03-07)
+
+Deep line-by-line audit of every file in the repository. 30 findings fixed across 17 files.
+
+### 🔴 Critical Fixes
+- **CI Pipeline**: Downgraded `actions/checkout@v6` → `@v4` (v6 doesn't exist yet)
+- **CI Pipeline**: Fixed stale `nexus.sh` path → `ecosystem/nexus.sh`
+- **VitePress**: Fixed `package.json` paths (`docs` → `.` since it lives inside `docs/`)
+- **Pacman Hook**: Unified hook filename between install (`99-cachy-health.hook`) and uninstall scripts
+
+### 🟡 Bug Fixes
+- **NVIDIA**: `mkinitcpio` MODULES injection now guarded against duplication on re-run
+- **AI Tuner**: 3-layer fallback — checks binary → service → model before querying Ollama
+- **Hyprland**: Fixed `Super+X` Nexus keybind path (`~/.local/bin` → `/usr/local/bin`)
+- **Zshrc**: Cross-module dependencies (`fnm`, `zoxide`, `direnv`) now wrapped in `command -v` guards
+- **Dotfiles**: `safe_config()` now called before overwriting `.zshrc`, `kitty.conf`, `starship.toml`
+
+### 🟠 Improvements
+- **KDE/Hyprland**: Portal conflict resolution — `xdg-desktop-portal-kde` auto-removed when Hyprland is installed
+- **Zram**: Compression algorithm change skipped when device is actively in use
+- **VM Hugepages**: No longer permanently reserved globally (use per-VM in libvirt XML instead)
+- **Theme Switcher**: Dunst urgency-level color distinction preserved during theme changes
+- **Waybar**: Removed Google Fonts `@import` (uses locally installed Inter instead — works offline)
+
+### 📝 Documentation & Consistency
+- Fixed stale MODULE comments in `04-dev.sh` and `06-dotfiles.sh`
+- README tool count corrected (6 → 7), tree updated with `Makefile`, `uninstall.sh`, `.githooks/`
+- `release.yml` now auto-generates release notes as fallback for empty changelog body
+- Antigravity fallback branding made consistent
+- Makefile lint target now excludes `node_modules/`
+- `.gitignore` updated with VitePress `dist/` and `cache/`
+
+---
+
 ## [v1.2.0] - The Legendary Polish Update (2026-03-07)
 
 This massive update focuses on bringing absolute enterprise repository cleanliness, native Linux development standards, and world-class documentation to the ecosystem.
