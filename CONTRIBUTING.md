@@ -6,7 +6,7 @@ Thank you for your interest in contributing! This project is maintained by [PT A
 
 ```bash
 # 1. Fork and clone
-git clone https://github.com/<your-user>/CachyOS-Workstation-Setup.git
+git clone https://github.com/anantaarthasejahtera/CachyOS-Workstation-Setup.git
 cd CachyOS-Workstation-Setup
 
 # 2. Create a feature branch

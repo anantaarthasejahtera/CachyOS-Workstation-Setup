@@ -23,7 +23,7 @@ We as members, contributors, and leaders pledge to make participation in our com
 
 ## Enforcement
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the project maintainers at [conduct@anartha.com](mailto:conduct@anartha.com).
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the project maintainers at [contact@anartha.com](mailto:contact@anartha.com).
 
 All complaints will be reviewed and investigated promptly and fairly. The project team is obligated to maintain confidentiality with regard to the reporter of an incident.
 
