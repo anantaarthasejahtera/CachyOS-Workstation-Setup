@@ -15,7 +15,7 @@
   <img src="https://img.shields.io/badge/Tools-50+-89b4fa?style=for-the-badge" alt="Tools"/>
   <img src="https://img.shields.io/badge/Guide-160+%20entries-f5c2e7?style=for-the-badge" alt="Guide"/>
   <img src="https://img.shields.io/badge/Language-EN%20%7C%20ID-f9e2af?style=for-the-badge" alt="Bilingual"/>
-  <img src="https://img.shields.io/badge/License-MIT-f9e2af?style=for-the-badge" alt="License"/>
+  <img src="https://img.shields.io/badge/License-GPL_v3-f9e2af?style=for-the-badge" alt="License"/>
   <br/>
   <a href="https://github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/actions/workflows/ci.yml">
     <img src="https://github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/actions/workflows/ci.yml/badge.svg" alt="CI"/>
@@ -546,7 +546,7 @@ Each module is **independent** — you can edit one without touching others.
 
 ## 📄 License
 
-MIT © 2025 [PT Ananta Artha Sejahtera](https://anartha.com) — see [LICENSE](LICENSE).
+GPL-3.0 © 2026 [PT Ananta Artha Sejahtera](https://anartha.com) — see [LICENSE](LICENSE).
 
 ---
 
