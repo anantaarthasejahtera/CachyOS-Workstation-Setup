@@ -61,6 +61,16 @@ Features:
 
 ## 📦 Quick Start
 
+### ⚡ One-Liner Install (Recommended)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/anantaarthasejahtera/CachyOS-Workstation-Setup/main/install.sh | bash
+```
+
+> Auto-installs dependencies, prompts for your identity, and launches the TUI module selector.
+
+### 🔧 Manual Install
+
 ```bash
 # Prerequisite: git must be installed (CachyOS ships with it by default)
 # If not: sudo pacman -S git
