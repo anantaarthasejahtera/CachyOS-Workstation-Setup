@@ -10,6 +10,19 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 MODULES_DIR="$SCRIPT_DIR/modules"
 source "$MODULES_DIR/00-common.sh"
 
+# Default Language
+GUI_LANG="en"
+
+loc() {
+    local en="$1"
+    local id="$2"
+    if [ "$GUI_LANG" = "id" ]; then
+        echo -e "$id"
+    else
+        echo -e "$en"
+    fi
+}
+
 # ─── Catppuccin Mocha .dialogrc ──────────────────────────
 setup_dialog_theme() {
     cat > "$HOME/.dialogrc" << 'DRCEOF'
@@ -90,10 +103,41 @@ MODULE_SCRIPTS[15]="15-ecosystem.sh"; MODULE_SIZES[15]="~1 MB"
 # Module order for execution
 MODULE_ORDER=(01 02 03 04 05 06 07 08 09 10 11 12 13 14 15)
 
+# ─── Language Selector ────────────────────────────────────
+select_language() {
+    local result
+    result=$(dialog --clear --title " 🌐 Language / Bahasa " \
+        --menu "\nSelect Installer Language / Pilih Bahasa Installer:\n" 12 55 2 \
+        "en" "English" \
+        "id" "Bahasa Indonesia" \
+        3>&1 1>&2 2>&3 || true)
+    
+    if [ -n "$result" ]; then
+        GUI_LANG="$result"
+    else
+        GUI_LANG="en"
+    fi
+}
+
 # ─── Welcome Screen ─────────────────────────────────────
 show_welcome() {
-    dialog --title " 🚀 CachyOS Workstation Setup " \
-        --msgbox "\n\
+    local msg=""
+    if [ "$GUI_LANG" = "id" ]; then
+        msg="\n\
+    ╔══════════════════════════════════════╗\n\
+    ║  🚀  Installer CachyOS Workstation  ║\n\
+    ║  ──────────────────────────────────  ║\n\
+    ║  Tema: Catppuccin Mocha              ║\n\
+    ║  Modul: 15 (modular penuh)           ║\n\
+    ║  Tools: 50+ terkonfigurasi           ║\n\
+    ║  Panduan: 160+ referensi command     ║\n\
+    ║                                      ║\n\
+    ║  Pilih modul di layar selanjutnya.   ║\n\
+    ║  Centang semua = install lengkap.    ║\n\
+    ║  Hapus centang yang tidak perlu.     ║\n\
+    ╚══════════════════════════════════════╝\n"
+    else
+        msg="\n\
     ╔══════════════════════════════════════╗\n\
     ║  🚀  CachyOS Workstation Installer  ║\n\
     ║  ──────────────────────────────────  ║\n\
@@ -105,30 +149,33 @@ show_welcome() {
     ║  Select modules on next screen.      ║\n\
     ║  All checked = full install.         ║\n\
     ║  Uncheck what you don't need.        ║\n\
-    ╚══════════════════════════════════════╝\n" \
-        20 50
+    ╚══════════════════════════════════════╝\n"
+    fi
+
+    dialog --title " $(loc '🚀 CachyOS Workstation Setup' '🚀 Setup CachyOS Workstation') " \
+        --msgbox "$msg" 20 50
 }
 
 # ─── Module Selector ─────────────────────────────────────
 select_modules() {
     local result
-    result=$(dialog --title " 📦 Select Modules " \
-        --checklist "\nSpace = toggle, Enter = confirm\n" 26 65 14 \
-        "01" "Base & GPU Drivers         [${MODULE_SIZES[01]}]" ON \
-        "02" "Kernel & Performance       [${MODULE_SIZES[02]}]" ON \
-        "03" "Security & Maintenance     [${MODULE_SIZES[03]}]" ON \
-        "04" "Dev Tools (Node,Py,Rust,Go)[${MODULE_SIZES[04]}]" ON \
-        "05" "Mobile Dev (Flutter)       [${MODULE_SIZES[05]}]" ON \
-        "06" "Shell & Dotfiles           [${MODULE_SIZES[06]}]" ON \
-        "07" "Editors (Antigravity)      [${MODULE_SIZES[07]}]" ON \
-        "08" "Desktop Theme (KDE)        [${MODULE_SIZES[08]}]" ON \
-        "09" "Hyprland WM                [${MODULE_SIZES[09]}]" ON \
-        "10" "Extra Apps (Browser, etc)  [${MODULE_SIZES[10]}]" ON \
-        "11" "Gaming (Steam, PCSX2)      [${MODULE_SIZES[11]}]" OFF \
-        "12" "Windows VM & Bottles       [${MODULE_SIZES[12]}]" OFF \
-        "13" "Waybar Status Bar          [${MODULE_SIZES[13]}]" ON \
-        "14" "Nexus & Guide System       [${MODULE_SIZES[14]}]" ON \
-        "15" "Living Ecosystem Utils     [${MODULE_SIZES[15]}]" ON \
+    result=$(dialog --title " $(loc '📦 Select Modules' '📦 Pilih Modul') " \
+        --checklist "\n$(loc 'Space = toggle, Enter = confirm' 'Spasi = pilih, Enter = konfirmasi')\n" 26 65 14 \
+        "01" "$(loc 'Base & GPU Drivers' 'Sistem Dasar & Driver GPU')         [${MODULE_SIZES[01]}]" ON \
+        "02" "$(loc 'Kernel & Performance' 'Kernel Custom & Performa')       [${MODULE_SIZES[02]}]" ON \
+        "03" "$(loc 'Security & Maintenance' 'Keamanan & Perawatan Otomatis')     [${MODULE_SIZES[03]}]" ON \
+        "04" "$(loc 'Dev Tools (Node,Py,Rust,Go)' 'Dev Tools (Node,Py,Rust,Go)') [${MODULE_SIZES[04]}]" ON \
+        "05" "$(loc 'Mobile Dev (Flutter)' 'Mobile Dev (Flutter/SDK)')       [${MODULE_SIZES[05]}]" ON \
+        "06" "$(loc 'Shell & Dotfiles' 'Zsh Shell & Dotfiles')           [${MODULE_SIZES[06]}]" ON \
+        "07" "$(loc 'Editors (Antigravity)' 'Code Editor (Antigravity)')      [${MODULE_SIZES[07]}]" ON \
+        "08" "$(loc 'Desktop Theme (KDE)' 'Tema Desktop (KDE/SDDM)')        [${MODULE_SIZES[08]}]" ON \
+        "09" "$(loc 'Hyprland WM' 'Hyprland Window Manager')                [${MODULE_SIZES[09]}]" ON \
+        "10" "$(loc 'Extra Apps (Browser, etc)' 'Aplikasi (Chrome, Flatpak)')  [${MODULE_SIZES[10]}]" ON \
+        "11" "$(loc 'Gaming (Steam, PCSX2)' 'Gaming (Steam, PCSX2)')      [${MODULE_SIZES[11]}]" OFF \
+        "12" "$(loc 'Windows VM & Bottles' 'Windows VM & Bottles')       [${MODULE_SIZES[12]}]" OFF \
+        "13" "$(loc 'Waybar Status Bar' 'Waybar Status Bar')          [${MODULE_SIZES[13]}]" ON \
+        "14" "$(loc 'Nexus & Guide System' 'Nexus & Sistem Guide')       [${MODULE_SIZES[14]}]" ON \
+        "15" "$(loc 'Living Ecosystem Utils' 'Utilitas Ecosystem AI')     [${MODULE_SIZES[15]}]" ON \
         3>&1 1>&2 2>&3)
 
     echo "$result"
@@ -142,27 +189,27 @@ check_dependencies() {
 
     # 13-waybar needs 09-hyprland (waybar config needs hyprland installed)
     if echo "$selected" | grep -q '"13"' && ! echo "$selected" | grep -q '"09"'; then
-        warnings+="  ⚠ Module 13 (Waybar) works best with Module 09 (Hyprland)\n"
+        warnings+="$(loc '  ⚠ Module 13 (Waybar) works best with Module 09 (Hyprland)\n' '  ⚠ Modul 13 (Waybar) butuh Modul 09 (Hyprland) untuk konfigurasi maksimal\n')"
     fi
 
     # 15-ecosystem needs 14-nexus-guide (ecosystem tools are accessed via Nexus)
     if echo "$selected" | grep -q '"15"' && ! echo "$selected" | grep -q '"14"'; then
-        warnings+="  ⚠ Module 15 (Ecosystem) needs Module 14 (Nexus) for GUI access\n"
+        warnings+="$(loc '  ⚠ Module 15 (Ecosystem) needs Module 14 (Nexus) for GUI access\n' '  ⚠ Modul 15 (Ecosystem) butuh Modul 14 (Nexus) untuk akses GUI\n')"
     fi
 
     # 06-dotfiles needs module 04-dev for fnm/pnpm/rustup referenced in .zshrc
     if echo "$selected" | grep -q '"06"' && ! echo "$selected" | grep -q '"04"'; then
-        warnings+="  ⚠ Module 06 (Dotfiles) .zshrc references tools from Module 04 (Dev)\n"
+        warnings+="$(loc '  ⚠ Module 06 (Dotfiles) .zshrc references tools from Module 04 (Dev)\n' '  ⚠ Modul 06 (Dotfiles) menggunakan command dari Modul 04 (Dev Tools)\n')"
     fi
 
     # 11-gaming benefits from 02-kernel for gamemode/performance tuning
     if echo "$selected" | grep -q '"11"' && ! echo "$selected" | grep -q '"02"'; then
-        warnings+="  ⚠ Module 11 (Gaming) benefits from Module 02 (Kernel tuning)\n"
+        warnings+="$(loc '  ⚠ Module 11 (Gaming) benefits from Module 02 (Kernel tuning)\n' '  ⚠ Modul 11 (Gaming) mendapat boost performa jika pakai Modul 02 (Kernel)\n')"
     fi
 
     if [ -n "$warnings" ]; then
-        dialog --title " ⚠ Dependency Hints " \
-            --msgbox "\nSome selected modules have dependencies:\n\n$warnings\nThese are recommendations, not requirements.\nYou may continue without them." 16 60
+        dialog --title " ⚠ $(loc 'Dependency Hints' 'Saran Dependensi') " \
+            --msgbox "\n$(loc 'Some selected modules have dependencies:' 'Beberapa modul yang dipilih saling bergantung:')\n\n$warnings\n$(loc 'These are recommendations, not requirements.' 'Ini hanya rekomendasi, bukan kewajiban mutlak.')\n$(loc 'You may continue without them.' 'Kamu boleh lanjut tanpanya.')" 16 65
     fi
 }
 
@@ -172,9 +219,9 @@ confirm_install() {
     local count
     count=$(echo "$selected" | wc -w)
 
-    dialog --title " ✅ Confirm Installation " \
-        --yesno "\nYou selected $count modules:\n\n$selected\n\nProceed with installation?" \
-        12 50
+    dialog --title " ✅ $(loc 'Confirm Installation' 'Konfirmasi Instalasi') " \
+        --yesno "\n$(loc "You selected $count modules:" "Kamu memilih $count modul:")\n\n$selected\n\n$(loc 'Proceed with installation?' 'Lanjutkan proses instalasi?')" \
+        12 55
 }
 
 # ─── Run Modules with Progress ───────────────────────────
@@ -195,10 +242,10 @@ run_modules() {
         (
             echo "XXX"
             echo "$percent"
-            echo "\nInstalling module $current/$total: $script\n"
+            echo "\n$(loc 'Installing module' 'Menginstall modul') $current/$total: $script\n"
             echo "XXX"
-        ) | dialog --title " ⚡ Installing... " \
-            --gauge "\nStarting installation..." 10 60 0 &
+        ) | dialog --title " ⚡ $(loc 'Installing...' 'Menginstall...') " \
+            --gauge "\n$(loc 'Starting installation...' 'Memulai instalasi...')" 10 60 0 &
         local dialog_pid=$!
 
         # Run the actual module
@@ -215,15 +262,33 @@ run_modules() {
     done
 
     # Final progress
-    dialog --title " ⚡ Installing... " \
-        --gauge "\n✅ All modules installed!" 10 60 100
+    dialog --title " ⚡ $(loc 'Installing...' 'Menginstall...') " \
+        --gauge "\n✅ $(loc 'All modules installed!' 'Semua modul berhasil diinstall!')" 10 60 100
     sleep 2
 }
 
 # ─── Post-Install Summary ───────────────────────────────
 show_summary() {
-    dialog --title " 🎉 Setup Complete! " \
-        --msgbox "\n\
+    local msg=""
+    if [ "$GUI_LANG" = "id" ]; then
+        msg="\n\
+    ╔══════════════════════════════════════╗\n\
+    ║    🎉 Instalasi Selesai!             ║\n\
+    ╠══════════════════════════════════════╣\n\
+    ║                                      ║\n\
+    ║  Silahkan reboot sistem kamu:        ║\n\
+    ║  $ sudo reboot                       ║\n\
+    ║                                      ║\n\
+    ║  Setelah reboot:                     ║\n\
+    ║  • Super+X    → Nexus Command Center ║\n\
+    ║  • Super+D    → App Launcher (Rofi)  ║\n\
+    ║  • guide      → Panduan Interaktif   ║\n\
+    ║  • ff         → Info Sistem          ║\n\
+    ║                                      ║\n\
+    ║  Log: ~/cachy-setup.log              ║\n\
+    ╚══════════════════════════════════════╝\n"
+    else
+        msg="\n\
     ╔══════════════════════════════════════╗\n\
     ║    🎉 Installation Complete!         ║\n\
     ╠══════════════════════════════════════╣\n\
@@ -238,8 +303,11 @@ show_summary() {
     ║  • ff         → System Info          ║\n\
     ║                                      ║\n\
     ║  Log: ~/cachy-setup.log              ║\n\
-    ╚══════════════════════════════════════╝\n" \
-        22 50
+    ╚══════════════════════════════════════╝\n"
+    fi
+
+    dialog --title " 🎉 $(loc 'Setup Complete!' 'Setup Selesai!') " \
+        --msgbox "$msg" 22 50
 }
 
 # ─── Main Flow ───────────────────────────────────────────
@@ -271,6 +339,7 @@ main() {
     fi
 
     # Interactive flow
+    select_language
     show_welcome
 
     local selected
@@ -288,7 +357,7 @@ main() {
     clear
     echo -e "${BOLD}${PURPLE}"
     echo "  ╔══════════════════════════════════════╗"
-    echo "  ║   🚀 Installing selected modules...  ║"
+    echo "  ║   🚀 $(loc 'Installing selected modules...' 'Menginstal modul secara otomatis...')  ║"
     echo "  ╚══════════════════════════════════════╝"
     echo -e "${NC}"
     echo "  Log: $LOGFILE"
@@ -300,7 +369,7 @@ main() {
 
     clear
     echo ""
-    echo -e "${GREEN}${BOLD}  🎉 Setup complete! Reboot with: sudo reboot${NC}"
+    echo -e "${GREEN}${BOLD}  🎉 $(loc 'Setup complete! Reboot with: sudo reboot' 'Setup selesai! Silakan reboot dengan komando: sudo reboot')${NC}"
     echo -e "  Log: ${CYAN}$LOGFILE${NC}"
     echo ""
 }
