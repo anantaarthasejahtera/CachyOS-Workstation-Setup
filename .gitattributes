@@ -1,0 +1,5 @@
+# Force LF on shell scripts (bash breaks with CRLF)
+*.sh text eol=lf
+
+# Keep markdown as-is (auto)
+*.md text eol=auto

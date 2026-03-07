@@ -43,7 +43,7 @@ Features:
 
 ---
 
-## � System Requirements
+## 💻 System Requirements
 
 | Tier | CPU | RAM | Storage | Use Case |
 |------|-----|-----|---------|----------|
@@ -55,7 +55,7 @@ Features:
 
 ---
 
-## �📦 Quick Start
+## 📦 Quick Start
 
 ```bash
 # Prerequisite: git must be installed (CachyOS ships with it by default)
