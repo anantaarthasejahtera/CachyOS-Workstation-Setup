@@ -1,0 +1,38 @@
+name: 🚀 Auto Release
+on:
+  push:
+    tags:
+      - 'v*' # Trigger when tags like v1.0.0, v2.1.3 are pushed
+
+permissions:
+  contents: write # Needed to create releases
+
+jobs:
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Need full history for changelog generation
+
+      - name: Install Zip
+        run: sudo apt-get install -y zip
+
+      - name: Package Source Code
+        run: |
+          echo "Packaging source code..."
+          # Exclude .git and temporary files
+          zip -r cachyos-workstation.zip . -x "*.git*" -x "*.tmp" -x "*.bak" -x "tmp/*"
+
+      - name: Generate Changelog and Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: cachyos-workstation.zip
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
