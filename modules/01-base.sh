@@ -25,6 +25,22 @@ if echo "$GPU_VENDOR" | grep -qi 'nvidia'; then
     sudo sed -i 's/^MODULES=(/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm /' /etc/mkinitcpio.conf 2>/dev/null || true
     sudo mkinitcpio -P 2>/dev/null || true
     ok "NVIDIA drivers installed (DRM KMS enabled)"
+
+    # Secure Boot check — NVIDIA DKMS needs MOK enrollment
+    if command -v mokutil &>/dev/null && mokutil --sb-state 2>/dev/null | grep -qi 'enabled'; then
+        warn "⚠ Secure Boot is ENABLED — NVIDIA DKMS modules need MOK key enrollment!"
+        warn "  After reboot, you may see a blue MOK Manager screen."
+        warn "  Select 'Enroll MOK' → confirm → enter your root password → reboot."
+        warn "  Or disable Secure Boot in BIOS for the simplest fix."
+        log "  Attempting to generate MOK key..."
+        if [ ! -f /root/mok.der ]; then
+            sudo openssl req -new -x509 -newkey rsa:2048 -keyout /root/mok.priv \
+                -outform DER -out /root/mok.der -nodes -days 36500 \
+                -subj "/CN=NVIDIA DKMS Signing Key/" 2>/dev/null || true
+            sudo mokutil --import /root/mok.der 2>/dev/null || true
+            warn "  MOK key generated. Enroll it on next reboot (blue screen prompt)."
+        fi
+    fi
 elif echo "$GPU_VENDOR" | grep -qi 'intel'; then
     log "Installing Intel GPU drivers..."
     install_pkg mesa lib32-mesa intel-media-driver vulkan-intel \

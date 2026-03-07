@@ -59,14 +59,31 @@ ok "PrismLauncher installed (open & login with Mojang/Microsoft account)"
 log "Installing PCSX2 (PS2 emulator)..."
 install_pkg pcsx2
 
-# Optimized PCSX2 config for Intel Iris Plus G7
+# Auto-detect GPU class for optimal PCSX2 settings
+GPU_INFO=$(lspci | grep -i 'vga\|3d' | head -1)
+if echo "$GPU_INFO" | grep -qi 'nvidia\|radeon\|rx '; then
+    # Discrete GPU: can handle higher settings
+    PCSX2_UPSCALE=3        # 3x native (1080p)
+    PCSX2_ANISO=4          # 4x anisotropic filtering
+    PCSX2_RENDERER=12      # Hardware renderer
+    GPU_CLASS="discrete"
+    log "  Discrete GPU detected → PCSX2 set to 3x upscale + 4x AF"
+else
+    # Integrated GPU (Intel/AMD APU): conservative settings
+    PCSX2_UPSCALE=1        # Native resolution
+    PCSX2_ANISO=0          # No anisotropic filtering
+    PCSX2_RENDERER=12      # Hardware renderer
+    GPU_CLASS="integrated"
+    log "  Integrated GPU detected → PCSX2 set to native resolution"
+fi
+
 mkdir -p "$HOME/.config/PCSX2/inis"
-cat > "$HOME/.config/PCSX2/inis/GS.ini" << 'PCSX2GS'
-# — PCSX2 Graphics — Optimized for Intel Iris Plus —
-Renderer = 12
-upscale_multiplier = 1
+cat > "$HOME/.config/PCSX2/inis/GS.ini" << PCSX2GS
+# --- PCSX2 Graphics --- Auto-configured for $GPU_CLASS GPU ---
+Renderer = $PCSX2_RENDERER
+upscale_multiplier = $PCSX2_UPSCALE
 texture_filtering = 2
-anisotropic_filtering = 0
+anisotropic_filtering = $PCSX2_ANISO
 ManualHardwareRendererFixes = false
 UserHacks_align_sprite = 0
 UserHacks_merge_sprite = 0
@@ -75,7 +92,7 @@ Vsync = 1
 PCSX2GS
 
 cat > "$HOME/.config/PCSX2/inis/PCSX2.ini" << 'PCSX2INI'
-# — PCSX2 Core — Optimized for i5-1035G7 —
+# --- PCSX2 Core --- Performance optimizations ---
 Framerate_Turbo = 200
 Framerate_Slowmo = 50
 Framerate_Nominal = 100
@@ -84,7 +101,7 @@ Enable_Instant_VU1 = true
 Enable_Fast_CDVD = true
 PCSX2INI
 
-ok "PCSX2 configured (add your PS2 ISO files to play, e.g. Black)"
+ok "PCSX2 configured for $GPU_CLASS GPU (upscale: ${PCSX2_UPSCALE}x, AF: ${PCSX2_ANISO}x)"
 
 log "Gaming setup summary:"
 log "  - CS2: Open Steam > install free"
