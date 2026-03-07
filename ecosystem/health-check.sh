@@ -55,6 +55,8 @@ elif echo "$GPU_VENDOR" | grep -qi 'amd\|radeon'; then
     else
         check_fail "AMD GPU driver NOT loaded — may need: sudo mkinitcpio -P && reboot"
     fi
+else
+    check_warn "No GPU detected (VM, headless, or unsupported hardware)"
 fi
 
 # ═══════════════════════════════════════════════════════

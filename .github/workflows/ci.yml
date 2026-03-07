@@ -119,11 +119,13 @@ jobs:
         run: |
           errors=0
 
-          # Check guide entry count is synced
+          # Check guide entry count is synced dynamically
+          # Instead of hardcoding a stale number, count actual entries and verify consistency
+          actual_count=$(grep -c '^\s*"' ecosystem/guide.sh 2>/dev/null || echo "0")
           for f in README.md installer.sh ecosystem/nexus.sh; do
-            count=$(grep -oP '\d+\+' "$f" | grep -c '160' || true)
-            if grep -q '150+' "$f"; then
-              echo "❌ Stale '150+' reference in $f"
+            ref_count=$(grep -oP '\d+(?=\+?\s*(searchable|entries|referensi|entry))' "$f" | head -1 || true)
+            if [ -n "$ref_count" ] && [ "$ref_count" -lt "$((actual_count - 20))" ]; then
+              echo "❌ Stale guide count '$ref_count' in $f (actual: ~$actual_count entries)"
               errors=$((errors + 1))
             fi
           done

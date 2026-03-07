@@ -87,7 +87,9 @@ safe_config() {
     mkdir -p "$(dirname "$target")"
 }
 
-# Copy dotfile from repo to target, with backup
+# Copy dotfile from repo to target, with backup.
+# Returns 1 if source file is missing (allows callers to detect partial deployment).
+DOTFILE_FAILURES=0
 deploy_dotfile() {
     local src="$DOTFILES_DIR/$1"
     local dest="$2"
@@ -96,7 +98,9 @@ deploy_dotfile() {
         cp "$src" "$dest"
         ok "Deployed: $1 → $dest"
     else
-        warn "Dotfile not found: $src"
+        warn "Dotfile not found: $src (skipped)"
+        ((DOTFILE_FAILURES++)) || true
+        return 1
     fi
 }
 
