@@ -237,7 +237,6 @@ run_modules() {
     # Create FIFO for gauge communication
     local fifo="/tmp/cachy-gauge-$$"
     mkfifo "$fifo"
-    trap "exec 3>&- 2>/dev/null; rm -f '$fifo'; kill '$gauge_pid' 2>/dev/null" EXIT INT TERM
 
     # Start gauge reading from FIFO in background
     dialog --title " ⚡ $(loc 'Installing...' 'Menginstall...') " \
