@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Module 02: Kernel & Performance Tuning
 source "$(dirname "$0")/00-common.sh"
 header "Performance & Deep System Tuning"
@@ -36,7 +36,7 @@ ok "PipeWire low-latency configured"
 # --- Kernel tuning (sysctl) ---
 log "Applying kernel performance tuning..."
 sudo tee /etc/sysctl.d/99-performance.conf > /dev/null << 'SYSEOF'
-# â”€â”€â”€ Memory Management â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# — Memory Management —
 # Reduce swap aggressiveness (16GB RAM = less swap needed)
 vm.swappiness = 10
 # Keep filesystem metadata cached longer
@@ -45,14 +45,14 @@ vm.vfs_cache_pressure = 50
 vm.dirty_ratio = 10
 vm.dirty_background_ratio = 5
 
-# â”€â”€â”€ Network Performance â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# — Network Performance —
 net.core.netdev_max_backlog = 16384
 net.core.somaxconn = 8192
 net.ipv4.tcp_fastopen = 3
 net.ipv4.tcp_max_syn_backlog = 8192
 net.ipv4.tcp_tw_reuse = 1
 
-# â”€â”€â”€ Kernel Hardening + Performance â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# — Kernel Hardening + Performance —
 kernel.nmi_watchdog = 0
 # Increase inotify watchers (for VS Code, Node.js file watching)
 fs.inotify.max_user_watches = 524288

@@ -45,7 +45,7 @@ get_battery() {
 
 get_ram() {
     local used total
-    read -r total used <<< $(free -m | awk '/Mem:/ {print $2, $3}')
+    read -r total used <<< "$(free -m | awk '/Mem:/ {print $2, $3}')"
     local percent=$(( (used * 100) / total ))
     local gb_used=$(awk "BEGIN {printf \"%.1f\", $used/1024}")
     local gb_total=$(awk "BEGIN {printf \"%.0f\", $total/1024}")
@@ -233,21 +233,21 @@ execute_action() {
         
         # Screenshots
         *"Screenshot"*"Region"*)
-            grim -g "$(slurp)" ~/Pictures/Screenshots/$(date +%Y%m%d-%H%M%S).png && \
-                notify-send "📸 Screenshot saved" "~/Pictures/Screenshots/" ;;
+            grim -g "$(slurp)" ~/Pictures/Screenshots/"$(date +%Y%m%d-%H%M%S)".png && \
+                notify-send "📸 Screenshot saved" "$HOME/Pictures/Screenshots/" ;;
         *"Screenshot"*"Full"*)
-            grim ~/Pictures/Screenshots/$(date +%Y%m%d-%H%M%S).png && \
-                notify-send "📸 Screenshot saved" "~/Pictures/Screenshots/" ;;
+            grim ~/Pictures/Screenshots/"$(date +%Y%m%d-%H%M%S)".png && \
+                notify-send "📸 Screenshot saved" "$HOME/Pictures/Screenshots/" ;;
         
         # Recording (smart toggle)
         *"Stop Recording"*)
             pkill -SIGINT wf-recorder && \
-                notify-send "🎥 Recording saved" "~/Videos/" ;;
+                notify-send "🎥 Recording saved" "$HOME/Videos/" ;;
         *"Record Screen"*)
-            wf-recorder -f ~/Videos/recording-$(date +%Y%m%d-%H%M%S).mp4 & disown
+            wf-recorder -f ~/Videos/recording-"$(date +%Y%m%d-%H%M%S)".mp4 & disown
             notify-send "🎥 Recording started" "Super+X → Stop to end" ;;
         *"Record Region"*)
-            wf-recorder -g "$(slurp)" -f ~/Videos/clip-$(date +%Y%m%d-%H%M%S).mp4 & disown
+            wf-recorder -g "$(slurp)" -f ~/Videos/clip-"$(date +%Y%m%d-%H%M%S)".mp4 & disown
             notify-send "🎥 Recording region" "Super+X → Stop to end" ;;
         
         # AI

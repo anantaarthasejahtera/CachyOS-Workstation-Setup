@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Module 04: Development Environment (Docker, Node, Python, Rust, Go)
 source "$(dirname "$0")/00-common.sh"
 header "Docker & Container Environment"
@@ -8,7 +8,7 @@ install_pkg docker docker-compose docker-buildx
 sudo systemctl enable --now docker.service
 sudo usermod -aG docker "$USER"
 
-# lazydocker â€” TUI for docker
+# lazydocker — TUI for docker
 install_aur lazydocker
 
 ok "Docker installed (group change takes effect after reboot)"
@@ -72,7 +72,7 @@ ok "Go installed"
 log "Installing editors..."
 install_pkg neovim
 # NOTE: Antigravity (VS Code fork) is installed in Module 9.
-# No need for separate VS Code â€” saves ~400MB RAM + disk.
+# No need for separate VS Code — saves ~400MB RAM + disk.
 
 # --- CLI Power Tools ---
 log "Installing CLI power tools..."

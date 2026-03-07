@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Module 14: Nexus Command Center & Guide System
 source "$(dirname "$0")/00-common.sh"
 header "Nexus Command Center & Guide System"

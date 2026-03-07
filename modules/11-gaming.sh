@@ -1,7 +1,7 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Module 11: Gaming (Steam, PCSX2, Minecraft, Roblox)
 source "$(dirname "$0")/00-common.sh"
-header "Gaming â€” Steam, Minecraft, PS2 Emulator"
+header "Gaming — Steam, Minecraft, PS2 Emulator"
 
 # --- Steam ---
 log "Installing Steam..."
@@ -15,7 +15,7 @@ log "Installing MangoHud (FPS overlay)..."
 install_pkg mangohud lib32-mangohud
 mkdir -p "$HOME/.config/MangoHud"
 cat > "$HOME/.config/MangoHud/MangoHud.conf" << 'MANGOEOF'
-# â”€â”€â”€ MangoHud â€” Catppuccin Style FPS Overlay â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# — MangoHud — Catppuccin Style FPS Overlay —
 legacy_layout=false
 fps
 frametime=0
@@ -62,7 +62,7 @@ install_pkg pcsx2
 # Optimized PCSX2 config for Intel Iris Plus G7
 mkdir -p "$HOME/.config/PCSX2/inis"
 cat > "$HOME/.config/PCSX2/inis/GS.ini" << 'PCSX2GS'
-# â”€â”€â”€ PCSX2 Graphics â€” Optimized for Intel Iris Plus â”€â”€â”€
+# — PCSX2 Graphics — Optimized for Intel Iris Plus —
 Renderer = 12
 upscale_multiplier = 1
 texture_filtering = 2
@@ -75,7 +75,7 @@ Vsync = 1
 PCSX2GS
 
 cat > "$HOME/.config/PCSX2/inis/PCSX2.ini" << 'PCSX2INI'
-# â”€â”€â”€ PCSX2 Core â€” Optimized for i5-1035G7 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# — PCSX2 Core — Optimized for i5-1035G7 —
 Framerate_Turbo = 200
 Framerate_Slowmo = 50
 Framerate_Nominal = 100

@@ -1,7 +1,7 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Module 09: Hyprland Window Manager
 source "$(dirname "$0")/00-common.sh"
-header "Hyprland â€” Tiling Window Manager + Cheatsheet"
+header "Hyprland — Tiling Window Manager + Cheatsheet"
 
 log "Installing Hyprland ecosystem..."
 # Hyprland core + CachyOS-optimized components
@@ -20,47 +20,47 @@ ok "Hyprland packages installed"
 log "Creating Hyprland cheatsheet helper..."
 mkdir -p "$HOME/.config/hypr"
 cat > "$HOME/.config/hypr/cheatsheet.txt" << 'CHEATEOF'
-â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
-â•‘  ðŸŽ® HYPRLAND KEYBINDING CHEATSHEET â€” CachyOS Edition        â•‘
-â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£
-â•‘                                                               â•‘
-â•‘  â”€â”€ ESSENTIALS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€  â•‘
-â•‘  Super + Enter          â†’ Open Kitty Terminal                 â•‘
-â•‘  Super + Q              â†’ Close focused window                â•‘
-â•‘  Super + D              â†’ App Launcher (rofi)                 â•‘
-â•‘  Super + X              â†’ Nexus Command Center                â•‘
-â•‘  Super + M              â†’ Exit Hyprland                       â•‘
-â•‘  Super + V              â†’ Clipboard history                   â•‘
-â•‘  Super + L              â†’ Lock screen                         â•‘
-â•‘                                                               â•‘
-â•‘  â”€â”€ WINDOW MANAGEMENT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€  â•‘
-â•‘  Super + Arrow Keys     â†’ Move focus between windows          â•‘
-â•‘  Super + Shift + Arrows â†’ Move window position                â•‘
-â•‘  Super + F              â†’ Toggle fullscreen                   â•‘
-â•‘  Super + Space          â†’ Toggle floating mode                â•‘
-â•‘  Super + P              â†’ Toggle pseudo-tiling                â•‘
-â•‘  Super + J              â†’ Toggle split direction              â•‘
-â•‘  Super + Mouse Drag     â†’ Move/resize floating window         â•‘
-â•‘                                                               â•‘
-â•‘  â”€â”€ WORKSPACES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€  â•‘
-â•‘  Super + 1-9            â†’ Switch to workspace 1-9             â•‘
-â•‘  Super + Shift + 1-9    â†’ Move window to workspace 1-9        â•‘
-â•‘  Super + Scroll          â†’ Cycle through workspaces           â•‘
-â•‘  Super + Tab            â†’ Overview (if plugin enabled)        â•‘
-â•‘                                                               â•‘
-â•‘  â”€â”€ SCREENSHOTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€  â•‘
-â•‘  Print                  â†’ Screenshot full screen              â•‘
-â•‘  Super + Shift + S      â†’ Screenshot region (select area)     â•‘
-â•‘                                                               â•‘
-â•‘  â”€â”€ MEDIA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€  â•‘
-â•‘  Volume Up/Down/Mute    â†’ Audio control                       â•‘
-â•‘  Brightness Up/Down     â†’ Screen brightness                   â•‘
-â•‘                                                               â•‘
-â•‘  â”€â”€ HELPER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€  â•‘
-â•‘  Super + /              â†’ Show this cheatsheet                â•‘
-â•‘  Type 'keys' in term    â†’ Also shows this cheatsheet          â•‘
-â•‘                                                               â•‘
-â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+—
+—  ðŸŽ® HYPRLAND KEYBINDING CHEATSHEET — CachyOS Edition        —
+—
+—                                                               —
+—  — ESSENTIALS —  —
+—  Super + Enter          → Open Kitty Terminal                 —
+—  Super + Q              → Close focused window                —
+—  Super + D              → App Launcher (rofi)                 —
+—  Super + X              → Nexus Command Center                —
+—  Super + M              → Exit Hyprland                       —
+—  Super + V              → Clipboard history                   —
+—  Super + L              → Lock screen                         —
+—                                                               —
+—  — WINDOW MANAGEMENT —  —
+—  Super + Arrow Keys     → Move focus between windows          —
+—  Super + Shift + Arrows → Move window position                —
+—  Super + F              → Toggle fullscreen                   —
+—  Super + Space          → Toggle floating mode                —
+—  Super + P              → Toggle pseudo-tiling                —
+—  Super + J              → Toggle split direction              —
+—  Super + Mouse Drag     → Move/resize floating window         —
+—                                                               —
+—  — WORKSPACES —  —
+—  Super + 1-9            → Switch to workspace 1-9             —
+—  Super + Shift + 1-9    → Move window to workspace 1-9        —
+—  Super + Scroll          → Cycle through workspaces           —
+—  Super + Tab            → Overview (if plugin enabled)        —
+—                                                               —
+—  — SCREENSHOTS —  —
+—  Print                  → Screenshot full screen              —
+—  Super + Shift + S      → Screenshot region (select area)     —
+—                                                               —
+—  — MEDIA —  —
+—  Volume Up/Down/Mute    → Audio control                       —
+—  Brightness Up/Down     → Screen brightness                   —
+—                                                               —
+—  — HELPER —  —
+—  Super + /              → Show this cheatsheet                —
+—  Type 'keys' in term    → Also shows this cheatsheet          —
+—                                                               —
+—
 CHEATEOF
 
 # --- Helper script to display cheatsheet via rofi ---
@@ -77,7 +77,7 @@ chmod +x "$HOME/.config/hypr/show-keys.sh"
 
 # --- Hyprland config ---
 cat > "$HOME/.config/hypr/hyprland.conf" << 'HYPREOF'
-# â”€â”€â”€ Hyprland Config â€” CachyOS Advan WorkPro â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# — Hyprland Config — CachyOS Advan WorkPro —
 # Monitor (auto-detect)
 monitor=,preferred,auto,1
 
@@ -90,12 +90,12 @@ exec-once = wl-paste --type image --watch cliphist store
 exec-once = /usr/lib/polkit-kde-authentication-agent-1
 exec-once = hypridle
 
-# â”€â”€â”€ Environment â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# — Environment —
 env = XCURSOR_SIZE,24
 env = XCURSOR_THEME,catppuccin-mocha-dark-cursors
 env = QT_QPA_PLATFORMTHEME,qt6ct
 
-# â”€â”€â”€ Input â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# — Input —
 input {
     kb_layout = us
     follow_mouse = 1
@@ -107,7 +107,7 @@ input {
     sensitivity = 0
 }
 
-# â”€â”€â”€ Appearance â€” Catppuccin Mocha â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# — Appearance — Catppuccin Mocha —
 general {
     gaps_in = 4
     gaps_out = 8
@@ -161,7 +161,7 @@ misc {
     disable_splash_rendering = true
 }
 
-# â”€â”€â”€ Window Rules â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# — Window Rules —
 windowrulev2 = float, class:^(floating-helper)$
 windowrulev2 = center, class:^(floating-helper)$
 windowrulev2 = size 640 480, class:^(floating-helper)$
@@ -171,7 +171,7 @@ windowrulev2 = float, title:^(File Operation Progress)$
 windowrulev2 = opacity 0.92 0.85, class:^(kitty)$
 windowrulev2 = opacity 0.92 0.85, class:^(Code)$
 
-# â”€â”€â”€ Keybindings â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# — Keybindings —
 $mainMod = SUPER
 
 bind = $mainMod, Return, exec, kitty
@@ -254,7 +254,7 @@ ok "Hyprland configured with cheatsheet helper (Super + / to view)"
 log "Writing Rofi Catppuccin theme..."
 mkdir -p "$HOME/.config/rofi"
 cat > "$HOME/.config/rofi/config.rasi" << 'ROFIEOF'
-/* â”€â”€â”€ Rofi â€” Catppuccin Mocha Glass â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* — Rofi — Catppuccin Mocha Glass — */
 configuration {
     modi: "drun,run,window,filebrowser";
     show-icons: true;
@@ -347,7 +347,7 @@ ok "Rofi Catppuccin glass theme written"
 log "Writing Dunst notification config..."
 mkdir -p "$HOME/.config/dunst"
 cat > "$HOME/.config/dunst/dunstrc" << 'DUNSTEOF'
-# â”€â”€â”€ Dunst â€” Catppuccin Mocha â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# — Dunst — Catppuccin Mocha —
 [global]
     monitor = 0
     follow = mouse
@@ -418,7 +418,7 @@ ok "Dunst Catppuccin notifications configured"
 # --- Hyprlock (Aesthetic Lock Screen) ---
 log "Writing Hyprlock config..."
 cat > "$HOME/.config/hypr/hyprlock.conf" << 'LOCKEOF'
-# â”€â”€â”€ Hyprlock â€” Catppuccin Mocha Lock Screen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# — Hyprlock — Catppuccin Mocha Lock Screen —
 background {
     monitor =
     path = screenshot

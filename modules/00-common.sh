@@ -57,7 +57,7 @@ install_aur() {
     local pkgs=("$@")
     local to_install=()
     for pkg in "${pkgs[@]}"; do
-        if ! pacman -Qi "$pkg" &>/dev/null && ! paru -Qi "$pkg" &>/dev/null 2>/dev/null; then
+        if ! pacman -Qi "$pkg" &>/dev/null && ! paru -Qi "$pkg" &>/dev/null; then
             to_install+=("$pkg")
         fi
     done

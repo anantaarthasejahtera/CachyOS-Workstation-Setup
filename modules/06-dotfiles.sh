@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Module 06: Shell, Terminal & Dotfiles
 source "$(dirname "$0")/00-common.sh"
 # MODULE 4: Shell & Terminal Aesthetic
@@ -46,7 +46,7 @@ ok "Shell & terminal aesthetic ready"
 # =====================================================================
 # MODULE 5: Desktop Aesthetic (KDE Plasma + Catppuccin)
 # =====================================================================
-header "Desktop Aesthetic â€” Catppuccin Mocha Rice"
+header "Desktop Aesthetic — Catppuccin Mocha Rice"
 
 # --- Catppuccin KDE Theme ---
 log "Installing Catppuccin theme suite..."
@@ -174,7 +174,7 @@ ok "PipeWire low-latency configured"
 # --- Kernel tuning (sysctl) ---
 log "Applying kernel performance tuning..."
 sudo tee /etc/sysctl.d/99-performance.conf > /dev/null << 'SYSEOF'
-# â”€â”€â”€ Memory Management â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# — Memory Management —
 # Reduce swap aggressiveness (16GB RAM = less swap needed)
 vm.swappiness = 10
 # Keep filesystem metadata cached longer
@@ -183,14 +183,14 @@ vm.vfs_cache_pressure = 50
 vm.dirty_ratio = 10
 vm.dirty_background_ratio = 5
 
-# â”€â”€â”€ Network Performance â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# — Network Performance —
 net.core.netdev_max_backlog = 16384
 net.core.somaxconn = 8192
 net.ipv4.tcp_fastopen = 3
 net.ipv4.tcp_max_syn_backlog = 8192
 net.ipv4.tcp_tw_reuse = 1
 
-# â”€â”€â”€ Kernel Hardening + Performance â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# — Kernel Hardening + Performance —
 kernel.nmi_watchdog = 0
 # Increase inotify watchers (for VS Code, Node.js file watching)
 fs.inotify.max_user_watches = 524288
@@ -269,7 +269,7 @@ else
     ok "SSH key already exists"
 fi
 
-# --- Cloudflare DNS (1.1.1.1 â€” faster + privacy) ---
+# --- Cloudflare DNS (1.1.1.1 — faster + privacy) ---
 log "Setting Cloudflare DNS..."
 sudo mkdir -p /etc/systemd/resolved.conf.d
 cat << 'DNSEOF' | sudo tee /etc/systemd/resolved.conf.d/dns.conf > /dev/null
@@ -380,7 +380,7 @@ mkdir -p "$HOME/projects" "$HOME/scripts" "$HOME/docker" "$HOME/.config"
 log "Writing Kitty config..."
 mkdir -p "$HOME/.config/kitty"
 cat > "$HOME/.config/kitty/kitty.conf" << 'KITTYEOF'
-# â”€â”€â”€ Kitty â€” Catppuccin Mocha â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# — Kitty — Catppuccin Mocha —
 font_family      JetBrainsMono Nerd Font
 bold_font        auto
 italic_font      auto
@@ -411,7 +411,7 @@ tab_bar_style            powerline
 tab_powerline_style      slanted
 active_tab_font_style    bold
 
-# â”€â”€â”€ Catppuccin Mocha Colors â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# — Catppuccin Mocha Colors —
 # The basic 16 colors
 foreground              #CDD6F4
 background              #1E1E2E
@@ -462,11 +462,11 @@ ok "Kitty config written"
 log "Writing Starship config..."
 mkdir -p "$HOME/.config"
 cat > "$HOME/.config/starship.toml" << 'STAREOF'
-# â”€â”€â”€ Starship â€” Catppuccin Mocha â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# — Starship — Catppuccin Mocha —
 palette = "catppuccin_mocha"
 
 format = """
-[â–‘â–’â–“](#89B4FA)\
+[—](#89B4FA)\
 $os\
 $username\
 [](bg:#CBA6F7 fg:#89B4FA)\
@@ -507,7 +507,7 @@ disabled = false
 style = "bg:#CBA6F7 fg:#1E1E2E"
 format = "[ $path ]($style)"
 truncation_length = 3
-truncation_symbol = "â€¦/"
+truncation_symbol = "—/"
 
 [git_branch]
 symbol = ""
@@ -565,8 +565,8 @@ style = "bg:#F9E2AF fg:#1E1E2E"
 format = '[ ó°¥” $time ]($style)'
 
 [character]
-success_symbol = '[â¯](bold #A6E3A1)'
-error_symbol = '[â¯](bold #F38BA8)'
+success_symbol = '[—](bold #A6E3A1)'
+error_symbol = '[—](bold #F38BA8)'
 
 [palettes.catppuccin_mocha]
 rosewater = "#f5e0dc"
@@ -601,7 +601,7 @@ ok "Starship config written"
 # --- Zshrc ---
 log "Writing .zshrc..."
 cat > "$HOME/.zshrc" << 'ZSHEOF'
-# â”€â”€â”€ CachyOS Zsh Config â€” Aesthetic + Productive â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# — CachyOS Zsh Config — Aesthetic + Productive —
 export ZSH="$HOME/.oh-my-zsh"
 
 # Plugins
@@ -620,10 +620,10 @@ plugins=(
 
 source $ZSH/oh-my-zsh.sh
 
-# â”€â”€â”€ Starship Prompt â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# — Starship Prompt —
 eval "$(starship init zsh)"
 
-# â”€â”€â”€ Tool Initialization â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# — Tool Initialization —
 eval "$(fnm env --use-on-cd)"
 eval "$(zoxide init zsh)"
 eval "$(direnv hook zsh)"      # auto-load .envrc per project
@@ -648,7 +648,7 @@ export PATH="$HOME/.flutter-sdk/bin:$PATH"
 export JAVA_HOME="/usr/lib/jvm/java-17-openjdk"
 export CHROME_EXECUTABLE="$(which zen-browser 2>/dev/null || which firefox 2>/dev/null || echo '')"
 
-# â”€â”€â”€ Modern Aliases â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# — Modern Aliases —
 alias ls='eza --icons --group-directories-first'
 alias ll='eza -la --icons --group-directories-first --git'
 alias lt='eza --tree --icons --level=2'
@@ -677,8 +677,8 @@ alias gb='git branch'
 alias gpl='git pull'
 
 # System aliases
-alias update='sudo pacman -Syu && flatpak update -y && rustup update 2>/dev/null; echo "âœ… System updated"'
-alias cleanup='sudo pacman -Sc --noconfirm && pacman -Qdtq | xargs -r sudo pacman -Rns --noconfirm 2>/dev/null; echo "âœ… Cleanup done"'
+alias update='sudo pacman -Syu && flatpak update -y && rustup update 2>/dev/null; echo "— System updated"'
+alias cleanup='sudo pacman -Sc --noconfirm && pacman -Qdtq | xargs -r sudo pacman -Rns --noconfirm 2>/dev/null; echo "— Cleanup done"'
 alias ff='fastfetch'
 alias keys='cat ~/.config/hypr/cheatsheet.txt 2>/dev/null || echo "Hyprland cheatsheet not found"'
 alias ports='ss -tulnp'
@@ -708,7 +708,7 @@ alias cleanup='sudo pacman -Rns $(pacman -Qdtq) 2>/dev/null; paru -Sc --noconfir
 alias ff='fastfetch'
 alias keys='cat ~/.config/hypr/cheatsheet.txt 2>/dev/null || echo "Hyprland not configured"'
 
-# â”€â”€â”€ FZF Config â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# — FZF Config —
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
 export FZF_DEFAULT_OPTS=" \
   --color=bg+:#313244,bg:#1e1e2e,spinner:#f5e0dc,hl:#f38ba8 \
@@ -716,7 +716,7 @@ export FZF_DEFAULT_OPTS=" \
   --color=marker:#f5e0dc,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8 \
   --border rounded --margin 1 --padding 1"
 
-# â”€â”€â”€ Greeting â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# — Greeting —
 fastfetch 2>/dev/null || true
 ZSHEOF
 ok ".zshrc written"
@@ -748,7 +748,7 @@ mkdir -p "$HOME/.config/fastfetch"
 cat > "$HOME/.config/fastfetch/config.jsonc" << 'FFEOF'
 {
     "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
-    "display": { "separator": " â†’ " },
+    "display": { "separator": " → " },
     "modules": [
         "title", "separator",
         "os", "host", "kernel",
@@ -817,7 +817,7 @@ mkdir -p "$NVIM_DIR/lua/plugins"
 
 # Init lazy.nvim
 cat > "$NVIM_DIR/init.lua" << 'NVIMINIT'
--- â”€â”€â”€ Neovim â€” Catppuccin Mocha â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- — Neovim — Catppuccin Mocha —
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 

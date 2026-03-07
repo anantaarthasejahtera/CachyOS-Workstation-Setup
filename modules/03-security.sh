@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Module 03: Security & Maintenance
 source "$(dirname "$0")/00-common.sh"
 header "Security & Maintenance"
@@ -24,7 +24,7 @@ else
     ok "SSH key already exists"
 fi
 
-# --- Cloudflare DNS (1.1.1.1 â€” faster + privacy) ---
+# --- Cloudflare DNS (1.1.1.1 — faster + privacy) ---
 log "Setting Cloudflare DNS..."
 sudo mkdir -p /etc/systemd/resolved.conf.d
 cat << 'DNSEOF' | sudo tee /etc/systemd/resolved.conf.d/dns.conf > /dev/null
