@@ -30,12 +30,13 @@ A **modular installer** that transforms a fresh CachyOS installation into a full
 
 Features:
 
-- **TUI installer** — Catppuccin-themed module selector with progress bars
+- **TUI installer** — Catppuccin-themed module selector with bilingual support (EN/ID) and progress bars
 - **Nexus v2** — Smart command center popup with 45+ actions and live system stats
 - **Guide v3** — 160+ searchable entries, executable, bilingual (EN/ID)
 - **Living Ecosystem (v4)** — 6 integrated tools: theming, rollback, cloud sync, AI tuning, app store, health check
 - **15 modules** — each independently runnable, fully idempotent
 - **Hardware-aware** — GPU auto-detect, dynamic hugepages, Secure Boot MOK, GPU-scaled configs
+- **Automated CI/CD** — Secure branch protection, Dependabot, and Automated GitHub Releases pipeline
 - **Post-update safety** — Pacman hook auto-validates system after kernel/WM/GPU updates
 
 ### 🎯 Who Is This For?
@@ -464,7 +465,15 @@ Launch from **Nexus** (`Super+X` → Time Machine) or terminal:
 config-rollback
 ```
 
-### Via CLI (Manual)
+### Via Uninstaller Script (Graceful Removal)
+
+We provide a dedicated cleanup script that safely removes the Nexus command center, interactive guides, ecosystem binaries, custom Rofi UI themes, and Pacman hooks without deleting your personal files or touching core packages.
+
+```bash
+./uninstall.sh
+```
+
+### Via CLI (Manual Rollback)
 
 ```bash
 # 1. List available backups (sorted by date)
