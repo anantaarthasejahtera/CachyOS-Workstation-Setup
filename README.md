@@ -26,16 +26,17 @@
 
 ## ✨ Overview
 
-A **modular installer** that transforms a fresh CachyOS installation into a fully configured, aesthetically stunning developer workstation. **Also safe on existing systems** — all configs are automatically backed up to `~/.config-backup/` before any changes, so nothing is ever lost.
+A **modular installer** that transforms a fresh CachyOS installation into a fully configured, aesthetically stunning developer workstation. Auto-detects your hardware (GPU, RAM, CPU cores, Secure Boot) and adapts accordingly. **Safe on existing systems** — all configs are automatically backed up to `~/.config-backup/` before any changes.
 
 Features:
 
 - **TUI installer** — Catppuccin-themed module selector with progress bars
-- **Nexus v2** — Smart command center popup with live system stats
+- **Nexus v2** — Smart command center popup with 45+ actions and live system stats
 - **Guide v3** — 160+ searchable entries, executable, bilingual (EN/ID)
-- **Living Ecosystem (v4)** — Dynamic theming, config rollback, cloud sync, AI auto-tuning, GUI app store, health check
+- **Living Ecosystem (v4)** — 6 integrated tools: theming, rollback, cloud sync, AI tuning, app store, health check
 - **15 modules** — each independently runnable, fully idempotent
-- **50+ tools** — dev, AI, gaming, VM, productivity
+- **Hardware-aware** — GPU auto-detect, dynamic hugepages, Secure Boot MOK, GPU-scaled configs
+- **Post-update safety** — Pacman hook auto-validates system after kernel/WM/GPU updates
 
 ### 🎯 Who Is This For?
 
@@ -135,7 +136,7 @@ CachyOS-Workstation-Setup/
 ├── installer.sh              # TUI installer (dialog-based)
 ├── nexus.sh                  # Nexus v2 Command Center (Super+X)
 ├── guide.sh                  # Guide v3 — bilingual reference (EN/ID)
-├── ecosystem/                # Phase 4 Living Ecosystem Utilities
+├── ecosystem/                # Living Ecosystem (6 integrated tools)
 │   ├── theme-switch.sh       # Dynamic Catppuccin flavor hot-swapper
 │   ├── config-rollback.sh    # Time Machine config restoration GUI
 │   ├── dotfiles-sync.sh      # Cloud Git sync for ~/.config
@@ -161,14 +162,15 @@ CachyOS-Workstation-Setup/
 │   └── 15-ecosystem.sh       # Installs Living Ecosystem Utilities
 ├── README.md
 ├── LICENSE
-└── .gitignore
+├── .gitignore
+└── .gitattributes            # Enforce LF line endings for .sh files
 ```
 
 ### Module Details
 
 | # | Module | Size | Key Tools |
 |---|--------|------|-----------|
-| 01 | Base & GPU | ~2 GB | GPU auto-detect (Intel/AMD/NVIDIA), paru, base-devel |
+| 01 | Base & GPU | ~2 GB | GPU auto-detect (Intel/AMD/NVIDIA), Secure Boot MOK, paru, base-devel |
 | 02 | Kernel | ~0 MB | sysctl tuning, NVMe optimization, THP, GuC/HuC |
 | 03 | Security | ~50 MB | UFW, SSH key (ed25519), Cloudflare DNS, Zram, Timeshift |
 | 04 | Dev Tools | ~4 GB | Docker, Node/fnm/pnpm, Python/uv, Rust, Go, CLI power tools |
@@ -178,8 +180,8 @@ CachyOS-Workstation-Setup/
 | 08 | Desktop | ~300 MB | KDE Catppuccin theme, GRUB theme, Inter + Nerd Fonts |
 | 09 | Hyprland | ~200 MB | Tiling WM, keybinds, Rofi, Hyprlock, Hypridle |
 | 10 | Apps | ~500 MB | Zen Browser, tmux, Spotify/Telegram/Discord (Flatpak) |
-| 11 | Gaming | ~3 GB | Steam (Proton), PCSX2, PrismLauncher, Roblox, MangoHud |
-| 12 | VM | ~2 GB | QEMU/KVM (hugepages, CPU pinning), Bottles, LibreOffice |
+| 11 | Gaming | ~3 GB | Steam (Proton), PCSX2 (GPU-aware config), PrismLauncher, Roblox, MangoHud |
+| 12 | VM | ~2 GB | QEMU/KVM (dynamic hugepages, CPU pinning), Bottles, LibreOffice |
 | 13 | Waybar | ~5 MB | Glassmorphism status bar with gradient CSS |
 | 14 | Nexus + Guide | ~1 MB | Smart command center + 160-entry bilingual guide |
 | 15 | Ecosystem | ~1 MB | Theme Engine, Config Rollback, Dotfiles Sync, AI Tuner, App Store, Health Check |
@@ -246,7 +248,8 @@ Press **`Super+X`** for a smart popup with **live system stats**:
 │  🎨  Dynamic Theme Switcher                   │
 │  🛡️  Time Machine (Config Rollback)            │
 │  ☁️  Dotfiles Cloud Sync                       │
-│  🧠  AI Auto-Tuner $ollama_status             │
+│  🧠  AI Auto-Tuner                            │
+│  🩺  System Health Check                      │
 │  ────────────────────────────────────────────  │
 │    Guide Popup (160+ entries)                 │
 ╰────────────────────────────────────────────────╯
@@ -364,10 +367,13 @@ All accessible via **Nexus** → AI section, or terminal `ollama run <model>`.
 
 Each module sources `modules/00-common.sh` which provides:
 
-- **Idempotent configs** — Existing configs backed up to `~/.config-backup/` before overwriting
+- **Safe configs** — `safe_config()` auto-backs up to `~/.config-backup/` before every overwrite
+- **Idempotent** — Re-run any module safely without side effects
 - **Smart installs** — Packages checked before install (no reinstalling)
+- **Hardware-aware** — GPU, RAM, CPU cores, and Secure Boot detected automatically
 - **Logging** — Everything logged to `~/cachy-setup.log`
 - **Run individual modules** — `bash modules/04-dev.sh` (test one module)
+- **Post-update safety** — Pacman hook runs `health-check` after critical updates
 
 ---
 
@@ -441,10 +447,11 @@ The setup script auto-detects hardware via `lspci` and `/proc/cpuinfo`, but some
 CachyOS (Arch-based) uses rolling releases. System updates **can** break configs. Our defense layers:
 
 ```
-Layer 1: safe_config()  → Auto-backup before every config change
+Layer 1: safe_config()   → Auto-backup before every config change
 Layer 2: config-rollback → Rofi GUI to restore any backup (Super+X → Time Machine)
-Layer 3: dotfiles-sync  → Cloud Git sync for disaster recovery
-Layer 4: Idempotent     → Re-run any module to re-apply: bash modules/09-hyprland.sh
+Layer 3: dotfiles-sync   → Cloud Git sync for disaster recovery
+Layer 4: Idempotent      → Re-run any module to re-apply: bash modules/09-hyprland.sh
+Layer 5: health-check    → Pacman hook auto-validates after kernel/WM/GPU updates
 ```
 
 **What CAN break after `pacman -Syu`:**
