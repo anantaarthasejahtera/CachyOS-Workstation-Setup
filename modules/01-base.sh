@@ -38,7 +38,7 @@ if echo "$GPU_VENDOR" | grep -qi 'nvidia'; then
         log "  Generating MOK signing key for NVIDIA DKMS..."
         if [ ! -f /root/mok.der ]; then
             # Ask for user confirmation before generating cryptographic keys
-            local mok_confirm="y"
+            mok_confirm="y"
             if [ -t 0 ]; then
                 echo -n "  Generate MOK signing key for Secure Boot NVIDIA? [Y/n]: "
                 read -r mok_confirm

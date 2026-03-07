@@ -399,7 +399,7 @@ ok ".zshrc written"
 log "Setting zsh as default shell..."
 if [ "$SHELL" != "$(which zsh)" ]; then
     # Ensure zsh is in /etc/shells before changing
-    grep -q "$(which zsh)" /etc/shells 2>/dev/null || echo "$(which zsh)" | sudo tee -a /etc/shells
+    grep -q "$(which zsh)" /etc/shells 2>/dev/null || which zsh | sudo tee -a /etc/shells
     chsh -s "$(which zsh)"
 fi
 
