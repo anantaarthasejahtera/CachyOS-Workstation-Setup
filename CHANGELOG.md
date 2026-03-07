@@ -6,6 +6,30 @@
 
 <hr>
 
+## [v1.4.0] - The External Audit Sweep (2026-03-07)
+
+All 23 findings from the comprehensive external DOCX audit have been resolved. 16 files modified.
+
+### 🔴 Critical Fixes
+- **Time Machine**: Fixed tilde expansion bug — config restore always failed silently because `~` was not expanded to `$HOME` in the file path
+- **VM Module**: `$VM_POOL` variable moved before first use (was empty in hugepages messages)
+- **Cleanup Service**: Removed redundant `sudo` from root-owned systemd service; added explicit `User=root`
+
+### 🟡 Bug Fixes
+- **Roblox Duplicate**: Removed duplicate Sober/Roblox install from Module 10 (kept in Module 11 Gaming)
+- **chsh Safety**: Now verifies `/etc/shells` contains zsh before calling `chsh`
+- **fnm PATH Race**: Added `hash -r` + `command -v` guard after fnm install
+- **Credential Leak Prevention**: Expanded dotfiles-sync `.gitignore` with `gnupg/`, `**/token*`, `**/secret*`, `**/*.key` patterns
+- **Error Propagation**: Added `set -euo pipefail` to all 9 modules (01-09) that were missing it
+
+### 📝 Documentation & Cleanup
+- Fixed THP description (`Disables` → `Sets to madvise`) in modules.md
+- Fixed Nexus path reference (`~/.local/bin` → `/usr/local/bin`) in modules.md
+- Fixed ecosystem tool count (5 → 7) in modules.md
+- Removed dead `status_icon()` function from nexus.sh
+
+---
+
 ## [v1.3.0] - The Bulletproof Audit (2026-03-07)
 
 Deep line-by-line audit of every file in the repository. 30 findings fixed across 17 files.
