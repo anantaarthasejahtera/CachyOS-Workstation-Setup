@@ -414,7 +414,7 @@ cat ~/cachy-setup.log | grep "Installing"
 
 ## ⚠️ Known Limitations & Maintenance
 
-> Transparency builds trust. Here's what you should know before deploying.
+> This script handles most hardware and software variations automatically, but some edge cases may require manual attention.
 
 ### 🖥️ Hardware Edge Cases
 
