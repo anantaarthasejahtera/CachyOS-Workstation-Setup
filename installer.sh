@@ -100,7 +100,7 @@ show_welcome() {
     ║  Theme: Catppuccin Mocha            ║\n\
     ║  Modules: 15 (fully modular)        ║\n\
     ║  Tools: 50+ pre-configured          ║\n\
-    ║  Guide: 150+ searchable entries     ║\n\
+    ║  Guide: 160+ searchable entries     ║\n\
     ║                                      ║\n\
     ║  Select modules on next screen.      ║\n\
     ║  All checked = full install.         ║\n\

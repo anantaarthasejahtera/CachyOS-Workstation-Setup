@@ -13,7 +13,7 @@
   <img src="https://img.shields.io/badge/Theme-Catppuccin%20Mocha-cba6f7?style=for-the-badge" alt="Catppuccin"/>
   <img src="https://img.shields.io/badge/Modules-15-a6e3a1?style=for-the-badge" alt="Modules"/>
   <img src="https://img.shields.io/badge/Tools-50+-89b4fa?style=for-the-badge" alt="Tools"/>
-  <img src="https://img.shields.io/badge/Guide-150+%20entries-f5c2e7?style=for-the-badge" alt="Guide"/>
+  <img src="https://img.shields.io/badge/Guide-160+%20entries-f5c2e7?style=for-the-badge" alt="Guide"/>
   <img src="https://img.shields.io/badge/Language-EN%20%7C%20ID-f9e2af?style=for-the-badge" alt="Bilingual"/>
   <img src="https://img.shields.io/badge/License-MIT-f9e2af?style=for-the-badge" alt="License"/>
 </p>
@@ -26,7 +26,7 @@ A **modular installer** that transforms a fresh CachyOS installation into a full
 
 - **TUI installer** — Catppuccin-themed module selector with progress bars
 - **Nexus v2** — Smart command center popup with live system stats
-- **Guide v3** — 150+ searchable entries, executable, bilingual (EN/ID)
+- **Guide v3** — 160+ searchable entries, executable, bilingual (EN/ID)
 - **Living Ecosystem (v4)** — Dynamic theming, config rollback, cloud sync, AI auto-tuning, GUI app store
 - **15 modules** — each independently runnable
 - **50+ tools** — dev, AI, gaming, VM, productivity
@@ -199,7 +199,13 @@ Press **`Super+X`** for a smart popup with **live system stats**:
 │    Docker Manager 🟢                          │
 │    VM Manager 🔴                              │
 │  ────────────────────────────────────────────  │
-│    Guide Popup (150+ entries)                 │
+│  🏪  GUI App Store (Browse & Install)         │
+│  🎨  Dynamic Theme Switcher                   │
+│  🛡️  Time Machine (Config Rollback)            │
+│  ☁️  Dotfiles Cloud Sync                       │
+│  🧠  AI Auto-Tuner $ollama_status             │
+│  ────────────────────────────────────────────  │
+│    Guide Popup (160+ entries)                 │
 ╰────────────────────────────────────────────────╯
 ```
 
@@ -243,7 +249,7 @@ guide --lang en    # 🇬🇧 English
 
 | Feature | Description |
 |---------|-------------|
-| **150+ entries** | 15 categories (hyprland, shell, git, docker, node, python, rust, go, flutter, editor, ai, gaming, vm, apps, system) |
+| **160+ entries** | 16 categories (hyprland, shell, git, docker, node, python, rust, go, flutter, editor, ai, gaming, vm, apps, system, ecosystem) |
 | **Executable** | Press Enter on any ▶ entry to run the command directly |
 | **Preview pane** | fzf right panel shows detailed explanation + examples |
 | **Bilingual** | Full English and Indonesian translations (auto-detected from locale) |
