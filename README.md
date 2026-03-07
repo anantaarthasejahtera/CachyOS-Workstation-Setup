@@ -62,7 +62,7 @@ Features:
 # If not: sudo pacman -S git
 
 # Clone
-git clone https://github.com/rixzkiye/CachyOS-Workstation-Setup.git
+git clone https://github.com/anantaarthasejahtera/CachyOS-Workstation-Setup.git
 cd CachyOS-Workstation-Setup
 
 # Edit your identity

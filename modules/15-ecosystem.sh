@@ -12,7 +12,7 @@ if [ -f "$REPO_DIR/ecosystem/theme-switch.sh" ]; then
     cp "$REPO_DIR/ecosystem/theme-switch.sh" "$HOME/.local/bin/theme-switch"
 else
     curl -fsSL -o "$HOME/.local/bin/theme-switch" \
-        "https://raw.githubusercontent.com/rixzkiye/CachyOS-Workstation-Setup/main/ecosystem/theme-switch.sh" 2>/dev/null || true
+        "https://raw.githubusercontent.com/anantaarthasejahtera/CachyOS-Workstation-Setup/main/ecosystem/theme-switch.sh" 2>/dev/null || true
 fi
 chmod +x "$HOME/.local/bin/theme-switch"
 ok "Theme Switcher installed"
@@ -23,7 +23,7 @@ if [ -f "$REPO_DIR/ecosystem/config-rollback.sh" ]; then
     cp "$REPO_DIR/ecosystem/config-rollback.sh" "$HOME/.local/bin/config-rollback"
 else
     curl -fsSL -o "$HOME/.local/bin/config-rollback" \
-        "https://raw.githubusercontent.com/rixzkiye/CachyOS-Workstation-Setup/main/ecosystem/config-rollback.sh" 2>/dev/null || true
+        "https://raw.githubusercontent.com/anantaarthasejahtera/CachyOS-Workstation-Setup/main/ecosystem/config-rollback.sh" 2>/dev/null || true
 fi
 chmod +x "$HOME/.local/bin/config-rollback"
 ok "Config Rollback installed"
@@ -34,7 +34,7 @@ if [ -f "$REPO_DIR/ecosystem/dotfiles-sync.sh" ]; then
     cp "$REPO_DIR/ecosystem/dotfiles-sync.sh" "$HOME/.local/bin/dotfiles-sync"
 else
     curl -fsSL -o "$HOME/.local/bin/dotfiles-sync" \
-        "https://raw.githubusercontent.com/rixzkiye/CachyOS-Workstation-Setup/main/ecosystem/dotfiles-sync.sh" 2>/dev/null || true
+        "https://raw.githubusercontent.com/anantaarthasejahtera/CachyOS-Workstation-Setup/main/ecosystem/dotfiles-sync.sh" 2>/dev/null || true
 fi
 chmod +x "$HOME/.local/bin/dotfiles-sync"
 ok "Cloud Sync installed"
@@ -45,7 +45,7 @@ if [ -f "$REPO_DIR/ecosystem/ai-tuner.sh" ]; then
     cp "$REPO_DIR/ecosystem/ai-tuner.sh" "$HOME/.local/bin/ai-tuner"
 else
     curl -fsSL -o "$HOME/.local/bin/ai-tuner" \
-        "https://raw.githubusercontent.com/rixzkiye/CachyOS-Workstation-Setup/main/ecosystem/ai-tuner.sh" 2>/dev/null || true
+        "https://raw.githubusercontent.com/anantaarthasejahtera/CachyOS-Workstation-Setup/main/ecosystem/ai-tuner.sh" 2>/dev/null || true
 fi
 chmod +x "$HOME/.local/bin/ai-tuner"
 ok "AI Auto-Tuner installed"
@@ -56,7 +56,7 @@ if [ -f "$REPO_DIR/ecosystem/app-store.sh" ]; then
     cp "$REPO_DIR/ecosystem/app-store.sh" "$HOME/.local/bin/app-store"
 else
     curl -fsSL -o "$HOME/.local/bin/app-store" \
-        "https://raw.githubusercontent.com/rixzkiye/CachyOS-Workstation-Setup/main/ecosystem/app-store.sh" 2>/dev/null || true
+        "https://raw.githubusercontent.com/anantaarthasejahtera/CachyOS-Workstation-Setup/main/ecosystem/app-store.sh" 2>/dev/null || true
 fi
 chmod +x "$HOME/.local/bin/app-store"
 ok "GUI App Store installed"
