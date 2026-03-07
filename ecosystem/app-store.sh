@@ -48,10 +48,27 @@ declare -A UTILS=(
     ["Nextcloud Desktop"]="nextcloud-client|pacman"
 )
 
+# ─── Custom User Apps ───
+# Load from ~/.config/app-store-custom.conf
+# Format: CategoryName|AppName|package_name|manager
+CUSTOM_CONF="$HOME/.config/app-store-custom.conf"
+declare -A CUSTOM=()
+if [ -f "$CUSTOM_CONF" ]; then
+    while IFS='|' read -r _cat app_name pkg_name manager; do
+        [[ "$_cat" =~ ^#.*$ ]] && continue  # Skip comments
+        [ -z "$app_name" ] && continue       # Skip empty lines
+        CUSTOM["$app_name"]="$pkg_name|$manager"
+    done < "$CUSTOM_CONF"
+fi
+
 # ─── Main Logic ───
 
 # 1. Select Category
-category=$(echo -e "🌐 Browsers\n💻 Development Tools\n🎮 Gaming & Chat\n🎨 Design & Media\n🛡️ Utilities" | rofi -dmenu -i -p "🏪 App Store" -width 400)
+# Build category list (add Custom only if user has custom apps)
+category_list="🌐 Browsers\n💻 Development Tools\n🎮 Gaming & Chat\n🎨 Design & Media\n🛡️ Utilities"
+[ ${#CUSTOM[@]} -gt 0 ] && category_list+="\n⭐ My Custom Apps"
+
+category=$(echo -e "$category_list" | rofi -dmenu -i -p "🏪 App Store" -width 400)
 [ -z "$category" ] && exit 0
 
 # 2. Extract apps based on category
@@ -62,6 +79,7 @@ case "$category" in
     *"Gaming"*) current_dict=GAMING ;;
     *"Design"*) current_dict=MEDIA ;;
     *"Utilities"*) current_dict=UTILS ;;
+    *"Custom"*) current_dict=CUSTOM ;;
     *) exit 0 ;;
 esac
 
