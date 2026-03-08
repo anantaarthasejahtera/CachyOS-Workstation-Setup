@@ -25,8 +25,8 @@ install_aur sddm-theme-catppuccin-mocha 2>/dev/null || true
 
 # --- Wallpapers (3-tier reliability) ---
 # Ensures the user ALWAYS gets an aesthetic wallpaper on first boot.
-# Tier 1: Clone community Catppuccin wallpaper repos
-# Tier 2: Direct curl of individual known-good images
+# Tier 1: Clone established, high-star wallpaper repos
+# Tier 2: Direct curl from Wallhaven CDN (largest wallpaper site)
 # Tier 3: Generate a Catppuccin Mocha gradient via ImageMagick (zero-net fallback)
 log "Setting up aesthetic wallpapers..."
 WALLPAPER_DIR="$HOME/Pictures/Wallpapers"
@@ -34,43 +34,45 @@ mkdir -p "$WALLPAPER_DIR"
 
 wallpapers_acquired=false
 
-# --- Tier 1: Clone repos (multiple community sources) ---
-log "  Tier 1: Trying community wallpaper repos..."
+# --- Tier 1: Clone repos (established, high-star sources) ---
+log "  Tier 1: Trying established wallpaper repos..."
+# D3Ext/aesthetic-wallpapers    — 2.9k ⭐, curated from Unixporn/Reddit/Wallhaven
+# mylinuxforwork/wallpaper      — 564 ⭐, designed for tiling WMs (Hyprland, i3, sway)
 for repo in \
-    "https://github.com/orangci/walls-catppuccin-mocha.git" \
-    "https://github.com/zhichaoh/catppuccin-wallpapers.git" \
-    "https://github.com/Gingeh/wallpapers.git"; do
+    "https://github.com/D3Ext/aesthetic-wallpapers.git" \
+    "https://github.com/mylinuxforwork/wallpaper.git"; do
     if [ "$wallpapers_acquired" = false ]; then
         rm -rf /tmp/cachy-wallpapers-clone
         if git clone --depth=1 "$repo" /tmp/cachy-wallpapers-clone 2>/dev/null; then
-            # Copy only image files (skip READMEs, licenses, etc.)
+            # Copy only image files (skip READMEs, licenses, scripts, etc.)
             find /tmp/cachy-wallpapers-clone -type f \( -name '*.png' -o -name '*.jpg' -o -name '*.jpeg' -o -name '*.webp' \) \
                 -exec cp {} "$WALLPAPER_DIR/" \; 2>/dev/null
             # Verify at least 1 image was copied
-            if [ "$(find "$WALLPAPER_DIR" -type f \( -name '*.png' -o -name '*.jpg' -o -name '*.jpeg' -o -name '*.webp' \) 2>/dev/null | wc -l)" -gt 0 ]; then
+            img_count=$(find "$WALLPAPER_DIR" -type f \( -name '*.png' -o -name '*.jpg' -o -name '*.jpeg' -o -name '*.webp' \) 2>/dev/null | wc -l)
+            if [ "$img_count" -gt 0 ]; then
                 wallpapers_acquired=true
-                ok "Wallpapers downloaded from: $(basename "$repo" .git)"
+                ok "Downloaded $img_count wallpapers from: $(basename "$repo" .git)"
             fi
         fi
         rm -rf /tmp/cachy-wallpapers-clone
     fi
 done
 
-# --- Tier 2: Direct curl of individual images ---
+# --- Tier 2: Direct curl from Wallhaven (largest wallpaper site) ---
 if [ "$wallpapers_acquired" = false ]; then
-    log "  Tier 2: Downloading individual wallpapers via curl..."
-    # Known-good URLs from Catppuccin community (raw GitHub content)
+    log "  Tier 2: Downloading curated wallpapers via curl..."
+    # Dark/moody aesthetic wallpapers from reliable CDNs
     urls=(
-        "https://raw.githubusercontent.com/orangci/walls-catppuccin-mocha/main/01.png"
-        "https://raw.githubusercontent.com/orangci/walls-catppuccin-mocha/main/02.png"
-        "https://raw.githubusercontent.com/orangci/walls-catppuccin-mocha/main/03.png"
+        "https://w.wallhaven.cc/full/x8/wallhaven-x8gkvz.jpg"
+        "https://w.wallhaven.cc/full/we/wallhaven-weqp76.jpg"
+        "https://w.wallhaven.cc/full/72/wallhaven-72rxqo.jpg"
     )
     for url in "${urls[@]}"; do
-        fname="catppuccin-$(basename "$url")"
+        fname="aesthetic-$(basename "$url")"
         curl -fsSL "$url" -o "$WALLPAPER_DIR/$fname" 2>/dev/null && wallpapers_acquired=true || true
     done
     if [ "$wallpapers_acquired" = true ]; then
-        ok "Individual wallpapers downloaded via curl"
+        ok "Curated wallpapers downloaded via curl"
     fi
 fi
 
