@@ -25,8 +25,9 @@ install_aur sddm-theme-catppuccin-mocha 2>/dev/null || true
 
 # --- Wallpapers (3-tier reliability) ---
 # Ensures the user ALWAYS gets an aesthetic wallpaper on first boot.
-# Tier 1: Clone established, high-star wallpaper repos
-# Tier 2: Direct curl from Wallhaven CDN (largest wallpaper site)
+# All sources are specifically chosen to match our Catppuccin Mocha theme.
+# Tier 1: Clone repos with Catppuccin Mocha color-matched wallpapers
+# Tier 2: Direct curl of specific Catppuccin Mocha wallpapers from raw GitHub
 # Tier 3: Generate a Catppuccin Mocha gradient via ImageMagick (zero-net fallback)
 log "Setting up aesthetic wallpapers..."
 WALLPAPER_DIR="$HOME/Pictures/Wallpapers"
@@ -34,13 +35,13 @@ mkdir -p "$WALLPAPER_DIR"
 
 wallpapers_acquired=false
 
-# --- Tier 1: Clone repos (established, high-star sources) ---
-log "  Tier 1: Trying established wallpaper repos..."
-# D3Ext/aesthetic-wallpapers    — 2.9k ⭐, curated from Unixporn/Reddit/Wallhaven
-# mylinuxforwork/wallpaper      — 564 ⭐, designed for tiling WMs (Hyprland, i3, sway)
+# --- Tier 1: Clone repos with Catppuccin-matched wallpapers ---
+log "  Tier 1: Trying Catppuccin-matched wallpaper repos..."
+# orangci/walls-catppuccin-mocha — wallpapers COLOR-CONVERTED to Catppuccin Mocha palette
+# dharmx/walls                  — go-to ricing wallpaper repo, widely used with Catppuccin setups
 for repo in \
-    "https://github.com/D3Ext/aesthetic-wallpapers.git" \
-    "https://github.com/mylinuxforwork/wallpaper.git"; do
+    "https://github.com/orangci/walls-catppuccin-mocha.git" \
+    "https://github.com/dharmx/walls.git"; do
     if [ "$wallpapers_acquired" = false ]; then
         rm -rf /tmp/cachy-wallpapers-clone
         if git clone --depth=1 "$repo" /tmp/cachy-wallpapers-clone 2>/dev/null; then
@@ -58,21 +59,25 @@ for repo in \
     fi
 done
 
-# --- Tier 2: Direct curl from Wallhaven (largest wallpaper site) ---
+# --- Tier 2: Direct curl of Catppuccin Mocha wallpapers from raw GitHub ---
 if [ "$wallpapers_acquired" = false ]; then
-    log "  Tier 2: Downloading curated wallpapers via curl..."
-    # Dark/moody aesthetic wallpapers from reliable CDNs
+    log "  Tier 2: Downloading Catppuccin Mocha wallpapers via curl..."
+    # These are from orangci/walls-catppuccin-mocha — guaranteed Catppuccin Mocha palette
     urls=(
-        "https://w.wallhaven.cc/full/x8/wallhaven-x8gkvz.jpg"
-        "https://w.wallhaven.cc/full/we/wallhaven-weqp76.jpg"
-        "https://w.wallhaven.cc/full/72/wallhaven-72rxqo.jpg"
+        "https://raw.githubusercontent.com/orangci/walls-catppuccin-mocha/master/dark-star.jpg"
+        "https://raw.githubusercontent.com/orangci/walls-catppuccin-mocha/master/eclipse.jpg"
+        "https://raw.githubusercontent.com/orangci/walls-catppuccin-mocha/master/droplets.png"
+        "https://raw.githubusercontent.com/orangci/walls-catppuccin-mocha/master/dragon.jpg"
+        "https://raw.githubusercontent.com/orangci/walls-catppuccin-mocha/refs/heads/master/day-forest-path.png"
+        "https://w.wallhaven.cc/full/2y/wallhaven-2y16jm.png"
+        "https://w.wallhaven.cc/full/ex/wallhaven-exj2yl.png"
     )
     for url in "${urls[@]}"; do
-        fname="aesthetic-$(basename "$url")"
+        fname="catppuccin-$(basename "$url")"
         curl -fsSL "$url" -o "$WALLPAPER_DIR/$fname" 2>/dev/null && wallpapers_acquired=true || true
     done
     if [ "$wallpapers_acquired" = true ]; then
-        ok "Curated wallpapers downloaded via curl"
+        ok "Catppuccin Mocha wallpapers downloaded via curl"
     fi
 fi
 
