@@ -35,7 +35,7 @@ The `SUPER` key (Windows/Cmd key) acts as your primary modifier.
 | **Clipboard History** | `SUPER + V` | Opens Rofi clipboard manager (`cliphist`) |
 | **Notification History** | `SUPER + N` | Shows recent notifications (`dunstctl history-pop`) |
 
-## 💻 Terminal Aliases (`.zshrc`)
+## 💻 Terminal Aliases (`config.fish`)
 
 | Command | Alias Equivalent | Purpose |
 |---------|------------------|---------|

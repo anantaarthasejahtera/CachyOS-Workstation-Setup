@@ -8,7 +8,7 @@ header "Living Ecosystem (8 Integrated Tools)"
 # 1. Theme Engine, Wallpaper Picker, Nexus Chat, AI Power Fix
 log "Installing Theme & Wallpaper Tools..."
 install_ecosystem "theme-switch.sh"
-install_ecosystem "wallpaper-picker.sh"
+# wallpaper-picker removed — using waypaper (GUI app) instead
 install_ecosystem "nexus-chat.sh"
 install_ecosystem "ai-power-fix.sh"
 ok "Theme & Wallpaper tools installed"

@@ -41,7 +41,7 @@ Android and cross-platform native development setup.
 
 ## 06: Shell & Dotfiles
 The terminal aesthetics and core interaction mechanics.
-* Replaces bash with `zsh` running `oh-my-zsh`.
+* Replaces bash with the modern `fish` shell.
 * Injects a customized `Starship.rs` prompt.
 * Binds `fzf` natively to `tab` completions.
 * Installs `kitty` terminal with GPU-accelerated rendering and matching Catppuccin color overlays.
@@ -67,7 +67,7 @@ The defining UI element of the ecosystem.
 Standard workstation applications.
 * Zen Browser (highly optimized Firefox fork).
 * Terminal multiplexing via `tmux`.
-* Flatpak initialization with Spotify, Discord, and Telegram integrations.
+* Native Arch and AUR packages for Spotify, Discord, and Telegram integrations (strictly avoids Flatpak).
 
 ## 11: Gaming
 Linux gaming optimized specifically for CachyOS.

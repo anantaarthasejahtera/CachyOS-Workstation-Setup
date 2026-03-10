@@ -19,7 +19,7 @@ By default, we provide a massive list of curated apps, but you can inject your o
 **Example:**
 ```text
 Dev Tools|Postman|postman-bin|paru
-Design|Blender|org.blender.Blender|flatpak
+Design|Blender|blender|pacman
 Utilities|BTop|btop|pacman
 ```
 
@@ -39,7 +39,7 @@ monitor=DP-1,3840x2160@144,0x0,1.25
 If you want Discord or Spotify to launch implicitly in specific workspaces:
 ```text
 exec-once = [workspace 4 silent] webcord
-exec-once = [workspace 5 silent] flatpak run com.spotify.Client
+exec-once = [workspace 5 silent] spotify-launcher
 ```
 
 ## Styling Waybar
@@ -51,16 +51,14 @@ The Waybar configuration is built using advanced CSS Variables injected by the `
 
 > **Note**: Do not hardcode colors (e.g., `#f38ba8`) in `style.css`. Instead, use the CSS variables like `@define-color red;` which are dynamically hot-swapped by the Theme Engine depending on if you are using Frappe, Macchiato, or Dracula.
 
-## Shell Aliases (ZSH / Fish)
+## Shell Aliases (Fish)
 
-Your `.zshrc` (installed via Module 06) is heavily optimized for speed. Custom aliases can be appended to the bottom:
+Your `config.fish` (installed via Module 06) is heavily optimized for speed. Custom aliases can be appended to the bottom using `abbr` or `alias`:
 
 ```bash
-alias update="sudo pacman -Syu && flatpak update"
-alias gc="git commit -m"
-alias docker-kill="docker kill \$(docker ps -q)"
+abbr update "sudo pacman -Syu"
+abbr gc "git commit -m"
+abbr docker-kill "docker kill (docker ps -q)"
 ```
 
-After modifying the file, run `source ~/.zshrc` to reload it.
-
-> **Fish Users**: If you use Fish shell instead of ZSH, add aliases to `~/.config/fish/config.fish` using the Fish syntax: `alias update "sudo pacman -Syu; and flatpak update"`. Fish does not use `&&` — use `; and` instead.
+After modifying the file, run `source ~/.config/fish/config.fish` to reload it.

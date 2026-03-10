@@ -213,7 +213,7 @@ build_guide_data() {
         "" ""
 
     # ══════════════════════════════════════════════════════
-    # SHELL — ZSH + Modern CLI Tools (Rust-powered replacements)
+    # SHELL — FISH + Modern CLI Tools (Rust-powered replacements)
     # ══════════════════════════════════════════════════════
     add "shell" "z <dir>" \
         "Smart cd (zoxide)" "cd pintar (zoxide)" \
@@ -277,8 +277,8 @@ build_guide_data() {
         "fastfetch" "fastfetch"
     add "shell" "update" \
         "Full system update (interactive)" "Update sistem lengkap (interaktif)" \
-        "Shows pending packages first, then asks confirmation|Runs: pacman -Syu + flatpak update + rustup update" \
-        "Tampilkan paket pending dulu, lalu minta konfirmasi|Jalankan: pacman -Syu + flatpak update + rustup update" \
+        "Shows pending packages first, then asks confirmation|Runs: pacman -Syu + rustup update" \
+        "Tampilkan paket pending dulu, lalu minta konfirmasi|Jalankan: pacman -Syu + rustup update" \
         "" ""
     add "shell" "cleanup" \
         "Remove orphan packages" "Hapus paket orphan" \
@@ -687,7 +687,7 @@ build_guide_data() {
         "Run Windows apps" "Jalankan aplikasi Windows" \
         "Wine-based app runner without full VM|Great for: office apps, small games, utilities" \
         "Penjalanan app berbasis Wine tanpa VM penuh|Bagus untuk: aplikasi kantor, game kecil, utilitas" \
-        "flatpak run com.usebottles.bottles" ""
+        "bottles" ""
     add "apps" "libreoffice" \
         "Office suite" "Suite kantor" \
         "Open .docx, .xlsx, .pptx natively|Writer, Calc, Impress, Draw" \
@@ -753,19 +753,19 @@ build_guide_data() {
         "ai-tuner" "ollama"
     add "ecosystem" "app-store" \
         "GUI App Store (Rofi)" "Toko Aplikasi GUI (Rofi)" \
-        "Curated app browser: Browsers, Dev Tools, Gaming, Media, Utilities|Multi-tier Rofi menu: Category → App → Confirm → Install|Supports: pacman, paru (AUR), and flatpak backends" \
-        "Peramban aplikasi terkurasi: Browser, Dev Tools, Gaming, Media, Utilitas|Menu Rofi multi-tingkat: Kategori → Aplikasi → Konfirmasi → Install|Mendukung: pacman, paru (AUR), dan backend flatpak" \
+        "Curated app browser: Browsers, Dev Tools, Gaming, Media, Utilities|Multi-tier Rofi menu: Category → App → Confirm → Install|Supports: pacman and paru (AUR) backends" \
+        "Peramban aplikasi terkurasi: Browser, Dev Tools, Gaming, Media, Utilitas|Menu Rofi multi-tingkat: Kategori → Aplikasi → Konfirmasi → Install|Mendukung: pacman dan paru (AUR) backend" \
         "app-store" ""
     add "ecosystem" "health-check" \
         "System Health Check (Doctor)" "Pemeriksaan Kesehatan Sistem (Dokter)" \
         "Validates: GPU drivers, Hyprland/Waybar config, critical packages, kernel modules, services, backups, disk space|Auto-runs via pacman hook after kernel/Hyprland/Waybar/NVIDIA updates|Run from Nexus (Super+X → Health Check) or terminal" \
         "Validasi: driver GPU, config Hyprland/Waybar, paket kritis, modul kernel, layanan, backup, ruang disk|Otomatis jalan via hook pacman setelah update kernel/Hyprland/Waybar/NVIDIA|Jalankan dari Nexus (Super+X → Health Check) atau terminal" \
         "health-check" ""
-    add "ecosystem" "wallpaper-picker" \
-        "Wallpaper Picker" "Pemilih Wallpaper" \
-        "Browse and apply wallpapers from ~/Pictures/Wallpapers/ via Rofi|Instantly updates Hyprpaper|Run from Nexus (Super+X → Change Wallpaper) or terminal" \
-        "Jelajahi dan terapkan wallpaper dari ~/Pictures/Wallpapers/ via Rofi|Langsung update Hyprpaper|Jalankan dari Nexus (Super+X → Change Wallpaper) atau terminal" \
-        "wallpaper-picker" ""
+    add "ecosystem" "waypaper" \
+        "Wallpaper Picker (Waypaper)" "Pemilih Wallpaper (Waypaper)" \
+        "Browse and apply wallpapers via Waypaper GUI|Instantly updates Hyprpaper|Run from Nexus (Super+X → Change Wallpaper) or terminal: waypaper" \
+        "Jelajahi dan terapkan wallpaper via GUI Waypaper|Langsung update Hyprpaper|Jalankan dari Nexus (Super+X → Change Wallpaper) atau terminal: waypaper" \
+        "waypaper" ""
     add "ecosystem" "nexus-chat" \
         "Nexus AI Chat" "Nexus Obrolan AI" \
         "Interactive AI chat launcher — select model (qwen3, deepseek-r1, qwen2.5-coder) then chat|Accessible from Nexus (Super+X → AI Chat) or terminal" \

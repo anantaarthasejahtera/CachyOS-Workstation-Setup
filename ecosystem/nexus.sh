@@ -81,7 +81,7 @@ build_menu() {
     entries+="\0nonselectable\x1f─────────────────────────────────────────\n"
 
     # ── Quick Actions ──
-    entries+="  System Update (pacman + flatpak)\n"
+    entries+="  System Update (pacman)\n"
     entries+="  Cleanup Packages & Cache\n"
     entries+="󰒲  Lock Screen\n"
     entries+="  Power Off\n"
@@ -142,8 +142,6 @@ build_menu() {
     command -v thunar &>/dev/null && entries+="  File Manager\n"
     if command -v obsidian &>/dev/null; then
         entries+="  Obsidian Notes\n"
-    elif flatpak list 2>/dev/null | grep -qi obsidian; then
-        entries+="  Obsidian Notes\n"
     fi
     command -v keepassxc &>/dev/null && entries+="  Password Manager\n"
     entries+="\0nonselectable\x1f─────────────────────────────────────────\n"
@@ -155,7 +153,7 @@ build_menu() {
     fi
     command -v prismlauncher &>/dev/null && { entries+="  Minecraft\n"; has_gaming=true; }
     command -v pcsx2 &>/dev/null && { entries+="  PS2 Emulator\n"; has_gaming=true; }
-    flatpak list 2>/dev/null | grep -qi sober && { entries+="  Roblox\n"; has_gaming=true; }
+    command -v sober &>/dev/null && { entries+="  Roblox\n"; has_gaming=true; }
     $has_gaming && entries+="\0nonselectable\x1f─────────────────────────────────────────\n"
 
     # ── System & Productivity ──
@@ -169,7 +167,7 @@ build_menu() {
         entries+="  Virtual Machine Manager $vm_status\n"
     fi
     
-    flatpak list 2>/dev/null | grep -qi bottles && entries+="  Bottles (Windows Apps)\n"
+    command -v bottles &>/dev/null && entries+="  Bottles (Windows Apps)\n"
     command -v libreoffice &>/dev/null && entries+="  LibreOffice\n"
     command -v obs &>/dev/null && entries+="  OBS Studio\n"
     command -v kdeconnect-cli &>/dev/null && entries+="  KDE Connect\n"
@@ -233,7 +231,7 @@ execute_action() {
             theme-switch &
             ;;
         *"Change Wallpaper"*)
-            wallpaper-picker &
+            waypaper &
             ;;
         *"System Update"*)
             # Gather pending updates for preview
@@ -249,11 +247,11 @@ execute_action() {
             # Confirm before running system update on rolling distro
             if zenity --question \
                 --title="⚠️ System Update" \
-                --text="$preview_text\n\n━━━━━━━━━━━━━━━━━━━━━━━\nThis will run:\n  sudo pacman -Syu\n  flatpak update\n  rustup update\n\nOn a rolling release, this can break things.\nAre you sure?" \
+                --text="$preview_text\n\n━━━━━━━━━━━━━━━━━━━━━━━\nThis will run:\n  sudo pacman -Syu\n  rustup update\n\nOn a rolling release, this can break things.\nAre you sure?" \
                 --ok-label="Yes, Update" \
                 --cancel-label="Cancel" \
                 --width=500 --height=400 2>/dev/null; then
-                kitty --hold -e bash -c 'echo "🔄 Updating system..."; sudo pacman -Syu && flatpak update -y 2>/dev/null && rustup update 2>/dev/null; echo ""; echo "✅ Update complete!"'
+                kitty --hold -e bash -c 'echo "🔄 Updating system..."; sudo pacman -Syu && rustup update 2>/dev/null; echo ""; echo "✅ Update complete!"'
             fi
             ;;
         *"Cleanup"*)
@@ -302,18 +300,18 @@ execute_action() {
         *"Zen Browser"*)     zen-browser & ;;
         *"Firefox"*)         firefox & ;;
         *"File Manager"*)    thunar & ;;
-        *"Obsidian"*)        (obsidian || flatpak run md.obsidian.Obsidian) &>/dev/null & ;;
+        *"Obsidian"*)        obsidian &>/dev/null & ;;
         *"Password"*)        keepassxc & ;;
         
         # Gaming
         *"Steam"*)           steam & ;;
         *"Minecraft"*)       prismlauncher & ;;
         *"PS2"*)             pcsx2 & ;;
-        *"Roblox"*)          flatpak run org.vinegarhq.Sober & ;;
+        *"Roblox"*)          sober & ;;
         
         # System
         *"Virtual Machine"*) virt-manager & ;;
-        *"Bottles"*)         flatpak run com.usebottles.bottles & ;;
+        *"Bottles"*)         bottles & ;;
         *"LibreOffice"*)     libreoffice --writer & ;;
         *"OBS"*)             obs & ;;
         *"KDE Connect"*)     kdeconnect-app & ;;

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Module 10: Extra Apps (Browser, Flatpak, tmux)
+# Module 10: Extra Apps (Browser, Native Apps, tmux)
 source "$(dirname "$0")/00-common.sh"
 set -euo pipefail
 skip_if_current
@@ -128,14 +128,11 @@ install_pkg bluez bluez-utils blueman
 sudo systemctl enable --now bluetooth.service
 ok "Bluetooth ready"
 
-# --- Flatpak apps ---
-log "Installing Flatpak apps..."
-install_pkg flatpak
-flatpak remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo 2>/dev/null || true
-flatpak install --user -y flathub com.spotify.Client 2>/dev/null || true
-flatpak install --user -y flathub org.telegram.desktop 2>/dev/null || true
-flatpak install --user -y flathub com.discordapp.Discord 2>/dev/null || true
-ok "Flatpak apps installed (Spotify, Telegram, Discord)"
+# --- Communication & Media Apps (Native Arch/AUR) ---
+log "Installing communication & media apps..."
+install_pkg telegram-desktop discord
+install_aur spotify-launcher
+ok "Apps installed (Spotify, Telegram, Discord) — native packages"
 
 # --- Productivity apps (moved from module 12 for better organization) ---
 log "Installing productivity apps..."
@@ -145,8 +142,7 @@ ok "LibreOffice installed (opens .docx, .xlsx, .pptx natively)"
 install_pkg kdeconnect
 ok "KDE Connect installed (pair phone for file transfer, notifications)"
 
-install_aur obsidian-bin 2>/dev/null || \
-    flatpak install --user -y flathub md.obsidian.Obsidian 2>/dev/null || true
+install_aur obsidian-bin 2>/dev/null || warn "Obsidian AUR install failed — install manually from https://obsidian.md"
 ok "Obsidian installed (markdown note-taking)"
 
 install_pkg keepassxc

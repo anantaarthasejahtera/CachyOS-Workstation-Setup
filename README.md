@@ -171,9 +171,8 @@ CachyOS-Workstation-Setup/
 │   ├── dotfiles-sync.sh      # Cloud Git sync for ~/.config
 │   ├── ai-tuner.sh           # Local AI system telemetry analysis
 │   ├── ai-power-fix.sh       # GPU power state fix for AI inference
-│   ├── app-store.sh          # Curated GUI App Store (Pacman/AUR/Flatpak)
+│   ├── app-store.sh          # Curated GUI App Store (Pacman/AUR)
 │   ├── health-check.sh       # Post-update system integrity validator
-│   ├── wallpaper-picker.sh   # Wallpaper selection and application
 │   └── post-install.sh       # First-boot post-install wizard
 ├── modules/
 │   ├── 00-common.sh          # Shared functions & helpers
@@ -182,11 +181,11 @@ CachyOS-Workstation-Setup/
 │   ├── 03-security.sh        # UFW, SSH key, DNS, auto-cleanup
 │   ├── 04-dev.sh             # Docker, Node, Python, Rust, Go
 │   ├── 05-mobile.sh          # Flutter, Android SDK, Kotlin
-│   ├── 06-dotfiles.sh        # Kitty, Zsh, Starship, fzf
+│   ├── 06-dotfiles.sh        # Kitty, Fish, Starship, fzf
 │   ├── 07-editors.sh         # Antigravity, Neovim, Ollama
 │   ├── 08-desktop.sh         # KDE Catppuccin, GRUB theme
 │   ├── 09-hyprland.sh        # WM config, keybinds, lock screen
-│   ├── 10-apps.sh            # Browser, tmux, Flatpak, Bluetooth
+│   ├── 10-apps.sh            # Browser, tmux, Bluetooth, Native Apps
 │   ├── 11-gaming.sh          # Steam, PCSX2, PrismLauncher, MangoHud
 │   ├── 12-vm.sh              # QEMU/KVM, Bottles, LibreOffice
 │   ├── 13-waybar.sh          # Status bar config + CSS
@@ -236,7 +235,7 @@ flowchart TB
         AT["🧠 ai-tuner"]
         AS["🏪 app-store"]
         HC["🩺 health-check"]
-        WP["🖼️ wallpaper-picker"]
+        WP["🖼️ waypaper"]
         NC["💬 nexus-chat"]
         PI["🧙 post-install"]
     end
@@ -267,16 +266,16 @@ flowchart TB
 | 03 | Security | ~50 MB | UFW, SSH key (ed25519), Cloudflare DNS, Zram, Timeshift |
 | 04 | Dev Tools | ~4 GB | Docker, Node/fnm/pnpm, Python/uv, Rust, Go, lazygit, CLI power tools |
 | 05 | Mobile | ~5 GB | Flutter, Android SDK (API 34), Kotlin, JDK 17, scrcpy |
-| 06 | Dotfiles | ~100 MB | Kitty, Zsh/Oh-My-Zsh, Starship prompt, fzf-tab |
+| 06 | Dotfiles | ~100 MB | Kitty, Fish shell, Starship prompt, fzf |
 | 07 | Editors | ~700 MB | [Antigravity](https://antigravity.google/blog) (Google's AI-powered VS Code fork), Neovim (lazy.nvim) |
 | 08 | Desktop | ~300 MB | KDE Catppuccin theme, GRUB theme, Inter + Nerd Fonts |
 | 09 | Hyprland | ~200 MB | Tiling WM, keybinds, Rofi, Hyprlock, Hypridle |
-| 10 | Apps | ~500 MB | Zen Browser, tmux, Spotify/Telegram/Discord (Flatpak) |
+| 10 | Apps | ~500 MB | Zen Browser, tmux, Spotify/Telegram/Discord (Native Arch/AUR packages) |
 | 11 | Gaming | ~3 GB | Steam (Proton), PCSX2 (GPU-aware config), PrismLauncher, Roblox, MangoHud |
 | 12 | VM | ~2 GB | QEMU/KVM via qemu-desktop (hugepages, CPU pinning), Bottles, LibreOffice |
 | 13 | Waybar | ~5 MB | Glassmorphism status bar with gradient CSS |
 | 14 | Nexus + Guide | ~1 MB | Smart command center + 130+ entry bilingual guide |
-| 15 | Ecosystem | ~1 MB | Theme Engine, Config Rollback, Dotfiles Sync, AI Tuner, App Store, Health Check, Wallpaper Picker, AI Chat, Post-Install |
+| 15 | Ecosystem | ~1 MB | Theme Engine, Config Rollback, Dotfiles Sync, AI Tuner, App Store, Health Check, Waypaper, AI Chat, Post-Install |
 
 ---
 
@@ -306,7 +305,7 @@ Local AI system telemetry auditing.
 ### 5. 🏪 Aesthetic GUI App Store (`app-store`)
 Visual package management elevated.
 - A curated multi-tiered Rofi menu categorized by Browsers, Development, Gaming, Design, and Utilities.
-- Automates the backend execution of `sudo pacman`, `paru`, or `flatpak install` intelligently for each app without forcing the user to touch the terminal.
+- Automates the backend execution of `sudo pacman` or `paru` intelligently for each app without forcing the user to touch the terminal.
 
 ### 6. 🩺 System Health Check (`health-check`)
 Post-update system integrity validator.
@@ -314,10 +313,10 @@ Post-update system integrity validator.
 - **Pacman hook**: Auto-runs after kernel, Hyprland, Waybar, or NVIDIA updates — you'll see the health report right in your terminal after `pacman -Syu`.
 - Also available via **Nexus** → System Health Check, or terminal: `health-check`.
 
-### 7. 🖼️ Wallpaper Picker (`wallpaper-picker`)
+### 7. 🖼️ Wallpaper Picker (`waypaper`)
 Visual wallpaper selection.
-- Browse all images in `~/Pictures/Wallpapers/` via Rofi, apply instantly.
-- Updates Hyprpaper config for persistence across reboots.
+- Browse and apply wallpapers via the Waypaper GUI.
+- Integrated with Hyprpaper for persistence across reboots.
 
 ### 8. 💬 Nexus AI Chat (`nexus-chat`)
 Interactive local AI chat.
@@ -342,7 +341,7 @@ Press **`Super+X`** for a smart popup with **live system stats**:
 │───────────────────────────────────────────────│
 │  ── 󰁹 87%  │  󰍛 4.2/16GB  │  󰋊 420G free ──   │
 │  ──────────────────────────────────────────── │
-│    System Update (pacman + flatpak)           │
+│    System Update (pacman)                     │
 │    Cleanup Packages & Cache                   │
 │  ──────────────────────────────────────────── │
 │    Screenshot — Region                        │

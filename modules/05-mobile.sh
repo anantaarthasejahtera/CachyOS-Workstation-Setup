@@ -44,7 +44,7 @@ fi
 export ANDROID_HOME="$HOME/Android/Sdk"
 export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
 
-# NOTE: Android PATH is set in module 06's .zshrc — no need to append here
+# NOTE: Android PATH is set in module 06's config.fish — no need to append here
 
 # Accept licenses & install SDK components (essentials only — emulator on-demand)
 yes | sdkmanager --licenses 2>/dev/null || true
