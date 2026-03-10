@@ -22,19 +22,17 @@ Comprehensive codebase remediation ensuring zero shell violations, zero duplicat
 
 ---
 
-## [v1.6.0] - The Deep Codebase Audit (2026-03-10)
+## [v1.7.0] - The Waypaper & Rofi Polish (2026-03-11)
 
-Comprehensive codebase remediation ensuring zero shell violations, zero duplicate packages, and zero reliance on intermediary dependency managers when native variants exist.
+Refinements to the Wayland ecosystem, introducing a native wallpaper manager and fixing Rofi media widgets integration.
 
-### 🔴 Critical Fixes
-- **Shell Policy (Fish Enforcement)**: Eradicated Zsh, Oh My Zsh, and `.zshrc` writing across all modules. Exclusively using Fish shell with `config.fish`, fast aliases (`eza`, `bat`), and maintaining the unified Starship prompt.
-- **Strict Anti-Flatpak Policy**: Eliminated all Flatpak usage from Mod 10 (Apps) and Mod 11 (Gaming). Using `telegram-desktop`, `discord` from official repos, and `spotify-launcher`, `obsidian-bin`, `pcsx2-latest-bin` from AUR.
-- **Dependency Duplication**: Removed redundant `pavucontrol`, `blueman`, `alacritty`, and `btop` installs across `09-hyprland.sh` and `13-waybar.sh`.
+### ✨ New Features
+- **Waypaper Integration**: Replaced the custom `wallpaper-picker.sh` script with `waypaper` for a more robust, GUI-based wallpaper management experience. Fully integrated into Waybar and Nexus.
 
-### 🟡 Bug Fixes & Refactors
-- **Rofi Theme Ownership**: Centralized all Rofi configurations (`config.rasi`, `media.rasi`, etc.) exclusively into `13-waybar.sh` to prevent overlapping edits.
-- **Mobile Environment**: `05-mobile.sh` correctly exports Android PATH to `config.fish` instead of the legacy Zsh configuration.
-- **Documentation**: README, Setup Scripts, and Guide Interactive fully translated to recognize the new default Fish environment and Native Package standard.
+### 🟡 Bug Fixes & Improvements
+- **Rofi Media Hub**: Fixed previous/next functionality and ensured thumbnail images update correctly upon song changes.
+- **Rofi Visuals**: Polished the graphical interface for Rofi widgets to match the transparent Catppuccin Hyprland aesthetics without background artifacts.
+- **Git & History**: Cleaned up the repository history using strict `--no-ff` merge policies and removed duplicated codebase audit changelogs.
 
 ---
 
