@@ -22,7 +22,9 @@ Comprehensive codebase remediation ensuring zero shell violations, zero duplicat
 
 ---
 
-## [v1.7.0] - The Waypaper & Rofi Polish (2026-03-11)
+## [v1.7.0] - The Final Stable Bash Version (2026-03-11)
+
+> **Milestone**: This is the final stable Bash version of the ecosystem. Subsequent releases will involve a major architecture migration to **Go** for enhanced performance, type safety, and maintainability.
 
 Refinements to the Wayland ecosystem, introducing a native wallpaper manager and fixing Rofi media widgets integration.
 
