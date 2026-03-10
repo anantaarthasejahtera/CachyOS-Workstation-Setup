@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/internal/pacman"
+	"github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/internal/modules"
 	"github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/internal/state"
 	"github.com/charmbracelet/huh"
 	"github.com/spf13/cobra"
@@ -17,7 +17,7 @@ var installCmd = &cobra.Command{
 	Short: "Run the interactive workstation installer",
 	Long:  `Run the full installation of CachyOS Workstation Setup. Triggers the TUI menu unless --all is specified.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("🚀 Nexus Installer v2.0 (Powered by Go)")
+		fmt.Println("🚀 Nexus Installer v2.0 (Powered by pure Go)")
 
 		if installAll {
 			runNonInteractiveInstall()
@@ -32,27 +32,33 @@ func runNonInteractiveInstall() {
 	fmt.Println("Executing non-interactive full installation...")
 	state.CreateBTRFSSnapperSnapshot("Pre-Nexus Full Install")
 	
-	fmt.Println("-> [00-common] Initializing base tools...")
-	pacman.Install("git", "curl", "wget", "fastfetch")
+	modules.InstallBaseSystem()
+	modules.InstallSystemAndSecurity()
+	modules.InstallDevAndEditors()
+	modules.InstallDesktopAndDotfiles()
+	modules.InstallAppsAndGaming()
+	modules.InstallMobile()
+	modules.InstallVM()
 	
-	fmt.Println("\n🎉 All modules installed successfully!")
+	fmt.Println("\n🎉 All massive porting modules installed successfully!")
 }
 
 func runInteractiveTUI() {
-	var modules []string
+	var selectedModules []string
 
 	form := huh.NewForm(
 		huh.NewGroup(
 			huh.NewMultiSelect[string]().
 				Title("Select CachyOS Workstation Modules to Install").
 				Options(
-					huh.NewOption("Base System (yay, git, curl)", "base").Selected(true),
-					huh.NewOption("Desktop Tools (Alacritty, Fish, Starship)", "desktop"),
-					huh.NewOption("Hyprland Ecosystem (Waybar, Rofi, SwayNC)", "hyprland"),
-					huh.NewOption("Gaming (Steam, Lutris, ProtonUp)", "gaming"),
-					huh.NewOption("Developer Tools (VSCode, Docker)", "dev"),
+					huh.NewOption("Base System (Base, Yay, GPU, Kernel, Security)", "base").Selected(true),
+					huh.NewOption("Development Tools (Docker, Go, Node, Python, Editors)", "dev").Selected(true),
+					huh.NewOption("Desktop Aesthetic (Hyprland, Waybar, Catppuccin)", "desktop").Selected(true),
+					huh.NewOption("Applications & Gaming (Steam, PCsX2, Zen Browser)", "apps").Selected(true),
+					huh.NewOption("Mobile Dev (Android SDK, Flutter)", "mobile"),
+					huh.NewOption("Virtualization (QEMU/KVM, Bottles)", "vm"),
 				).
-				Value(&modules),
+				Value(&selectedModules),
 		),
 	).WithTheme(huh.ThemeCatppuccin())
 
@@ -62,23 +68,29 @@ func runInteractiveTUI() {
 		os.Exit(1)
 	}
 
-	if len(modules) == 0 {
+	if len(selectedModules) == 0 {
 		fmt.Println("No modules selected. Exiting.")
 		return
 	}
 
-	fmt.Printf("\nExecuting installation for: %v\n", modules)
+	fmt.Printf("\nExecuting installation for: %v\n", selectedModules)
 	state.CreateBTRFSSnapperSnapshot("Pre-Nexus TUI Install")
 
-	// Mocking execution of modules based on selection
-	for _, m := range modules {
-		fmt.Printf("-> Installing module: %s...\n", m)
+	for _, m := range selectedModules {
+		fmt.Printf("\n-> Executing Selection: %s...\n", m)
 		if m == "base" {
-			pacman.Install("git", "curl", "wget", "fastfetch")
+			modules.InstallBaseSystem()
+			modules.InstallSystemAndSecurity()
+		} else if m == "dev" {
+			modules.InstallDevAndEditors()
 		} else if m == "desktop" {
-			pacman.Install("alacritty", "fish", "starship", "eza")
-		} else if m == "hyprland" {
-			pacman.Install("hyprland", "waybar", "rofi-wayland")
+			modules.InstallDesktopAndDotfiles()
+		} else if m == "apps" {
+			modules.InstallAppsAndGaming()
+		} else if m == "mobile" {
+			modules.InstallMobile()
+		} else if m == "vm" {
+			modules.InstallVM()
 		}
 	}
 	
