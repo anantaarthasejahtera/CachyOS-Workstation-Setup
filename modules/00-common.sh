@@ -10,7 +10,7 @@ _COMMON_LOADED=1
 # ─── Configuration ────────────────────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 MODULES_DIR="$SCRIPT_DIR/modules"
-DOTFILES_DIR="$SCRIPT_DIR/dotfiles"
+
 
 GIT_NAME="${GIT_NAME:-Your Name}"
 GIT_EMAIL="${GIT_EMAIL:-you@example.com}"
@@ -57,12 +57,51 @@ install_aur() {
     local pkgs=("$@")
     local to_install=()
     for pkg in "${pkgs[@]}"; do
-        if ! pacman -Qi "$pkg" &>/dev/null && ! paru -Qi "$pkg" &>/dev/null; then
+        if ! pacman -Qi "$pkg" &>/dev/null 2>&1 && ! paru -Qi "$pkg" &>/dev/null 2>&1; then
             to_install+=("$pkg")
         fi
     done
     if [ ${#to_install[@]} -gt 0 ]; then
         paru -S --noconfirm --needed "${to_install[@]}" 2>&1 | tee -a "$LOGFILE"
+    fi
+}
+
+# Remove a package if installed (idempotent, won't fail if not present)
+remove_pkg() {
+    local pkg="$1"
+    if pacman -Qi "$pkg" &>/dev/null 2>&1; then
+        log "Removing deprecated package: $pkg"
+        sudo pacman -Rns --noconfirm "$pkg" 2>&1 | tee -a "$LOGFILE" || true
+    fi
+}
+
+# Migrate from old package to new (remove old → install new)
+migrate_pkg() {
+    local old="$1" new="$2"
+    if pacman -Qi "$old" &>/dev/null 2>&1; then
+        log "Migrating: $old → $new"
+        sudo pacman -Rns --noconfirm "$old" 2>&1 | tee -a "$LOGFILE" || true
+    fi
+    install_pkg "$new"
+}
+
+# Batch-remove deprecated packages from previous versions.
+# Usage: cleanup_deprecated pkg1 pkg2 pkg3 ...
+# Each module calls this at the top with its own deprecated list.
+# Idempotent: silently skips packages that aren't installed.
+cleanup_deprecated() {
+    local found=0
+    for pkg in "$@"; do
+        if pacman -Qi "$pkg" &>/dev/null 2>&1; then
+            # Disable any associated service before removal
+            sudo systemctl disable --now "${pkg}.service" 2>/dev/null || true
+            log "Cleaning up deprecated package: $pkg"
+            sudo pacman -Rns --noconfirm "$pkg" 2>&1 | tee -a "$LOGFILE" || true
+            found=1
+        fi
+    done
+    if [ "$found" -eq 1 ]; then
+        ok "Deprecated packages cleaned up"
     fi
 }
 
@@ -87,25 +126,53 @@ safe_config() {
     mkdir -p "$(dirname "$target")"
 }
 
-# Copy dotfile from repo to target, with backup.
-# Returns 1 if source file is missing (allows callers to detect partial deployment).
-DOTFILE_FAILURES=0
-deploy_dotfile() {
-    local src="$DOTFILES_DIR/$1"
-    local dest="$2"
-    if [ -f "$src" ]; then
-        safe_config "$dest"
-        cp "$src" "$dest"
-        ok "Deployed: $1 → $dest"
+# ─── Ecosystem Tool Installer ────────────────────────────
+# Copies from local repo if available, else curls from GitHub.
+# Usage: install_ecosystem "script-name.sh" "target-binary-name"
+ECOSYSTEM_REPO_URL="https://raw.githubusercontent.com/anantaarthasejahtera/CachyOS-Workstation-Setup/main/ecosystem"
+install_ecosystem() {
+    local script_name="$1"
+    local target_name="${2:-${script_name%.sh}}"
+    local install_dir="/usr/local/bin"
+    local repo_dir
+    repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/ecosystem"
+
+    if [ -f "$repo_dir/$script_name" ]; then
+        sudo cp "$repo_dir/$script_name" "$install_dir/$target_name"
     else
-        warn "Dotfile not found: $src (skipped)"
-        ((DOTFILE_FAILURES++)) || true
-        return 1
+        sudo curl -fsSL --retry 3 --retry-delay 2 \
+            -o "$install_dir/$target_name" \
+            "$ECOSYSTEM_REPO_URL/$script_name" 2>/dev/null || true
     fi
+    sudo chmod +x "$install_dir/$target_name"
 }
 
+# ─── Catppuccin Wallpaper Generator ──────────────────────
+# Generates a 4K Catppuccin Mocha gradient wallpaper via ImageMagick.
+# Returns 0 on success, 1 on failure.
+generate_catppuccin_wallpaper() {
+    local output_path="$1"
+    local magick_cmd=""
+    if command -v magick &>/dev/null; then
+        magick_cmd="magick"
+    elif command -v convert &>/dev/null; then
+        magick_cmd="convert"
+    else
+        return 1
+    fi
+    $magick_cmd -size 3840x2160 \
+        xc:'#1e1e2e' \
+        \( -size 3840x2160 gradient:'#302d41'-'#1e1e2e' \) -compose overlay -composite \
+        \( -size 200x200 xc:'#cba6f7' -blur 0x80 -resize 3840x2160! \) -compose softlight -composite \
+        \( -size 200x200 xc:'#89b4fa' -gravity southeast -blur 0x60 -resize 3840x2160! \) -compose softlight -composite \
+        "$output_path" 2>/dev/null
+}
+
+
 # ─── Module Versioning ───────────────────────────────────
-# Tracks which modules have been run via checksum of the script
+# Tracks which modules have been run via checksum of the script.
+# On re-run: if the script hasn't changed, the module is skipped entirely.
+# Override with: FORCE_RERUN=1 bash setup.sh
 MODULE_VERSION_DIR="$HOME/.config/cachy-setup/versions"
 mkdir -p "$MODULE_VERSION_DIR"
 
@@ -136,5 +203,19 @@ module_needs_update() {
         return 1  # Up to date
     fi
     return 0  # Needs update
+}
+
+# Call at the TOP of each module (after source + set -euo pipefail).
+# Skips the module if it's already been run and the script hasn't changed.
+# User can force re-run with: FORCE_RERUN=1
+skip_if_current() {
+    if [ "${FORCE_RERUN:-0}" = "1" ]; then
+        log "Force re-run: $(basename "${BASH_SOURCE[1]}")"
+        return 0
+    fi
+    if ! module_needs_update; then
+        ok "Module $(basename "${BASH_SOURCE[1]}" .sh) is up to date — skipping (use FORCE_RERUN=1 to re-run)"
+        exit 0
+    fi
 }
 

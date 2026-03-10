@@ -26,7 +26,7 @@ if ! ollama list 2>/dev/null | grep -q "$MODEL"; then
     exit 1
 fi
 
-# Show loading notification
+# Show loading notification (only after all checks pass)
 notify-send -a "AI Tuner" -i "dialog-information" "Gathering System State..." "This might take a few seconds."
 
 # 1. Gather Telemetry

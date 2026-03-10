@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
 # Module 12: Windows Compatibility & Virtualization
 source "$(dirname "$0")/00-common.sh"
+set -euo pipefail
+skip_if_current
 header "Windows Compatibility — VM, Bottles, Office"
+
+# ── Deprecated packages (auto-removed on re-run) ──────────
+# qemu-desktop is lighter than qemu-full (~200MB less, x86_64 only)
+cleanup_deprecated \
+    qemu-full       # replaced by qemu-desktop (no ARM/SPARC/PPC emulators needed)
 
 # --- Check hardware virtualization support ---
 log "Checking virtualization support..."
@@ -13,8 +20,8 @@ fi
 
 # --- QEMU/KVM + Virt-Manager (Windows VM) ---
 log "Installing QEMU/KVM virtualization stack..."
-install_pkg qemu-full virt-manager libvirt edk2-ovmf dnsmasq iptables-nft \
-    swtpm spice-vdagent vde2 bridge-utils
+install_pkg qemu-desktop virt-manager libvirt edk2-ovmf dnsmasq iptables-nft \
+    swtpm spice-vdagent vde2
 
 # Enable libvirt services
 sudo systemctl enable --now libvirtd.service
@@ -210,35 +217,8 @@ flatpak install --user -y flathub com.usebottles.bottles 2>/dev/null || \
     install_aur bottles 2>/dev/null || true
 ok "Bottles installed (run MS Office 2016, small Windows apps)"
 
-# --- LibreOffice (native Office alternative) ---
-log "Installing LibreOffice..."
-install_pkg libreoffice-fresh
-ok "LibreOffice installed (opens .docx, .xlsx, .pptx natively)"
+# NOTE: LibreOffice, KDE Connect, Obsidian, KeePassXC, OBS moved to module 10
 
-# --- KDE Connect (phone <-> laptop sync) ---
-log "Installing KDE Connect..."
-install_pkg kdeconnect
-ok "KDE Connect installed (pair phone for file transfer, notifications, remote)"
-
-# --- Obsidian (markdown knowledge base) ---
-log "Installing Obsidian..."
-install_aur obsidian-bin 2>/dev/null || \
-    flatpak install --user -y flathub md.obsidian.Obsidian 2>/dev/null || true
-ok "Obsidian installed (markdown note-taking)"
-
-# --- KeePassXC (password manager, offline, encrypted) ---
-log "Installing KeePassXC..."
-install_pkg keepassxc
-ok "KeePassXC installed (encrypted password manager, works offline)"
-
-# --- Screen recording ---
-log "Installing screen recording tools..."
-install_pkg obs-studio wf-recorder
-ok "OBS Studio + wf-recorder installed"
-log "  OBS: full studio (streaming + recording)"
-log "  wf-recorder: lightweight Wayland recorder"
-log "  Quick record: wf-recorder -f ~/Videos/recording.mp4"
-log "  Region record: wf-recorder -g \"\$(slurp)\" -f ~/Videos/clip.mp4"
-
-ok "Windows compatibility & productivity ready"
+ok "Virtualization & Windows compatibility ready"
+mark_module_done
 

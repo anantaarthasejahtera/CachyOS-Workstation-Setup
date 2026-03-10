@@ -11,10 +11,10 @@ curl -fsSL https://raw.githubusercontent.com/anantaarthasejahtera/CachyOS-Workst
 ```
 
 This will:
-1. Install base dependencies (like `git` and `dialog`).
+1. Install base dependencies (like `git` and `zenity`).
 2. Clone the repository into `~/.cache/cachy-workstation-setup`.
 3. Prompt you for your Git identity (Name & Email).
-4. Launch the **Bilingual TUI Installer**.
+4. Launch the **Bilingual GUI Installer** (zenity-based).
 
 ### 🔧 Manual Install
 
@@ -39,7 +39,5 @@ We provide a **Graceful Uninstaller** that removes Nexus, Guide, Ecosystem utili
 
 ```bash
 cd ~/.cache/cachy-workstation-setup
-make uninstall
-# OR
 ./uninstall.sh
 ```

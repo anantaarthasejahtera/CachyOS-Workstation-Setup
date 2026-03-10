@@ -30,7 +30,7 @@ git push origin feature/your-idea
 Each module is **independent** — you can edit one without touching others. All modules source `modules/00-common.sh` for shared helpers.
 
 ```
-setup.sh → installer.sh (TUI) → modules/01-base.sh
+setup.sh → installer.sh (GUI/zenity) → modules/01-base.sh
                                 → modules/02-kernel.sh
                                 → modules/03-security.sh
                                 → ...

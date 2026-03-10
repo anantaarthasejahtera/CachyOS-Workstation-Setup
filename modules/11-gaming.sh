@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Module 11: Gaming (Steam, PCSX2, Minecraft, Roblox)
 source "$(dirname "$0")/00-common.sh"
+set -euo pipefail
+skip_if_current
 header "Gaming — Steam, Minecraft, PS2 Emulator"
 
 # --- Steam ---
@@ -14,6 +16,7 @@ ok "Steam installed (CS2 = free, Far Cry 3 = buy on Steam)"
 log "Installing MangoHud (FPS overlay)..."
 install_pkg mangohud lib32-mangohud
 mkdir -p "$HOME/.config/MangoHud"
+safe_config "$HOME/.config/MangoHud/MangoHud.conf"
 cat > "$HOME/.config/MangoHud/MangoHud.conf" << 'MANGOEOF'
 # — MangoHud — Catppuccin Style FPS Overlay —
 legacy_layout=false
@@ -56,55 +59,11 @@ install_pkg prismlauncher
 ok "PrismLauncher installed (open & login with Mojang/Microsoft account)"
 
 # --- PCSX2 (PS2 Emulator) ---
-log "Installing PCSX2 (PS2 emulator)..."
-install_pkg pcsx2
-
-# Create PCSX2 directories (bios dir for user's BIOS files, inis for config)
-mkdir -p "$HOME/.config/PCSX2/bios" "$HOME/.config/PCSX2/inis"
-
-# Auto-detect GPU class for optimal PCSX2 settings
-GPU_INFO=$(lspci | grep -i 'vga\|3d' | head -1)
-if echo "$GPU_INFO" | grep -qi 'nvidia\|radeon\|rx '; then
-    # Discrete GPU: can handle higher settings
-    PCSX2_UPSCALE=3        # 3x native (1080p)
-    PCSX2_ANISO=4          # 4x anisotropic filtering
-    PCSX2_RENDERER=12      # Hardware renderer
-    GPU_CLASS="discrete"
-    log "  Discrete GPU detected → PCSX2 set to 3x upscale + 4x AF"
-else
-    # Integrated GPU (Intel/AMD APU): conservative settings
-    PCSX2_UPSCALE=1        # Native resolution
-    PCSX2_ANISO=0          # No anisotropic filtering
-    PCSX2_RENDERER=12      # Hardware renderer
-    GPU_CLASS="integrated"
-    log "  Integrated GPU detected → PCSX2 set to native resolution"
-fi
-
-mkdir -p "$HOME/.config/PCSX2/inis"
-cat > "$HOME/.config/PCSX2/inis/GS.ini" << PCSX2GS
-# --- PCSX2 Graphics --- Auto-configured for $GPU_CLASS GPU ---
-Renderer = $PCSX2_RENDERER
-upscale_multiplier = $PCSX2_UPSCALE
-texture_filtering = 2
-anisotropic_filtering = $PCSX2_ANISO
-ManualHardwareRendererFixes = false
-UserHacks_align_sprite = 0
-UserHacks_merge_sprite = 0
-LinearPresent = 1
-Vsync = 1
-PCSX2GS
-
-cat > "$HOME/.config/PCSX2/inis/PCSX2.ini" << 'PCSX2INI'
-# --- PCSX2 Core --- Performance optimizations ---
-Framerate_Turbo = 200
-Framerate_Slowmo = 50
-Framerate_Nominal = 100
-Enable_MTVU = true
-Enable_Instant_VU1 = true
-Enable_Fast_CDVD = true
-PCSX2INI
-
-ok "PCSX2 configured for $GPU_CLASS GPU (upscale: ${PCSX2_UPSCALE}x, AF: ${PCSX2_ANISO}x)"
+log "Installing PCSX2 (PS2 emulator) via Flatpak..."
+# Arch removed PCSX2 from repos, flatpak is the official recommended way now
+flatpak install -y flathub net.pcsx2.PCSX2 || warn "Failed to install PCSX2 flatpak"
+# NOTE: Flatpak PCSX2 uses ~/.var/app/net.pcsx2.PCSX2/config/PCSX2/ — configure via the app GUI
+ok "PCSX2 installed (configure graphics settings via the app)"
 
 log "Gaming setup summary:"
 log "  - CS2: Open Steam > install free"
@@ -115,4 +74,5 @@ log "  - FPS overlay: Press F12 in any game"
 log "  - GameMode: Run games with 'gamemoderun ./game'"
 
 ok "Gaming module ready"
+mark_module_done
 

@@ -16,6 +16,11 @@ Unlike standard launchers (like `rofi -show drun` which we map to `Super+D`), th
 
 ## Customization
 
-The script driving the UI can be found at `modules/14-nexus-guide.sh` (which generates `~/.local/bin/nexus` or `/usr/local/bin/nexus`). 
+The Nexus script is deployed to `/usr/local/bin/nexus` by Module 14 (`modules/14-nexus-guide.sh`). The source lives in `ecosystem/nexus.sh`.
 
-To add your own custom scripts, modify the `nexus.sh` generator in your cloned repository and run `make install-all` (or run `./setup.sh` and select only Module 14).
+To add your own custom actions, edit `ecosystem/nexus.sh` in the cloned repository and re-run Module 14, or run:
+
+```bash
+# Re-deploy just the Nexus and Guide
+bash modules/14-nexus-guide.sh
+```

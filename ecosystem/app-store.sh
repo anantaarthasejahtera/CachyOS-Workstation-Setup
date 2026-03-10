@@ -106,7 +106,7 @@ IFS='|' read -r pkg_name manager <<< "${current_dict[$selected_app]}"
 confirm=$(echo -e "Yes, Install\nCancel" | rofi -dmenu -i -p "🚀 Install $selected_app via $manager?")
 [ "$confirm" != "Yes, Install" ] && exit 0
 
-# Execute installation in Kitty
+# Execute installation in Kitty (variables are safe: cmd is built from controlled values above)
 case "$manager" in
     "pacman")
         cmd="sudo pacman -S --noconfirm $pkg_name"

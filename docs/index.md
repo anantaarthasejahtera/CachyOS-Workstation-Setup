@@ -24,7 +24,7 @@ features:
   - title: Nexus Command Center
     details: Super+X brings up a smart popup with 45+ actions, live system stats, and GUI App Store.
   - title: Bilingual Support
-    details: The Guide CLI and TUI Installer are fully translated in English and Bahasa Indonesia.
+    details: The Guide CLI and GUI Installer are fully translated in English and Bahasa Indonesia.
 ---
 
 ## Why CachyOS Workstation?

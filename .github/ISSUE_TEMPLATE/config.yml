@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Ask a Question
+    url: https://github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/discussions/new?category=q-a
+    about: Use GitHub Discussions for questions and help
+  - name: 📖 Documentation
+    url: https://anantaarthasejahtera.github.io/CachyOS-Workstation-Setup/
+    about: Check the docs before opening an issue
+  - name: 🔒 Security Vulnerability
+    url: https://github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/security/policy
+    about: Report security issues privately via our Security Policy

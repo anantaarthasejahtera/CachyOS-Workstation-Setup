@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 # Module 13: Waybar Status Bar
 source "$(dirname "$0")/00-common.sh"
+set -euo pipefail
+skip_if_current
 header "Waybar — Aesthetic Status Bar for Hyprland"
 
 mkdir -p "$HOME/.config/waybar"
 
 # Waybar config
+safe_config "$HOME/.config/waybar/config.jsonc"
 cat > "$HOME/.config/waybar/config.jsonc" << 'WBCONF'
 {
     "layer": "top",
@@ -17,37 +20,37 @@ cat > "$HOME/.config/waybar/config.jsonc" << 'WBCONF'
     "modules-right": ["pulseaudio", "backlight", "battery", "network", "bluetooth", "tray", "custom/power"],
     "hyprland/workspaces": {
         "format": "{icon}",
-        "format-icons": { "1": "ó°² ", "2": "ó°²¢", "3": "ó°²¤", "4": "ó°²¦", "5": "ó°²¨", "urgent": "", "default": "" },
+        "format-icons": { "1": "󰲠", "2": "󰲢", "3": "󰲤", "4": "󰲦", "5": "󰲨", "urgent": "", "default": "" },
         "on-click": "activate"
     },
     "clock": {
-        "format": "ó°¥”  {:%H:%M  ó°ƒ¶  %a %d %b}",
+        "format": "󰥔  {:%H:%M  󰃶  %a %d %b}",
         "tooltip-format": "<tt>{calendar}</tt>"
     },
     "battery": {
         "format": "{icon}  {capacity}%",
-        "format-icons": ["ó°‚Ž", "ó°º", "ó°»", "ó°¼", "ó°½", "ó°¾", "ó°¿", "ó°‚€", "ó°‚", "ó°‚‚", "ó°¹"],
-        "format-charging": "ó°‚„ {capacity}%"
+        "format-icons": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"],
+        "format-charging": "󰂄 {capacity}%"
     },
     "network": {
-        "format-wifi": "ó°¤¨  {signalStrength}%",
-        "format-ethernet": "ó°ˆ€ Connected",
-        "format-disconnected": "ó°¤­  Off",
+        "format-wifi": "󰤨  {signalStrength}%",
+        "format-ethernet": "󰈀 Connected",
+        "format-disconnected": "󰤭  Off",
         "tooltip-format": "{ifname}: {ipaddr}/{cidr}"
     },
     "pulseaudio": {
         "format": "{icon}  {volume}%",
-        "format-muted": "ó°Ÿ Muted",
-        "format-icons": { "default": ["ó°•¿", "ó°–€", "ó°•¾"] },
+        "format-muted": "󰝟 Muted",
+        "format-icons": { "default": ["󰕿", "󰖀", "󰕾"] },
         "on-click": "pavucontrol"
     },
     "backlight": {
-        "format": "ó°ƒ   {percent}%"
+        "format": "󰃠  {percent}%"
     },
     "bluetooth": {
-        "format": "ó°‚¯",
-        "format-connected": "ó°‚± {device_alias}",
-        "format-disabled": "ó°‚²",
+        "format": "󰂯",
+        "format-connected": "󰂱 {device_alias}",
+        "format-disabled": "󰂲",
         "on-click": "blueman-manager"
     },
     "tray": {
@@ -55,7 +58,7 @@ cat > "$HOME/.config/waybar/config.jsonc" << 'WBCONF'
         "spacing": 8
     },
     "custom/power": {
-        "format": "—",
+        "format": "⏻",
         "on-click": "rofi -show power-menu -modi power-menu:rofi-power-menu",
         "tooltip": false
     }
@@ -63,6 +66,7 @@ cat > "$HOME/.config/waybar/config.jsonc" << 'WBCONF'
 WBCONF
 
 # Waybar Catppuccin style
+safe_config "$HOME/.config/waybar/style.css"
 cat > "$HOME/.config/waybar/style.css" << 'WBSTYLE'
 /* — Waybar — Catppuccin Mocha Glass — */
 /* Uses locally installed Inter & JetBrainsMono Nerd Font (no internet needed) */
@@ -144,4 +148,5 @@ tooltip {
 WBSTYLE
 
 ok "Waybar configured with Catppuccin glass theme"
+mark_module_done
 

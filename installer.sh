@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-#  CachyOS Workstation Installer — TUI Panel
-#  Uses `dialog` for aesthetic terminal GUI
+#  CachyOS Workstation Installer — GUI Wizard (zenity)
+#  Uses zenity for graphical popup dialogs
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 set -euo pipefail
@@ -17,80 +17,23 @@ loc() {
     local en="$1"
     local id="$2"
     if [ "$GUI_LANG" = "id" ]; then
-        echo -e "$id"
+        echo "$id"
     else
-        echo -e "$en"
+        echo "$en"
     fi
 }
 
-# ─── Catppuccin Mocha .dialogrc ──────────────────────────
-setup_dialog_theme() {
-    cat > "$HOME/.dialogrc" << 'DRCEOF'
-# Catppuccin Mocha theme for dialog
-use_shadow = OFF
-use_colors = ON
-
-screen_color = (WHITE,BLACK,ON)
-shadow_color = (BLACK,BLACK,ON)
-
-dialog_color = (WHITE,BLACK,OFF)
-title_color = (MAGENTA,BLACK,ON)
-border_color = (MAGENTA,BLACK,ON)
-
-button_active_color = (BLACK,MAGENTA,ON)
-button_inactive_color = (WHITE,BLACK,OFF)
-button_key_active_color = (BLACK,MAGENTA,ON)
-button_key_inactive_color = (MAGENTA,BLACK,OFF)
-button_label_active_color = (BLACK,MAGENTA,ON)
-button_label_inactive_color = (WHITE,BLACK,ON)
-
-inputbox_color = (WHITE,BLACK,OFF)
-inputbox_border_color = (BLUE,BLACK,ON)
-
-searchbox_color = (WHITE,BLACK,OFF)
-searchbox_title_color = (MAGENTA,BLACK,ON)
-searchbox_border_color = (BLUE,BLACK,ON)
-
-position_indicator_color = (MAGENTA,BLACK,ON)
-
-menubox_color = (WHITE,BLACK,OFF)
-menubox_border_color = (BLUE,BLACK,ON)
-
-item_color = (WHITE,BLACK,OFF)
-item_selected_color = (BLACK,MAGENTA,ON)
-
-tag_color = (CYAN,BLACK,ON)
-tag_selected_color = (BLACK,MAGENTA,ON)
-tag_key_color = (CYAN,BLACK,ON)
-tag_key_selected_color = (BLACK,MAGENTA,ON)
-
-check_color = (WHITE,BLACK,OFF)
-check_selected_color = (BLACK,MAGENTA,ON)
-
-uarrow_color = (BLUE,BLACK,ON)
-darrow_color = (BLUE,BLACK,ON)
-
-gauge_color = (MAGENTA,BLACK,ON)
-
-border2_color = (BLUE,BLACK,ON)
-inputbox_border2_color = (BLUE,BLACK,ON)
-searchbox_border2_color = (BLUE,BLACK,ON)
-menubox_border2_color = (BLUE,BLACK,ON)
-DRCEOF
-}
-
 # ─── Define Modules ──────────────────────────────────────
-# Format: "tag" "description" "status"
 declare -A MODULE_SCRIPTS
 declare -A MODULE_SIZES
 
 MODULE_SCRIPTS[01]="01-base.sh";      MODULE_SIZES[01]="~2 GB"
-MODULE_SCRIPTS[02]="02-kernel.sh";    MODULE_SIZES[02]="~0 MB"
+MODULE_SCRIPTS[02]="02-kernel.sh";    MODULE_SIZES[02]="~50 MB"
 MODULE_SCRIPTS[03]="03-security.sh";  MODULE_SIZES[03]="~50 MB"
 MODULE_SCRIPTS[04]="04-dev.sh";       MODULE_SIZES[04]="~4 GB"
 MODULE_SCRIPTS[05]="05-mobile.sh";    MODULE_SIZES[05]="~5 GB"
 MODULE_SCRIPTS[06]="06-dotfiles.sh";  MODULE_SIZES[06]="~100 MB"
-MODULE_SCRIPTS[07]="07-editors.sh";   MODULE_SIZES[07]="~700 MB"
+MODULE_SCRIPTS[07]="07-editors.sh";   MODULE_SIZES[07]="~5 GB"
 MODULE_SCRIPTS[08]="08-desktop.sh";   MODULE_SIZES[08]="~300 MB"
 MODULE_SCRIPTS[09]="09-hyprland.sh";  MODULE_SIZES[09]="~200 MB"
 MODULE_SCRIPTS[10]="10-apps.sh";      MODULE_SIZES[10]="~500 MB"
@@ -100,116 +43,221 @@ MODULE_SCRIPTS[13]="13-waybar.sh";    MODULE_SIZES[13]="~5 MB"
 MODULE_SCRIPTS[14]="14-nexus-guide.sh"; MODULE_SIZES[14]="~1 MB"
 MODULE_SCRIPTS[15]="15-ecosystem.sh"; MODULE_SIZES[15]="~1 MB"
 
-# Module order for execution
 MODULE_ORDER=(01 02 03 04 05 06 07 08 09 10 11 12 13 14 15)
 
 # ─── Language Selector ────────────────────────────────────
 select_language() {
     local result
-    result=$(dialog --clear --title " 🌐 Language / Bahasa " \
-        --menu "\nSelect Installer Language / Pilih Bahasa Installer:\n" 12 55 2 \
-        "en" "English" \
-        "id" "Bahasa Indonesia" \
-        3>&1 1>&2 2>&3 || true)
-    
+    result=$(zenity --list --radiolist \
+        --title="🌐 Language / Bahasa" \
+        --text="Select Installer Language / Pilih Bahasa Installer:" \
+        --column="" --column="Code" --column="Language" \
+        --width=400 --height=250 \
+        --print-column=2 --hide-column=2 \
+        TRUE "en" "English" \
+        FALSE "id" "Bahasa Indonesia" 2>/dev/null) || true
+
     if [ -n "$result" ]; then
         GUI_LANG="$result"
-    else
-        GUI_LANG="en"
     fi
 }
 
 # ─── Welcome Screen ─────────────────────────────────────
 show_welcome() {
-    local msg=""
-    if [ "$GUI_LANG" = "id" ]; then
-        msg="\n\
-    ╔══════════════════════════════════════╗\n\
-    ║  🚀  Installer CachyOS Workstation  ║\n\
-    ║  ──────────────────────────────────  ║\n\
-    ║  Tema: Catppuccin Mocha              ║\n\
-    ║  Modul: 15 (modular penuh)           ║\n\
-    ║  Tools: 50+ terkonfigurasi           ║\n\
-    ║  Panduan: 160+ referensi command     ║\n\
-    ║                                      ║\n\
-    ║  Pilih modul di layar selanjutnya.   ║\n\
-    ║  Centang semua = install lengkap.    ║\n\
-    ║  Hapus centang yang tidak perlu.     ║\n\
-    ╚══════════════════════════════════════╝\n"
-    else
-        msg="\n\
-    ╔══════════════════════════════════════╗\n\
-    ║  🚀  CachyOS Workstation Installer  ║\n\
-    ║  ──────────────────────────────────  ║\n\
-    ║  Theme: Catppuccin Mocha            ║\n\
-    ║  Modules: 15 (fully modular)        ║\n\
-    ║  Tools: 50+ pre-configured          ║\n\
-    ║  Guide: 160+ searchable entries     ║\n\
-    ║                                      ║\n\
-    ║  Select modules on next screen.      ║\n\
-    ║  All checked = full install.         ║\n\
-    ║  Uncheck what you don't need.        ║\n\
-    ╚══════════════════════════════════════╝\n"
-    fi
+    zenity --info \
+        --title="🚀 $(loc 'CachyOS Workstation Setup' 'Setup CachyOS Workstation')" \
+        --width=500 --height=350 \
+        --text="$(loc \
+'<big><b>🚀 CachyOS Workstation Installer</b></big>
 
-    dialog --title " $(loc '🚀 CachyOS Workstation Setup' '🚀 Setup CachyOS Workstation') " \
-        --msgbox "$msg" 20 50
+<b>Theme:</b> Catppuccin Mocha
+<b>Modules:</b> 15 (fully modular)
+<b>Tools:</b> 50+ pre-configured
+<b>Guide:</b> 130+ searchable entries
+
+This wizard will guide you through the setup
+step by step. Select what you need at each stage.
+
+• All configs are backed up automatically
+• Unchanged modules are skipped on re-run
+• You can go Back at any step' \
+'<big><b>🚀 Installer CachyOS Workstation</b></big>
+
+<b>Tema:</b> Catppuccin Mocha
+<b>Modul:</b> 15 (modular penuh)
+<b>Tools:</b> 50+ terkonfigurasi
+<b>Panduan:</b> 130+ referensi command
+
+Wizard ini akan memandu kamu langkah demi langkah.
+Pilih apa yang kamu butuhkan di setiap tahap.
+
+• Semua konfigurasi di-backup otomatis
+• Modul yg tidak berubah di-skip saat re-run
+• Kamu bisa kembali (Back) di setiap langkah')" 2>/dev/null || true
 }
 
-# ─── Module Selector ─────────────────────────────────────
-select_modules() {
+# ─── Wizard Steps ────────────────────────────────────────
+
+# Global array for selections
+declare -a WIZARD_SELECTED=()
+
+# Helper: show a zenity checklist for a wizard step
+# Args: step_num total title text [TRUE/FALSE "id" "label" "size"]...
+# Returns: 0=Next, 1=Cancel/Back
+# Populates STEP_RESULT with selected IDs (space-separated)
+STEP_RESULT=""
+
+wizard_step() {
+    local step_num="$1"
+    local total="$2"
+    local title="$3"
+    local text="$4"
+    shift 4
+
+    STEP_RESULT=""
     local result
-    result=$(dialog --title " $(loc '📦 Select Modules' '📦 Pilih Modul') " \
-        --checklist "\n$(loc 'Space = toggle, Enter = confirm' 'Spasi = pilih, Enter = konfirmasi')\n" 26 65 14 \
-        "01" "$(loc 'Base & GPU Drivers' 'Sistem Dasar & Driver GPU')         [${MODULE_SIZES[01]}]" ON \
-        "02" "$(loc 'Kernel & Performance' 'Kernel Custom & Performa')       [${MODULE_SIZES[02]}]" ON \
-        "03" "$(loc 'Security & Maintenance' 'Keamanan & Perawatan Otomatis')     [${MODULE_SIZES[03]}]" ON \
-        "04" "$(loc 'Dev Tools (Node,Py,Rust,Go)' 'Dev Tools (Node,Py,Rust,Go)') [${MODULE_SIZES[04]}]" ON \
-        "05" "$(loc 'Mobile Dev (Flutter)' 'Mobile Dev (Flutter/SDK)')       [${MODULE_SIZES[05]}]" ON \
-        "06" "$(loc 'Shell & Dotfiles' 'Zsh Shell & Dotfiles')           [${MODULE_SIZES[06]}]" ON \
-        "07" "$(loc 'Editors (Antigravity)' 'Code Editor (Antigravity)')      [${MODULE_SIZES[07]}]" ON \
-        "08" "$(loc 'Desktop Theme (KDE)' 'Tema Desktop (KDE/SDDM)')        [${MODULE_SIZES[08]}]" ON \
-        "09" "$(loc 'Hyprland WM' 'Hyprland Window Manager')                [${MODULE_SIZES[09]}]" ON \
-        "10" "$(loc 'Extra Apps (Browser, etc)' 'Aplikasi (Chrome, Flatpak)')  [${MODULE_SIZES[10]}]" ON \
-        "11" "$(loc 'Gaming (Steam, PCSX2)' 'Gaming (Steam, PCSX2)')      [${MODULE_SIZES[11]}]" OFF \
-        "12" "$(loc 'Windows VM & Bottles' 'Windows VM & Bottles')       [${MODULE_SIZES[12]}]" OFF \
-        "13" "$(loc 'Waybar Status Bar' 'Waybar Status Bar')          [${MODULE_SIZES[13]}]" ON \
-        "14" "$(loc 'Nexus & Guide System' 'Nexus & Sistem Guide')       [${MODULE_SIZES[14]}]" ON \
-        "15" "$(loc 'Living Ecosystem Utils' 'Utilitas Ecosystem AI')     [${MODULE_SIZES[15]}]" ON \
-        3>&1 1>&2 2>&3)
+    result=$(zenity --list --checklist \
+        --title="$title  [$step_num/$total]" \
+        --text="$text\n\n$(loc 'Check the modules you want to install:' 'Centang modul yang ingin diinstall:')" \
+        --column="" --column="ID" --column="Module" --column="Size" \
+        --width=700 --height=420 \
+        --separator=" " --print-column=2 \
+        --ok-label="$(loc 'Next →' 'Lanjut →')" \
+        --cancel-label="$(loc '← Back' '← Kembali')" \
+        "$@" 2>/dev/null) || return 1
+
+    STEP_RESULT="$result"
+    return 0
+}
+
+run_wizard() {
+    local step=1
+    local total=5
+
+    # Arrays to hold selections per step (for back/forward navigation)
+    local step1="" step2="" step3="" step4="" step5=""
+
+    while true; do
+        case $step in
+            1)
+                if wizard_step "$step" "$total" \
+                    "$(loc '🔧 Step 1: Foundation' '🔧 Langkah 1: Fondasi Sistem')" \
+                    "$(loc 'Core system: GPU drivers, kernel tuning, security hardening.' 'Sistem inti: driver GPU, tuning kernel, keamanan.')" \
+                    TRUE  "01" "$(loc 'Base & GPU Drivers' 'Sistem Dasar & Driver GPU')" "${MODULE_SIZES[01]}" \
+                    TRUE  "02" "$(loc 'Kernel & Performance Tuning' 'Kernel & Tuning Performa')" "${MODULE_SIZES[02]}" \
+                    TRUE  "03" "$(loc 'Security & Maintenance' 'Keamanan & Perawatan')" "${MODULE_SIZES[03]}"
+                then
+                    step1="$STEP_RESULT"
+                    step=2
+                fi
+                # Cancel from step 1 = exit wizard (no "Back" possible)
+                if [ $step -eq 1 ]; then
+                    zenity --question \
+                        --title="$(loc 'Exit Wizard?' 'Keluar Wizard?')" \
+                        --text="$(loc 'Are you sure you want to exit the setup wizard?\nNo changes have been made.' 'Yakin ingin keluar dari wizard setup?\nBelum ada perubahan yang dibuat.')" \
+                        --ok-label="$(loc 'Exit' 'Keluar')" \
+                        --cancel-label="$(loc 'Stay' 'Tetap')" \
+                        --width=350 2>/dev/null || continue
+                    echo ""
+                    return
+                fi
+                ;;
+            2)
+                if wizard_step "$step" "$total" \
+                    "$(loc '💻 Step 2: Development' '💻 Langkah 2: Development')" \
+                    "$(loc 'Programming tools: Docker, Node.js, Python, Rust, Go, Flutter, editors.' 'Tools pemrograman: Docker, Node.js, Python, Rust, Go, Flutter, editor.')" \
+                    TRUE  "04" "$(loc 'Dev Tools (Docker, Node, Python, Rust, Go)' 'Dev Tools (Docker, Node, Python, Rust, Go)')" "${MODULE_SIZES[04]}" \
+                    FALSE "05" "$(loc 'Mobile Dev (Flutter, Android SDK)' 'Mobile Dev (Flutter, Android SDK)')" "${MODULE_SIZES[05]}" \
+                    TRUE  "07" "$(loc 'Editors (Antigravity, Neovim, Ollama AI)' 'Editor (Antigravity, Neovim, Ollama AI)')" "${MODULE_SIZES[07]}"
+                then
+                    step2="$STEP_RESULT"
+                    step=3
+                else
+                    step=1  # Back
+                fi
+                ;;
+            3)
+                if wizard_step "$step" "$total" \
+                    "$(loc '🎨 Step 3: Desktop & Appearance' '🎨 Langkah 3: Desktop & Tampilan')" \
+                    "$(loc 'Shell environment, Hyprland WM, Catppuccin themes, status bar.' 'Lingkungan shell, Hyprland WM, tema Catppuccin, status bar.')" \
+                    TRUE  "06" "$(loc 'Shell & Dotfiles (Zsh, Kitty, Starship)' 'Shell & Dotfiles (Zsh, Kitty, Starship)')" "${MODULE_SIZES[06]}" \
+                    TRUE  "08" "$(loc 'Desktop Theme (KDE Catppuccin, GRUB)' 'Tema Desktop (KDE Catppuccin, GRUB)')" "${MODULE_SIZES[08]}" \
+                    TRUE  "09" "$(loc 'Hyprland Window Manager' 'Hyprland Window Manager')" "${MODULE_SIZES[09]}" \
+                    TRUE  "13" "$(loc 'Waybar Status Bar' 'Waybar Status Bar')" "${MODULE_SIZES[13]}"
+                then
+                    step3="$STEP_RESULT"
+                    step=4
+                else
+                    step=2  # Back
+                fi
+                ;;
+            4)
+                if wizard_step "$step" "$total" \
+                    "$(loc '📦 Step 4: Apps & Ecosystem' '📦 Langkah 4: Aplikasi & Ekosistem')" \
+                    "$(loc 'Browser, productivity apps, Nexus command center, ecosystem tools.' 'Browser, aplikasi produktivitas, Nexus, tools ekosistem.')" \
+                    TRUE  "10" "$(loc 'Apps (Browser, Productivity, Flatpak)' 'Aplikasi (Browser, Produktivitas, Flatpak)')" "${MODULE_SIZES[10]}" \
+                    TRUE  "14" "$(loc 'Nexus & Guide System' 'Nexus & Sistem Guide')" "${MODULE_SIZES[14]}" \
+                    TRUE  "15" "$(loc 'Living Ecosystem (8 AI Tools)' 'Ekosistem AI (8 Tools)')" "${MODULE_SIZES[15]}"
+                then
+                    step4="$STEP_RESULT"
+                    step=5
+                else
+                    step=3  # Back
+                fi
+                ;;
+            5)
+                if wizard_step "$step" "$total" \
+                    "$(loc '🎮 Step 5: Extras (Optional)' '🎮 Langkah 5: Extras (Opsional)')" \
+                    "$(loc 'Heavy optional modules. Uncheck to save disk space & time.' 'Modul opsional berat. Hapus centang untuk hemat ruang & waktu.')" \
+                    FALSE "11" "$(loc 'Gaming (Steam, PCSX2, Wine)' 'Gaming (Steam, PCSX2, Wine)')" "${MODULE_SIZES[11]}" \
+                    FALSE "12" "$(loc 'Virtualization (QEMU/KVM, Bottles)' 'Virtualisasi (QEMU/KVM, Bottles)')" "${MODULE_SIZES[12]}"
+                then
+                    step5="$STEP_RESULT"
+                    break  # All steps done
+                else
+                    step=4  # Back
+                fi
+                ;;
+        esac
+    done
+
+    # Merge all step selections
+    local all_selected="$step1 $step2 $step3 $step4 $step5"
+
+    # Build output in module execution order
+    local result=""
+    for mod in "${MODULE_ORDER[@]}"; do
+        if echo "$all_selected" | grep -qw "$mod"; then
+            result+="\"$mod\" "
+        fi
+    done
 
     echo "$result"
 }
 
 # ─── Module Dependencies ─────────────────────────────────
-# Warn about missing pairings (soft dependency — not blocking)
 check_dependencies() {
     local selected="$1"
     local warnings=""
 
-    # 13-waybar needs 09-hyprland (waybar config needs hyprland installed)
     if echo "$selected" | grep -q '"13"' && ! echo "$selected" | grep -q '"09"'; then
-        warnings+="$(loc '  ⚠ Module 13 (Waybar) works best with Module 09 (Hyprland)\n' '  ⚠ Modul 13 (Waybar) butuh Modul 09 (Hyprland) untuk konfigurasi maksimal\n')"
+        warnings+="$(loc '⚠ Waybar (13) works best with Hyprland (09)\n' '⚠ Waybar (13) butuh Hyprland (09) untuk konfigurasi maksimal\n')"
     fi
-
-    # 15-ecosystem needs 14-nexus-guide (ecosystem tools are accessed via Nexus)
     if echo "$selected" | grep -q '"15"' && ! echo "$selected" | grep -q '"14"'; then
-        warnings+="$(loc '  ⚠ Module 15 (Ecosystem) needs Module 14 (Nexus) for GUI access\n' '  ⚠ Modul 15 (Ecosystem) butuh Modul 14 (Nexus) untuk akses GUI\n')"
+        warnings+="$(loc '⚠ Ecosystem (15) needs Nexus (14) for GUI access\n' '⚠ Ecosystem (15) butuh Nexus (14) untuk akses GUI\n')"
     fi
-
-    # 06-dotfiles needs module 04-dev for fnm/pnpm/rustup referenced in .zshrc
     if echo "$selected" | grep -q '"06"' && ! echo "$selected" | grep -q '"04"'; then
-        warnings+="$(loc '  ⚠ Module 06 (Dotfiles) .zshrc references tools from Module 04 (Dev)\n' '  ⚠ Modul 06 (Dotfiles) menggunakan command dari Modul 04 (Dev Tools)\n')"
+        warnings+="$(loc '⚠ Dotfiles (06) references tools from Dev (04)\n' '⚠ Dotfiles (06) menggunakan command dari Dev Tools (04)\n')"
     fi
-
-    # 11-gaming benefits from 02-kernel for gamemode/performance tuning
     if echo "$selected" | grep -q '"11"' && ! echo "$selected" | grep -q '"02"'; then
-        warnings+="$(loc '  ⚠ Module 11 (Gaming) benefits from Module 02 (Kernel tuning)\n' '  ⚠ Modul 11 (Gaming) mendapat boost performa jika pakai Modul 02 (Kernel)\n')"
+        warnings+="$(loc '⚠ Gaming (11) benefits from Kernel tuning (02)\n' '⚠ Gaming (11) mendapat boost dari Kernel tuning (02)\n')"
     fi
 
     if [ -n "$warnings" ]; then
-        dialog --title " ⚠ $(loc 'Dependency Hints' 'Saran Dependensi') " \
-            --msgbox "\n$(loc 'Some selected modules have dependencies:' 'Beberapa modul yang dipilih saling bergantung:')\n\n$warnings\n$(loc 'These are recommendations, not requirements.' 'Ini hanya rekomendasi, bukan kewajiban mutlak.')\n$(loc 'You may continue without them.' 'Kamu boleh lanjut tanpanya.')" 16 65
+        zenity --warning \
+            --title="$(loc '⚠ Dependency Hints' '⚠ Saran Dependensi')" \
+            --width=500 \
+            --text="$(loc 'Some selected modules have dependencies:' 'Beberapa modul saling bergantung:')\n\n$warnings\n$(loc 'These are recommendations, not requirements.' 'Ini rekomendasi, bukan keharusan.')" 2>/dev/null || true
     fi
 }
 
@@ -217,196 +265,397 @@ check_dependencies() {
 confirm_install() {
     local selected="$1"
     local count
-    count=$(echo "$selected" | wc -w)
+    count=$(echo "$selected" | grep -oP '"[0-9]+"' | wc -l)
 
-    dialog --title " ✅ $(loc 'Confirm Installation' 'Konfirmasi Instalasi') " \
-        --yesno "\n$(loc "You selected $count modules:" "Kamu memilih $count modul:")\n\n$selected\n\n$(loc 'Proceed with installation?' 'Lanjutkan proses instalasi?')" \
-        12 55
+    # Build a readable list
+    local module_list=""
+    for mod in "${MODULE_ORDER[@]}"; do
+        if echo "$selected" | grep -q "\"$mod\""; then
+            module_list+="  • ${MODULE_SCRIPTS[$mod]}  [${MODULE_SIZES[$mod]}]\n"
+        fi
+    done
+
+    zenity --question \
+        --title="$(loc '✅ Confirm Installation' '✅ Konfirmasi Instalasi')" \
+        --width=500 --height=400 \
+        --ok-label="$(loc '🚀 Install Now' '🚀 Install Sekarang')" \
+        --cancel-label="$(loc 'Cancel' 'Batal')" \
+        --text="$(loc "You selected <b>$count modules</b>:" "Kamu memilih <b>$count modul</b>:")\n\n$module_list\n$(loc 'Proceed with installation?' 'Lanjutkan proses instalasi?')" 2>/dev/null
 }
 
 # ─── Run Modules with Progress ───────────────────────────
-# Uses a named FIFO so we can update the gauge in real-time:
-#   - Percentage updates between modules
-#   - Live log tailing shows last activity line while module runs
-#   - Spinner animation proves the installer is not hung
 run_modules() {
     local selected="$1"
     local modules=($selected)
     local total=${#modules[@]}
+    # Temp file for error dialog communication between subshell and parent
+    local error_flag_file
+    error_flag_file=$(mktemp /tmp/cachy-setup-error.XXXXXX)
+    rm -f "$error_flag_file"
 
-    # Create FIFO for gauge communication
-    local fifo="/tmp/cachy-gauge-$$"
-    mkfifo "$fifo"
+    (
+        local current=0
+        for mod in "${modules[@]}"; do
+            mod=$(echo "$mod" | tr -d '"')
+            current=$((current + 1))
+            local script="${MODULE_SCRIPTS[$mod]}"
+            local pct=$(( ((current - 1) * 100) / total ))
 
-    # Start gauge reading from FIFO in background
-    dialog --title " ⚡ $(loc 'Installing...' 'Menginstall...') " \
-        --gauge "\n$(loc 'Preparing modules...' 'Menyiapkan modul...')" 10 70 0 < "$fifo" &
-    local gauge_pid=$!
+            echo "$pct"
+            echo "# $(loc "Installing module $current/$total: $script" "Menginstall modul $current/$total: $script")"
 
-    # Open FIFO for writing (fd 3) — keeps gauge alive
-    exec 3>"$fifo"
+            # Run module
+            FORCE_RERUN="${FORCE_RERUN:-0}" bash "$MODULES_DIR/$script" >> "$LOGFILE" 2>&1
+            local exit_code=$?
 
-    local current=0
-    for mod in "${modules[@]}"; do
-        # Remove quotes from dialog output
-        mod=$(echo "$mod" | tr -d '"')
-        current=$((current + 1))
-        local script="${MODULE_SCRIPTS[$mod]}"
-        local base_percent=$(( ((current - 1) * 100) / total ))
-
-        # Update gauge: show which module is starting
-        echo "XXX" >&3
-        echo "$base_percent" >&3
-        echo "\n$(loc 'Installing module' 'Menginstall modul') $current/$total: $script\n$(loc 'Starting...' 'Memulai...')" >&3
-        echo "XXX" >&3
-
-        # Run the module in background so we can tail the log
-        log "━━━ Running: $script ($current/$total) ━━━"
-        bash "$MODULES_DIR/$script" >> "$LOGFILE" 2>&1 &
-        local mod_pid=$!
-
-        # While module runs, update gauge with last log activity + spinner
-        local spin=0
-        local spinchars=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
-        while kill -0 "$mod_pid" 2>/dev/null; do
-            # Read last meaningful log line (strip ANSI colors, truncate)
-            local last
-            last=$(tail -1 "$LOGFILE" 2>/dev/null | sed 's/\x1b\[[0-9;]*m//g' | cut -c1-55)
-            local s=${spinchars[$((spin % 10))]}
-            echo "XXX" >&3
-            echo "$base_percent" >&3
-            echo "\n$s [$current/$total] $script\n${last:-$(loc 'Working...' 'Bekerja...')}" >&3
-            echo "XXX" >&3
-            spin=$((spin + 1))
-            sleep 1.5
+            if [ $exit_code -ne 0 ]; then
+                # Module failed — write error info and break out of progress pipe
+                # Zenity dialogs CANNOT be shown inside a piped subshell (stdout is the pipe)
+                # Instead, signal the parent process to handle error recovery
+                echo "$script:$exit_code:$current" > "$error_flag_file"
+                echo "100"
+                echo "# $(loc "Module $script failed — handling error..." "Modul $script gagal — menangani error...")"
+                exit 2
+            fi
         done
 
-        # Check exit status of the module
-        if wait "$mod_pid"; then
-            ok "Module $script completed"
-        else
-            warn "Module $script had errors (check log)"
-        fi
-    done
+        echo "100"
+        echo "# $(loc '✅ All modules installed successfully!' '✅ Semua modul berhasil diinstall!')"
+        sleep 1
+    ) | zenity --progress \
+        --title="$(loc '⚡ Installing...' '⚡ Menginstall...')" \
+        --text="$(loc 'Preparing modules...' 'Menyiapkan modul...')" \
+        --width=550 --height=150 \
+        --auto-close --no-cancel \
+        --percentage=0 2>/dev/null
 
-    # Final 100% completion message
-    echo "XXX" >&3
-    echo "100" >&3
-    echo "\n✅ $(loc 'All modules installed!' 'Semua modul berhasil diinstall!')" >&3
-    echo "XXX" >&3
-    sleep 2
+    local pipe_exit=${PIPESTATUS[0]}
 
-    # Cleanup: close fd, wait for gauge, remove FIFO
-    exec 3>&-
-    wait "$gauge_pid" 2>/dev/null || true
-    rm -f "$fifo"
+    # Check if a module failed and handle error recovery outside the pipe
+    if [ -f "$error_flag_file" ]; then
+        local error_info
+        error_info=$(cat "$error_flag_file")
+        rm -f "$error_flag_file"
+        local failed_script failed_code failed_idx
+        IFS=':' read -r failed_script failed_code failed_idx <<< "$error_info"
+
+        local choice
+        choice=$(zenity --list --radiolist \
+            --title="$(loc '❌ Module Failed' '❌ Modul Gagal')" \
+            --text="$(loc "Module <b>$failed_script</b> failed (exit code $failed_code).\nLog: $LOGFILE\n\nWhat would you like to do?" "Modul <b>$failed_script</b> gagal (exit code $failed_code).\nLog: $LOGFILE\n\nApa yang ingin dilakukan?")" \
+            --column="" --column="Action" --column="Description" \
+            --width=550 --height=300 \
+            --print-column=2 --hide-column=2 \
+            TRUE  "Retry"  "$(loc 'Try running this module again' 'Coba jalankan modul ini lagi')" \
+            FALSE "Ignore" "$(loc 'Skip and continue remaining modules' 'Lewati dan lanjut modul berikutnya')" \
+            FALSE "Abort"  "$(loc 'Stop the entire installation' 'Hentikan seluruh instalasi')" \
+            2>/dev/null) || choice="Abort"
+
+        case "$choice" in
+            "Retry")
+                # Retry failed module, then continue with remaining modules
+                FORCE_RERUN="${FORCE_RERUN:-0}" bash "$MODULES_DIR/$failed_script" >> "$LOGFILE" 2>&1
+                if [ $? -ne 0 ]; then
+                    zenity --warning \
+                        --title="$(loc '⚠️ Retry Failed' '⚠️ Percobaan Ulang Gagal')" \
+                        --text="$(loc "Module $failed_script failed again. Continuing with remaining modules." "Modul $failed_script gagal lagi. Melanjutkan modul berikutnya.")" \
+                        --width=400 2>/dev/null || true
+                fi
+                ;& # fall through to shared remaining-module logic
+            "Ignore")
+                # Continue with remaining modules (shared by both Retry and Ignore)
+                local remaining=""
+                local skip=true
+                for mod in "${modules[@]}"; do
+                    mod=$(echo "$mod" | tr -d '"')
+                    if [ "$skip" = true ] && [ "${MODULE_SCRIPTS[$mod]}" = "$failed_script" ]; then
+                        skip=false
+                        continue
+                    fi
+                    [ "$skip" = false ] && remaining+="$mod "
+                done
+                if [ -n "$remaining" ]; then
+                    run_modules "$remaining"
+                fi
+                ;;
+            *)
+                zenity --error \
+                    --title="$(loc '❌ Installation Aborted' '❌ Instalasi Dibatalkan')" \
+                    --text="$(loc 'Installation was stopped. Check log:' 'Instalasi dihentikan. Cek log:')\n$LOGFILE" \
+                    --width=400 2>/dev/null || true
+                return 1
+                ;;
+        esac
+        return 0
+    fi
+
+    rm -f "$error_flag_file"
+    if [ $pipe_exit -ne 0 ]; then
+        zenity --error \
+            --title="$(loc '❌ Installation Aborted' '❌ Instalasi Dibatalkan')" \
+            --text="$(loc 'Installation was stopped. Check log:' 'Instalasi dihentikan. Cek log:')\n$LOGFILE" \
+            --width=400 2>/dev/null || true
+        return 1
+    fi
+    return 0
 }
 
 # ─── Post-Install Summary ───────────────────────────────
 show_summary() {
-    local msg=""
-    if [ "$GUI_LANG" = "id" ]; then
-        msg="\n\
-    ╔══════════════════════════════════════╗\n\
-    ║    🎉 Instalasi Selesai!             ║\n\
-    ╠══════════════════════════════════════╣\n\
-    ║                                      ║\n\
-    ║  Silahkan reboot sistem kamu:        ║\n\
-    ║  $ sudo reboot                       ║\n\
-    ║                                      ║\n\
-    ║  Setelah reboot:                     ║\n\
-    ║  • Super+X    → Nexus Command Center ║\n\
-    ║  • Super+D    → App Launcher (Rofi)  ║\n\
-    ║  • guide      → Panduan Interaktif   ║\n\
-    ║  • ff         → Info Sistem          ║\n\
-    ║                                      ║\n\
-    ║  Log: ~/cachy-setup.log              ║\n\
-    ╚══════════════════════════════════════╝\n"
-    else
-        msg="\n\
-    ╔══════════════════════════════════════╗\n\
-    ║    🎉 Installation Complete!         ║\n\
-    ╠══════════════════════════════════════╣\n\
-    ║                                      ║\n\
-    ║  Please reboot your system:          ║\n\
-    ║  $ sudo reboot                       ║\n\
-    ║                                      ║\n\
-    ║  After reboot:                       ║\n\
-    ║  • Super+X    → Nexus Command Center ║\n\
-    ║  • Super+D    → App Launcher         ║\n\
-    ║  • guide      → Searchable Help      ║\n\
-    ║  • ff         → System Info          ║\n\
-    ║                                      ║\n\
-    ║  Log: ~/cachy-setup.log              ║\n\
-    ╚══════════════════════════════════════╝\n"
-    fi
+    zenity --info \
+        --title="$(loc '🎉 Installation Complete!' '🎉 Instalasi Selesai!')" \
+        --width=500 --height=380 \
+        --text="$(loc \
+'<big><b>🎉 Installation Complete!</b></big>
 
-    dialog --title " 🎉 $(loc 'Setup Complete!' 'Setup Selesai!') " \
-        --msgbox "$msg" 22 50
+Please <b>reboot</b> your system:
+<tt>  sudo reboot</tt>
+
+<b>After reboot:</b>
+  • <b>Super+X</b>  →  Nexus Command Center
+  • <b>Super+D</b>  →  App Launcher (Rofi)
+  • <b>guide</b>       →  Searchable Help
+  • <b>ff</b>            →  System Info
+
+Log: ~/cachy-setup.log' \
+'<big><b>🎉 Instalasi Selesai!</b></big>
+
+Silahkan <b>reboot</b> sistem kamu:
+<tt>  sudo reboot</tt>
+
+<b>Setelah reboot:</b>
+  • <b>Super+X</b>  →  Nexus Command Center
+  • <b>Super+D</b>  →  App Launcher (Rofi)
+  • <b>guide</b>       →  Panduan Interaktif
+  • <b>ff</b>            →  Info Sistem
+
+Log: ~/cachy-setup.log')" 2>/dev/null || true
 }
 
 # ─── Main Flow ───────────────────────────────────────────
 main() {
     # Pre-flight
     if [ "$EUID" -eq 0 ]; then
-        err "Do NOT run as root. Run as normal user."
+        zenity --error --title="Error" \
+            --text="$(loc 'Do NOT run as root. Run as normal user (sudo is used internally).' 'JANGAN jalankan sebagai root. Jalankan sebagai user biasa.')" \
+            --width=400 2>/dev/null || true
         exit 1
     fi
 
-    # Ensure dialog is available (CachyOS base should have it)
-    if ! command -v dialog &>/dev/null; then
-        echo "Installing dialog..."
-        sudo pacman -S --noconfirm dialog
+    # Colors for terminal output
+    BOLD='\033[1m'
+    NC='\033[0m'
+    CYAN='\033[1;36m'
+    GREEN='\033[1;32m'
+    PURPLE='\033[1;35m'
+
+    # Sudo Validation & Keep-Alive
+    echo -e "${CYAN}Please enter your password to authorize the installation:${NC}"
+    if sudo -v; then
+        while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+        keep_alive_pid=$!
+        trap 'kill ${keep_alive_pid:-} 2>/dev/null || true' EXIT
+    else
+        zenity --error --title="Error" \
+            --text="$(loc 'Sudo authorization failed.' 'Otorisasi sudo gagal.')" \
+            --width=300 2>/dev/null || true
+        exit 1
     fi
 
-    # Setup Catppuccin theme for dialog
-    setup_dialog_theme
+    # Ensure zenity is available
+    if ! command -v zenity &>/dev/null; then
+        echo "Installing zenity..."
+        sudo pacman -S --noconfirm zenity
+    fi
 
-    # Check for --all flag (skip selector, install everything via run_modules)
+    # Check for --all flag
     if [[ "${1:-}" == "--all" ]]; then
-        log "Installing ALL modules via run_modules()..."
-        # Build selection string matching what dialog outputs
+        zenity --question \
+            --title="$(loc '⚠ Install All Modules' '⚠ Install Semua Modul')" \
+            --text="$(loc 'This will install ALL 15 modules (~18 GB).\n\nAre you sure?' 'Ini akan menginstall SEMUA 15 modul (~18 GB).\n\nYakin?')" \
+            --width=400 2>/dev/null || exit 0
+
+        log "Installing ALL modules..."
         local all_modules=""
         for mod in "${MODULE_ORDER[@]}"; do
             all_modules+="\"$mod\" "
         done
-        run_modules "$all_modules"
-        show_summary
+        run_modules "$all_modules" && show_summary
         return
     fi
 
-    # Interactive flow
+    # Interactive Wizard Flow
     select_language
     show_welcome
 
+    # ── Git Identity Configuration ──
+    # Only prompt if identity hasn't been set yet
+    local env_file="$SCRIPT_DIR/.env"
+    local current_name="${GIT_NAME:-}"
+    # Fallback: load from .env if GIT_NAME isn't in environment (e.g., direct invocation)
+    if [ -z "$current_name" ] && [ -f "$env_file" ]; then
+        current_name=$(grep -oP '^GIT_NAME="\K[^"]+' "$env_file" 2>/dev/null || echo "")
+    fi
+
+    if [ -z "$current_name" ] || [ "$current_name" = "Your Name" ] || [ "$current_name" = "Kamu" ]; then
+        # Detect identity sources
+        local gh_name="" gh_email="" git_name="" git_email=""
+
+        if command -v gh &>/dev/null && gh auth status &>/dev/null 2>&1; then
+            gh_name=$(gh api user --jq '.name // empty' 2>/dev/null || echo "")
+            gh_email=$(gh api user --jq '.email // empty' 2>/dev/null || echo "")
+            [ -z "$gh_email" ] && gh_email=$(gh api user/emails --jq '[.[] | select(.primary)][0].email // empty' 2>/dev/null || echo "")
+        fi
+
+        git_name=$(git config --global user.name 2>/dev/null || echo "")
+        git_email=$(git config --global user.email 2>/dev/null || echo "")
+
+        # Build zenity list
+        local list_items=()
+        local default_set=false
+
+        if [ -n "$gh_name" ] && [ -n "$gh_email" ]; then
+            list_items+=(TRUE "GitHub" "🐙 $gh_name <$gh_email>")
+            default_set=true
+        fi
+
+        if [ -n "$git_name" ] && [ -n "$git_email" ]; then
+            if [ "$git_name" != "$gh_name" ] || [ "$git_email" != "$gh_email" ]; then
+                if [ "$default_set" = false ]; then
+                    list_items+=(TRUE "GitConfig" "⚙️ $git_name <$git_email>")
+                    default_set=true
+                else
+                    list_items+=(FALSE "GitConfig" "⚙️ $git_name <$git_email>")
+                fi
+            fi
+        fi
+
+        if [ "$default_set" = false ]; then
+            list_items+=(TRUE "Manual" "✏️ Enter name and email manually")
+        else
+            list_items+=(FALSE "Manual" "✏️ Enter name and email manually")
+        fi
+        list_items+=(FALSE "Skip" "⏭️ Skip for now (edit .env later)")
+
+        local identity_choice
+        identity_choice=$(zenity --list --radiolist \
+            --title="$(loc '👤 Git Identity Setup' '👤 Konfigurasi Identitas Git')" \
+            --text="$(loc 'Configure your Git identity for commits and SSH keys.' 'Konfigurasi identitas Git untuk commit dan SSH key.')" \
+            --column="" --column="Source" --column="Identity" \
+            --width=550 --height=320 \
+            --print-column=2 --hide-column=2 \
+            "${list_items[@]}" 2>/dev/null) || identity_choice="Skip"
+
+        local input_name="" input_email=""
+
+        case "$identity_choice" in
+            "GitHub")  input_name="$gh_name"; input_email="$gh_email" ;;
+            "GitConfig") input_name="$git_name"; input_email="$git_email" ;;
+            "Manual")
+                input_name=$(zenity --entry \
+                    --title="$(loc '👤 Your Name' '👤 Nama Kamu')" \
+                    --text="$(loc 'Enter your full name (for Git commits):' 'Masukkan nama lengkap (untuk commit Git):')" \
+                    --entry-text="$git_name" --width=400 2>/dev/null) || input_name=""
+                [ -n "$input_name" ] && input_email=$(zenity --entry \
+                    --title="$(loc '📧 Your Email' '📧 Email Kamu')" \
+                    --text="$(loc 'Enter your email (for Git commits):' 'Masukkan email (untuk commit Git):')" \
+                    --entry-text="$git_email" --width=400 2>/dev/null) || input_email=""
+                ;;
+        esac
+
+        if [ -n "$input_name" ] && [ -n "$input_email" ]; then
+            if zenity --question \
+                --title="$(loc '✅ Confirm Identity' '✅ Konfirmasi Identitas')" \
+                --text="$(loc 'Save this identity?' 'Simpan identitas ini?')\n\n  <b>Name:</b>  $input_name\n  <b>Email:</b> $input_email" \
+                --width=400 2>/dev/null
+            then
+                cat > "$env_file" << ENVEOF
+# CachyOS Workstation — User Configuration
+GIT_NAME="$input_name"
+GIT_EMAIL="$input_email"
+ENVEOF
+                export GIT_NAME="$input_name"
+                export GIT_EMAIL="$input_email"
+                log "Git identity saved: $input_name <$input_email>"
+            fi
+        fi
+    fi
+
+    # Re-run mode check
+    if [ -d "$HOME/.config/cachy-setup/versions" ] && [ -n "$(ls -A "$HOME/.config/cachy-setup/versions" 2>/dev/null)" ]; then
+        local rerun_choice
+        rerun_choice=$(zenity --list --radiolist \
+            --title="$(loc '🔄 Re-run Mode' '🔄 Mode Re-run')" \
+            --text="$(loc 'Some modules have been installed before.\nUnchanged modules will be skipped to save time.' 'Beberapa modul pernah diinstall.\nModul yg tidak berubah akan di-skip.')" \
+            --column="" --column="Mode" --column="Description" \
+            --width=550 --height=280 \
+            --print-column=2 --hide-column=2 \
+            TRUE  "Smart" "$(loc 'Skip unchanged, run updated only' 'Skip yg sama, jalankan yg baru')" \
+            FALSE "Force" "$(loc 'Re-run ALL selected modules' 'Paksa jalankan SEMUA modul')" \
+            FALSE "Reset" "$(loc 'Clear history and run fresh' 'Hapus riwayat, install ulang')" \
+            2>/dev/null) || rerun_choice="Smart"
+
+        case "$rerun_choice" in
+            "Force") export FORCE_RERUN=1 ;;
+            "Reset")
+                rm -rf "$HOME/.config/cachy-setup/versions"
+                mkdir -p "$HOME/.config/cachy-setup/versions"
+                ;;
+        esac
+    fi
+
+    # Run the 5-step wizard
     local selected
-    selected=$(select_modules)
+    selected=$(run_wizard)
 
     if [ -z "$selected" ]; then
-        dialog --title " Cancelled " --msgbox "\nNo modules selected. Exiting." 7 40
+        zenity --info --title="$(loc 'Cancelled' 'Dibatalkan')" \
+            --text="$(loc 'No modules selected. Exiting.' 'Tidak ada modul dipilih. Keluar.')" \
+            --width=300 2>/dev/null || true
         exit 0
     fi
 
     check_dependencies "$selected"
     confirm_install "$selected" || exit 0
 
-    # Clear dialog and run
-    clear
-    echo -e "${BOLD}${PURPLE}"
-    echo "  ╔══════════════════════════════════════╗"
-    echo "  ║   🚀 $(loc 'Installing selected modules...' 'Menginstal modul secara otomatis...')  ║"
-    echo "  ╚══════════════════════════════════════╝"
-    echo -e "${NC}"
-    echo "  Log: $LOGFILE"
+    # Run installation
+    echo ""
+    echo -e "${BOLD}${PURPLE}  🚀 Setup Wizard — Installing modules...${NC}"
+    echo -e "  Log: ${CYAN}$LOGFILE${NC}"
     echo ""
 
-    run_modules "$selected"
+    if ! run_modules "$selected"; then
+        exit 1
+    fi
 
     show_summary
 
-    clear
+    # Post-install action
+    local post_choice
+    post_choice=$(zenity --list --radiolist \
+        --title="$(loc '🎯 Next Steps' '🎯 Langkah Selanjutnya')" \
+        --text="$(loc 'Installation is complete! What would you like to do next?' 'Instalasi selesai! Apa yang ingin dilakukan selanjutnya?')" \
+        --column="" --column="Action" --column="Description" \
+        --width=500 --height=280 \
+        --print-column=2 --hide-column=2 \
+        TRUE  "Wizard" "$(loc 'Run Post-Install Wizard (Recommended)' 'Jalankan Wizard Post-Install (Rekomendasi)')" \
+        FALSE "Reboot" "$(loc 'Reboot the system now' 'Reboot sistem sekarang')" \
+        FALSE "Exit"   "$(loc 'Finish and stay in terminal' 'Selesai dan tetap di terminal')" \
+        2>/dev/null) || post_choice="Exit"
+
+    case "$post_choice" in
+        "Wizard")
+            if [ -f "$MODULES_DIR/../ecosystem/post-install.sh" ]; then
+                bash "$MODULES_DIR/../ecosystem/post-install.sh"
+            fi
+            ;;
+        "Reboot")
+            sudo reboot
+            ;;
+    esac
+
     echo ""
-    echo -e "${GREEN}${BOLD}  🎉 $(loc 'Setup complete! Reboot with: sudo reboot' 'Setup selesai! Silakan reboot dengan komando: sudo reboot')${NC}"
+    echo -e "${GREEN}${BOLD}  🎉 $(loc 'Setup complete! Reboot with: sudo reboot' 'Setup selesai! Reboot dengan: sudo reboot')${NC}"
     echo -e "  Log: ${CYAN}$LOGFILE${NC}"
     echo ""
 }

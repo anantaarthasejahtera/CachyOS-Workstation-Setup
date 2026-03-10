@@ -31,11 +31,12 @@ The Health Check intercepted a dangerous update (usually related to parsing a ba
 **Action:**
 Read the explicit error thrown by `health-check`. If it cites an NVIDIA DKMS failure, do not reboot. Run `sudo dkms autoinstall` to force the kernel module to recompile.
 
-## 🐋 Docker Rootless Permission Issues
+## 🐋 Docker Permission Issues
 
 If you try to run `docker ps` and receive a permission error:
-1. Ensure the docker socket is active: `systemctl --user start docker.socket`
-2. Ensure you have sourced your `~/.zshrc` so the `DOCKER_HOST` environment variable points to the rootless socket (`unix:///run/user/1000/docker.sock`).
+1. Ensure the Docker daemon is running: `sudo systemctl start docker`
+2. Ensure your user is in the `docker` group: `groups | grep docker`
+3. If not, add yourself: `sudo usermod -aG docker $USER` then **log out and back in** for group changes to apply.
 
 ## 🧠 Ollama / AI Tuner Too Slow
 

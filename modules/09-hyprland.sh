@@ -2,6 +2,7 @@
 # Module 09: Hyprland Window Manager
 source "$(dirname "$0")/00-common.sh"
 set -euo pipefail
+skip_if_current
 header "Hyprland — Tiling Window Manager + Cheatsheet"
 
 log "Installing Hyprland ecosystem..."
@@ -9,11 +10,14 @@ log "Installing Hyprland ecosystem..."
 install_pkg hyprland hyprpaper hyprlock hypridle xdg-desktop-portal-hyprland
 
 # Supporting apps for Hyprland
-install_pkg waybar rofi-wayland dunst swww grim slurp wl-clipboard \
+install_pkg waybar rofi-wayland dunst grim slurp wl-clipboard \
     cliphist brightnessctl playerctl polkit-kde-agent
 
 # File manager & app launcher
 install_pkg thunar nwg-look
+
+# Install Rofi power menu for waybar
+install_aur rofi-power-menu
 
 ok "Hyprland packages installed"
 
@@ -30,7 +34,7 @@ log "Creating Hyprland cheatsheet helper..."
 mkdir -p "$HOME/.config/hypr"
 cat > "$HOME/.config/hypr/cheatsheet.txt" << 'CHEATEOF'
 —
-—  ðŸŽ® HYPRLAND KEYBINDING CHEATSHEET — CachyOS Edition        —
+—  🎮 HYPRLAND KEYBINDING CHEATSHEET — CachyOS Edition        —
 —
 —                                                               —
 —  — ESSENTIALS —  —
@@ -41,6 +45,7 @@ cat > "$HOME/.config/hypr/cheatsheet.txt" << 'CHEATEOF'
 —  Super + M              → Exit Hyprland                       —
 —  Super + V              → Clipboard history                   —
 —  Super + L              → Lock screen                         —
+—  Super + N              → Recall last notification            —
 —                                                               —
 —  — WINDOW MANAGEMENT —  —
 —  Super + Arrow Keys     → Move focus between windows          —
@@ -85,6 +90,7 @@ KEYSEOF
 chmod +x "$HOME/.config/hypr/show-keys.sh"
 
 # --- Hyprland config ---
+safe_config "$HOME/.config/hypr/hyprland.conf"
 cat > "$HOME/.config/hypr/hyprland.conf" << 'HYPREOF'
 # — Hyprland Config — CachyOS Advan WorkPro —
 # Monitor (auto-detect)
@@ -98,6 +104,7 @@ exec-once = wl-paste --type text --watch cliphist store
 exec-once = wl-paste --type image --watch cliphist store
 exec-once = /usr/lib/polkit-kde-authentication-agent-1
 exec-once = hypridle
+exec-once = post-install-wizard
 
 # — Environment —
 env = XCURSOR_SIZE,24
@@ -160,25 +167,61 @@ dwindle {
     preserve_split = true
 }
 
-gestures {
-    workspace_swipe = true
-    workspace_swipe_fingers = 3
-}
+# Gestures are configured via touchpad section in input {}
 
 misc {
     disable_hyprland_logo = true
     disable_splash_rendering = true
 }
 
-# — Window Rules —
-windowrulev2 = float, class:^(floating-helper)$
-windowrulev2 = center, class:^(floating-helper)$
-windowrulev2 = size 640 480, class:^(floating-helper)$
-windowrulev2 = float, class:^(pavucontrol)$
-windowrulev2 = float, class:^(blueman-manager)$
-windowrulev2 = float, title:^(File Operation Progress)$
-windowrulev2 = opacity 0.92 0.85, class:^(kitty)$
-windowrulev2 = opacity 0.92 0.85, class:^(Code)$
+# ═══════════════════════════════════════════════════════════════════════
+# Window Rules — Hyprland v0.54.1 (breaking change from v0.52 and below)
+# ═══════════════════════════════════════════════════════════════════════
+#
+# IMPORTANT: Hyprland v0.53 completely overhauled window rule syntax.
+# The old syntax (v0.52 and below) is NO LONGER VALID:
+#
+#   ❌ OLD (broken):  windowrule = float, class:^(kitty)$
+#   ❌ OLD (broken):  windowrulev2 = opacity 0.9, class:^(kitty)$
+#
+# The NEW syntax (v0.53+ / v0.54.1) requires:
+#
+#   1. Use `match:` prefix for matching properties (class, title, etc)
+#      ✅ match:class    instead of    class:
+#      ✅ match:title    instead of    title:
+#
+#   2. Boolean effects need EXPLICIT value (1 = on, 0 = off)
+#      ✅ float 1        instead of    float
+#      ✅ center 1       instead of    center
+#
+#   3. Opacity uses `override` keyword for exact values
+#      ✅ opacity 0.92 override 0.85 override
+#         (0.92 = active, 0.85 = inactive, "override" = exact value not multiplier)
+#
+#   4. Two syntax styles available:
+#      a) Inline:  windowrule = effect value, match:class ^(regex)$
+#      b) Block:   windowrule { match:class = ^(regex)$  effect = value }
+#         Block is useful for grouping multiple effects on one window.
+#
+# Reference: https://wiki.hyprland.org/Configuring/Window-Rules/
+# ═══════════════════════════════════════════════════════════════════════
+
+# Named block rule — groups multiple effects for the cheatsheet popup
+windowrule {
+    match:class = ^(floating-helper)$
+    float = 1
+    center = 1
+    size = 640 480
+}
+
+# Inline rules — one effect per line (simpler for single-effect rules)
+windowrule = float 1, match:class ^(pavucontrol)$       # PulseAudio volume control
+windowrule = float 1, match:class ^(blueman-manager)$    # Bluetooth manager
+windowrule = float 1, match:title ^(File Operation Progress)$  # Thunar file ops
+
+# Opacity: active=0.92, inactive=0.85 (override = exact value, not multiplier)
+windowrule = opacity 0.92 override 0.85 override, match:class ^(kitty)$
+windowrule = opacity 0.92 override 0.85 override, match:class ^(Code)$
 
 # — Keybindings —
 $mainMod = SUPER
@@ -192,9 +235,10 @@ bind = $mainMod, X, exec, /usr/local/bin/nexus
 bind = $mainMod, F, fullscreen
 bind = $mainMod, Space, togglefloating
 bind = $mainMod, P, pseudo
-bind = $mainMod, J, togglesplit
+bind = $mainMod, J, layoutmsg, togglesplit
 bind = $mainMod, V, exec, cliphist list | rofi -dmenu | cliphist decode | wl-copy
 bind = $mainMod, L, exec, hyprlock
+bind = $mainMod, N, exec, dunstctl history-pop
 bind = $mainMod, slash, exec, ~/.config/hypr/show-keys.sh
 
 # Move focus
@@ -262,6 +306,7 @@ ok "Hyprland configured with cheatsheet helper (Super + / to view)"
 # --- Rofi Catppuccin Theme ---
 log "Writing Rofi Catppuccin theme..."
 mkdir -p "$HOME/.config/rofi"
+safe_config "$HOME/.config/rofi/config.rasi"
 cat > "$HOME/.config/rofi/config.rasi" << 'ROFIEOF'
 /* — Rofi — Catppuccin Mocha Glass — */
 configuration {
@@ -355,6 +400,7 @@ ok "Rofi Catppuccin glass theme written"
 # --- Dunst Catppuccin Notifications ---
 log "Writing Dunst notification config..."
 mkdir -p "$HOME/.config/dunst"
+safe_config "$HOME/.config/dunst/dunstrc"
 cat > "$HOME/.config/dunst/dunstrc" << 'DUNSTEOF'
 # — Dunst — Catppuccin Mocha —
 [global]
@@ -426,6 +472,7 @@ ok "Dunst Catppuccin notifications configured"
 
 # --- Hyprlock (Aesthetic Lock Screen) ---
 log "Writing Hyprlock config..."
+safe_config "$HOME/.config/hypr/hyprlock.conf"
 cat > "$HOME/.config/hypr/hyprlock.conf" << 'LOCKEOF'
 # — Hyprlock — Catppuccin Mocha Lock Screen —
 background {
@@ -504,13 +551,19 @@ ok "Hyprlock aesthetic lock screen configured"
 
 # --- Hyprpaper (wallpaper daemon) ---
 log "Writing Hyprpaper config..."
-WALL_DEFAULT=$(find "$HOME/Pictures/Wallpapers" -type f \( -name '*.png' -o -name '*.jpg' \) 2>/dev/null | head -1)
+WALL_DEFAULT="$HOME/Pictures/Wallpapers/catppuccin-mocha-waves.png"
+if [ ! -f "$WALL_DEFAULT" ]; then
+    WALL_DEFAULT="$HOME/Pictures/Wallpapers/catppuccin-mocha-landscape.png"
+fi
+if [ ! -f "$WALL_DEFAULT" ]; then
+    WALL_DEFAULT=$(find "$HOME/Pictures/Wallpapers" -type f \( -name '*.png' -o -name '*.jpg' \) -print -quit 2>/dev/null || true)
+fi
 if [ -n "$WALL_DEFAULT" ]; then
     cat > "$HOME/.config/hypr/hyprpaper.conf" << PAPEREOF
 preload = $WALL_DEFAULT
 wallpaper = ,$WALL_DEFAULT
 splash = false
-ipc = off
+ipc = on
 PAPEREOF
     ok "Hyprpaper configured with wallpaper: $(basename "$WALL_DEFAULT")"
 else
@@ -519,7 +572,7 @@ else
 # preload = ~/Pictures/Wallpapers/your-wallpaper.png
 # wallpaper = ,~/Pictures/Wallpapers/your-wallpaper.png
 splash = false
-ipc = off
+ipc = on
 PAPEREOF
     warn "No wallpaper found. Edit ~/.config/hypr/hyprpaper.conf manually"
 fi
@@ -554,4 +607,5 @@ listener {
 }
 IDLEEOF
 ok "Hypridle auto-lock configured"
+mark_module_done
 
