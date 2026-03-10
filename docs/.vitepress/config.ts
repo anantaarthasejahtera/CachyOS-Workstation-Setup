@@ -4,6 +4,7 @@ export default defineConfig({
   title: 'CachyOS Workstation',
   description: 'Modular, aesthetic, bilingual developer environment built on CachyOS',
   lang: 'en-US',
+  base: '/CachyOS-Workstation-Setup/',
 
   head: [
     ['meta', { name: 'theme-color', content: '#cba6f7' }],
@@ -44,7 +45,7 @@ export default defineConfig({
     ],
 
     footer: {
-      message: 'Released under the MIT License.',
+      message: 'Released under the GPL-3.0 License.',
       copyright: 'Copyright © 2024-present PT Ananta Artha Sejahtera',
     },
 

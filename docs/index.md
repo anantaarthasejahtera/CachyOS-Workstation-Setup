@@ -18,13 +18,13 @@ hero:
 
 features:
   - title: 15 Modular Scripts
-    details: Fully idempotent, hardware-aware modules. Install everything or cherry-pick what you need. Safe config rollbacks.
+    details: Fully idempotent, hardware-aware, declarative modules. Install everything or cherry-pick. Auto-migrate deprecated packages on re-run.
   - title: Living Ecosystem
-    details: 6 integrated tools including a Dynamic Theming Engine, Time Machine Rollback, and local AI Auto-Tuner.
+    details: 9 integrated tools — Dynamic Theming, Time Machine Rollback, AI Auto-Tuner, Wallpaper Picker, Nexus Chat, App Store, and more.
   - title: Nexus Command Center
-    details: Super+X brings up a smart popup with 45+ actions, live system stats, and GUI App Store.
+    details: Super+X brings up a smart popup with 45+ actions, live system stats, GUI App Store, and AI-powered system management.
   - title: Bilingual Support
-    details: The Guide CLI and GUI Installer are fully translated in English and Bahasa Indonesia.
+    details: The Guide CLI (130+ entries) and GUI Installer are fully translated in English and Bahasa Indonesia.
 ---
 
 ## Why CachyOS Workstation?
