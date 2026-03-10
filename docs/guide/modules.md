@@ -28,7 +28,7 @@ Sets up local firewalls and automated housekeeping tasks.
 ## 04: Development Tools
 The heavy lifters for programmers across all major stacks.
 * **Docker**: Configured to run rootless with auto-started daemon.
-* **JavaScript/TypeScript**: Installs `fnm` and sets `Node 22` as default, coupled with `pnpm` specifically for hard-linking disk space savings.
+* **JavaScript/TypeScript**: Installs `fnm` and sets `Node 24` as default, coupled with `pnpm` specifically for hard-linking disk space savings.
 * **Python**: Purges `pip` usage globally in favor of `uv` (Astral's lightning-fast Rust-based package manager).
 * **Rust**: Orchestrates `rustup` complete with nightly toolchains.
 * **Go**: Native package installation with GOPATH setup.

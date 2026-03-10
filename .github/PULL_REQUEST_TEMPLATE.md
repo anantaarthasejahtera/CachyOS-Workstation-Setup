@@ -22,3 +22,4 @@
 - [ ] I have updated the documentation (README/Guide) if necessary.
 - [ ] I have used the `log`, `ok`, `warn`, `err` helpers for output.
 - [ ] My script has LF line endings.
+- [ ] This PR does **NOT** contain breaking changes (or they are documented above).

@@ -1,34 +1,22 @@
 #!/usr/bin/env bash
 # Module 14: Nexus Command Center & Guide System
 source "$(dirname "$0")/00-common.sh"
+set -euo pipefail
+skip_if_current
 header "Nexus Command Center & Guide System"
-
-REPO_DIR="$(dirname "$0")/.."
-INSTALL_DIR="/usr/local/bin"
 
 # --- Nexus Command Center ---
 log "Installing Nexus v2 Command Center..."
-if [ -f "$REPO_DIR/ecosystem/nexus.sh" ]; then
-    sudo cp "$REPO_DIR/ecosystem/nexus.sh" "$INSTALL_DIR/nexus"
-else
-    sudo curl -fsSL -o "$INSTALL_DIR/nexus" \
-        "https://raw.githubusercontent.com/anantaarthasejahtera/CachyOS-Workstation-Setup/main/ecosystem/nexus.sh" 2>/dev/null || true
-fi
-sudo chmod +x "$INSTALL_DIR/nexus"
+install_ecosystem "nexus.sh" "nexus"
 ok "Nexus installed (Super+X to open)"
 log "  Dynamic stats, smart toggles, live service detection"
 
 # --- Guide v3 (Bilingual Interactive Reference) ---
 log "Installing Guide v3..."
-if [ -f "$REPO_DIR/ecosystem/guide.sh" ]; then
-    sudo cp "$REPO_DIR/ecosystem/guide.sh" "$INSTALL_DIR/guide"
-else
-    sudo curl -fsSL -o "$INSTALL_DIR/guide" \
-        "https://raw.githubusercontent.com/anantaarthasejahtera/CachyOS-Workstation-Setup/main/ecosystem/guide.sh" 2>/dev/null || true
-fi
-sudo chmod +x "$INSTALL_DIR/guide"
+install_ecosystem "guide.sh" "guide"
 ok "Guide v3 installed"
 log "  guide              → interactive fzf (preview + execute)"
 log "  guide <keyword>    → filter by keyword"
 log "  guide --popup      → rofi popup mode"
 log "  guide --web <q>    → query cheat.sh (online)"
+mark_module_done

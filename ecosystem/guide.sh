@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #  Guide v3 — Bilingual Interactive Reference (EN/ID)
 #  
@@ -81,6 +81,10 @@ build_guide_data() {
         "Close focused window" "Tutup jendela aktif" \
         "Immediately kills the focused window" "Langsung menutup jendela yang sedang aktif" \
         "" ""
+    add "hyprland" "Super+M" \
+        "Exit Hyprland (logout)" "Keluar Hyprland (logout)" \
+        "Immediately exits the Hyprland session (returns to login manager)" "Langsung keluar dari sesi Hyprland (kembali ke login manager)" \
+        "" ""
     add "hyprland" "Super+F" \
         "Toggle fullscreen" "Toggle layar penuh" \
         "Makes window fill entire screen or restore to tiled" "Membuat jendela penuh layar atau kembali ke tiling" \
@@ -88,6 +92,14 @@ build_guide_data() {
     add "hyprland" "Super+Space" \
         "Toggle floating" "Toggle melayang" \
         "Switch between tiling mode and floating mode" "Beralih antara mode tiling dan mode melayang" \
+        "" ""
+    add "hyprland" "Super+P" \
+        "Pseudo-tiling" "Pseudo-tiling" \
+        "Keep window's preferred size within tiled slot (partially floating)" "Pertahankan ukuran preferensi jendela dalam slot tiling (setengah melayang)" \
+        "" ""
+    add "hyprland" "Super+J" \
+        "Toggle split orientation" "Toggle orientasi split" \
+        "Switch dwindle layout between horizontal and vertical split" "Beralih layout dwindle antara split horizontal dan vertikal" \
         "" ""
     add "hyprland" "Super+1-9" \
         "Switch workspace" "Pindah workspace" \
@@ -102,8 +114,8 @@ build_guide_data() {
         "Navigate between windows using arrow keys" "Navigasi antar jendela dengan tombol panah" \
         "" ""
     add "hyprland" "Super+Shift+Arrow" \
-        "Resize/move window" "Ubah ukuran/pindahkan jendela" \
-        "Reposition or resize windows in tiling layout" "Ubah posisi atau ukuran jendela dalam layout tiling" \
+        "Move window (direction)" "Pindahkan jendela (arah)" \
+        "Move the active window to another position in tiling layout" "Pindahkan jendela aktif ke posisi lain dalam layout tiling" \
         "" ""
     add "hyprland" "Super+L" \
         "Lock screen" "Kunci layar" \
@@ -115,7 +127,11 @@ build_guide_data() {
         "" ""
     add "hyprland" "Super+V" \
         "Clipboard history" "Riwayat clipboard" \
-        "Browse all copied text and images (via cliphist)" "Jelajahi semua teks dan gambar yang dicopy (via cliphist)" \
+        "Browse all copied text and images (via cliphist + Rofi)" "Jelajahi semua teks dan gambar yang dicopy (via cliphist + Rofi)" \
+        "" ""
+    add "hyprland" "Super+N" \
+        "Notification history" "Riwayat notifikasi" \
+        "Pop the most recent notification from dunst history" "Munculkan notifikasi terbaru dari riwayat dunst" \
         "" ""
     add "hyprland" "Super+/" \
         "Keybind cheatsheet" "Lembar contekan shortcut" \
@@ -132,6 +148,28 @@ build_guide_data() {
     add "hyprland" "Super+Mouse" \
         "Drag to move/resize" "Drag untuk pindah/ubah ukuran" \
         "Hold Super + left click = move, right click = resize" "Tahan Super + klik kiri = pindah, klik kanan = ubah ukuran" \
+        "" ""
+
+    # ── Media Keys (Fn keys on laptop / multimedia keyboards) ──
+    add "hyprland" "XF86AudioRaiseVolume" \
+        "Volume up (+5%)" "Volume naik (+5%)" \
+        "wpctl set-volume on default audio sink" "wpctl set-volume pada audio sink default" \
+        "" ""
+    add "hyprland" "XF86AudioLowerVolume" \
+        "Volume down (-5%)" "Volume turun (-5%)" \
+        "wpctl set-volume on default audio sink" "wpctl set-volume pada audio sink default" \
+        "" ""
+    add "hyprland" "XF86AudioMute" \
+        "Mute/unmute" "Bisukan/aktifkan suara" \
+        "Toggle mute on default audio sink via wpctl" "Toggle bisukan pada audio sink default via wpctl" \
+        "" ""
+    add "hyprland" "XF86MonBrightness↑/↓" \
+        "Brightness up/down (5%)" "Kecerahan naik/turun (5%)" \
+        "Adjust screen brightness via brightnessctl" "Atur kecerahan layar via brightnessctl" \
+        "" ""
+    add "hyprland" "XF86AudioPlay/Next/Prev" \
+        "Media controls" "Kontrol media" \
+        "Play/pause, next, previous track via playerctl" "Play/pause, lagu berikut, sebelumnya via playerctl" \
         "" ""
 
     # ══════════════════════════════════════════════════════
@@ -168,9 +206,14 @@ build_guide_data() {
         "Detach from tmux (it keeps running in background). Reattach: tmux attach" \
         "Lepas dari tmux (tetap berjalan di latar). Sambung kembali: tmux attach" \
         "" ""
+    add "terminal" "t / ta / tn / tl / tk" \
+        "tmux shortcut aliases" "Alias singkat tmux" \
+        "t=tmux, ta=attach, tn=new session, tl=list, tk=kill session|Example: tn work → creates session named 'work'" \
+        "t=tmux, ta=attach, tn=sesi baru, tl=daftar, tk=hapus sesi|Contoh: tn work → buat sesi bernama 'work'" \
+        "" ""
 
     # ══════════════════════════════════════════════════════
-    # SHELL — Zsh + Modern CLI tools
+    # SHELL — ZSH + Modern CLI Tools (Rust-powered replacements)
     # ══════════════════════════════════════════════════════
     add "shell" "z <dir>" \
         "Smart cd (zoxide)" "cd pintar (zoxide)" \
@@ -189,8 +232,8 @@ build_guide_data() {
         "" ""
     add "shell" "ls / ll / la / lt" \
         "eza (modern ls)" "eza (ls modern)" \
-        "ls=icons+dirs first, ll=long+git, la=hidden, lt=tree view|Colorized, respects .gitignore, Nerd Font icons" \
-        "ls=ikon+folder dulu, ll=panjang+git, la=tersembunyi, lt=pohon|Berwarna, hormati .gitignore, ikon Nerd Font" \
+        "ls=icons+dirs first, ll=long+git status, la=all (hidden), lt=tree (2 levels)|Colorized, respects .gitignore, Nerd Font icons" \
+        "ls=ikon+folder dulu, ll=panjang+status git, la=semua (tersembunyi), lt=pohon (2 level)|Berwarna, hormati .gitignore, ikon Nerd Font" \
         "eza --icons --group-directories-first" "eza"
     add "shell" "cat <file>" \
         "bat (syntax highlighting)" "bat (pewarnaan sintaks)" \
@@ -212,16 +255,31 @@ build_guide_data() {
         "Beautiful TUI: CPU cores, RAM, disk I/O, network, process tree|Keybinds: e=expand, s=sort, q=quit|Much better than htop or top" \
         "TUI cantik: core CPU, RAM, disk I/O, jaringan, pohon proses|Tombol: e=perluas, s=urutkan, q=keluar|Jauh lebih baik dari htop atau top" \
         "btm" "btm"
+    add "shell" "ps / procs" \
+        "procs (modern ps)" "procs (ps modern)" \
+        "Beautiful process viewer with tree, CPU/MEM%, ports|Replaces 'ps aux'. Alias: ps=procs" \
+        "Penampil proses cantik dengan tree, CPU/MEM%, port|Menggantikan 'ps aux'. Alias: ps=procs" \
+        "procs" "procs"
+    add "shell" "du / dust" \
+        "dust (disk usage tree)" "dust (pohon penggunaan disk)" \
+        "Visual tree showing which folders use most space|Replaces 'du'. Alias: du=dust" \
+        "Pohon visual menampilkan folder yang pakai ruang terbanyak|Menggantikan 'du'. Alias: du=dust" \
+        "dust" "dust"
+    add "shell" "df / duf" \
+        "duf (disk free overview)" "duf (ringkasan disk kosong)" \
+        "Colorful overview: filesystem, mount point, size, used, available|Replaces 'df'. Alias: df=duf" \
+        "Ringkasan berwarna: filesystem, mount point, ukuran, terpakai, tersedia|Menggantikan 'df'. Alias: df=duf" \
+        "duf" "duf"
     add "shell" "ff" \
         "fastfetch (system info)" "fastfetch (info sistem)" \
         "Show: OS, kernel, CPU, GPU, RAM, uptime, theme, resolution|Custom config with Catppuccin colors|Much faster than neofetch" \
         "Tampilkan: OS, kernel, CPU, GPU, RAM, uptime, tema, resolusi|Config kustom dengan warna Catppuccin|Jauh lebih cepat dari neofetch" \
         "fastfetch" "fastfetch"
     add "shell" "update" \
-        "Full system update" "Update sistem lengkap" \
-        "Runs: sudo pacman -Syu + flatpak update + rustup update|One command to update everything" \
-        "Jalankan: sudo pacman -Syu + flatpak update + rustup update|Satu perintah untuk update semua" \
-        "sudo pacman -Syu && flatpak update -y" ""
+        "Full system update (interactive)" "Update sistem lengkap (interaktif)" \
+        "Shows pending packages first, then asks confirmation|Runs: pacman -Syu + flatpak update + rustup update" \
+        "Tampilkan paket pending dulu, lalu minta konfirmasi|Jalankan: pacman -Syu + flatpak update + rustup update" \
+        "" ""
     add "shell" "cleanup" \
         "Remove orphan packages" "Hapus paket orphan" \
         "Remove unused packages and clear pacman cache|Frees disk space safely" \
@@ -244,8 +302,19 @@ build_guide_data() {
         "Display the Hyprland keyboard shortcuts reference file" "Tampilkan file referensi shortcut keyboard Hyprland" \
         "cat ~/.config/hypr/cheatsheet.txt" ""
 
+    add "shell" ".. / ..." \
+        "Quick parent navigation" "Navigasi cepat ke parent" \
+        "..=up 1 dir, ...=up 2 dirs. Uses zoxide under the hood" \
+        "..=naik 1 dir, ...=naik 2 dir. Menggunakan zoxide di belakang" \
+        "" ""
+    add "shell" "mkdir" \
+        "mkdir -pv (enhanced)" "mkdir -pv (ditingkatkan)" \
+        "Aliased to create parent dirs + verbose output" \
+        "Di-alias untuk buat parent dirs + output verbose" \
+        "" ""
+
     # ══════════════════════════════════════════════════════
-    # GIT — Version Control
+    # GIT — Version Control + Aliases
     # ══════════════════════════════════════════════════════
     add "git" "git status" \
         "Check repo status" "Cek status repo" \
@@ -302,6 +371,16 @@ build_guide_data() {
         "Save uncommitted changes aside. Restore: git stash pop|Useful when switching branches" \
         "Simpan perubahan yang belum dicommit. Kembalikan: git stash pop|Berguna saat berpindah branch" \
         "" "git"
+    add "git" "lazygit" \
+        "Terminal Git UI (interactive)" "UI Git Terminal (interaktif)" \
+        "Beautiful TUI: stage hunks, branch, rebase, merge conflicts, stash|Navigate: arrow keys, Enter, Space to stage|Much faster than typing git commands manually" \
+        "TUI cantik: stage hunk, branch, rebase, konflik merge, stash|Navigasi: panah, Enter, Space untuk stage|Jauh lebih cepat dari mengetik perintah git manual" \
+        "lazygit" "lazygit"
+    add "git" "ga / gco / gb / gpl" \
+        "Git shortcut aliases" "Alias singkat Git" \
+        "ga=git add, gco=git checkout, gb=git branch, gpl=git pull|Full list: gs=status, gc=commit, gp=push, gd=diff, gl=log" \
+        "ga=git add, gco=git checkout, gb=git branch, gpl=git pull|Daftar lengkap: gs=status, gc=commit, gp=push, gd=diff, gl=log" \
+        "" "git"
 
     # ══════════════════════════════════════════════════════
     # DOCKER — Containers
@@ -321,19 +400,25 @@ build_guide_data() {
         "Stop and remove all compose containers, networks|Add -v to also remove volumes (data)" \
         "Hentikan dan hapus semua container compose, jaringan|Tambah -v untuk hapus juga volume (data)" \
         "docker compose down" "docker"
-    add "docker" "lazydocker" \
+    add "docker" "lazydocker / lzd" \
         "Docker TUI manager" "Manajer Docker TUI" \
-        "Beautiful terminal UI: containers, images, volumes, logs|Navigate with arrow keys, Enter to see logs" \
-        "UI terminal cantik: container, image, volume, log|Navigasi dengan panah, Enter untuk lihat log" \
+        "Beautiful terminal UI: containers, images, volumes, logs|Navigate with arrow keys, Enter to see logs|Alias: lzd=lazydocker" \
+        "UI terminal cantik: container, image, volume, log|Navigasi dengan panah, Enter untuk lihat log|Alias: lzd=lazydocker" \
         "lazydocker" "lazydocker"
-    add "docker" "docker logs -f <container>" \
+    add "docker" "docker logs -f / dlog" \
         "Follow container logs" "Ikuti log container" \
-        "Stream real-time logs from a container. Ctrl+C to stop" "Stream log real-time dari container. Ctrl+C untuk berhenti" \
+        "Stream real-time logs from a container. Ctrl+C to stop|Alias: dlog=docker logs -f" \
+        "Stream log real-time dari container. Ctrl+C untuk berhenti|Alias: dlog=docker logs -f" \
         "" "docker"
-    add "docker" "docker exec -it <c> bash" \
+    add "docker" "docker exec -it / dex" \
         "Enter container shell" "Masuk shell container" \
-        "Open interactive bash inside running container|Use 'sh' instead of 'bash' for Alpine-based images" \
-        "Buka bash interaktif di dalam container berjalan|Gunakan 'sh' bukan 'bash' untuk image berbasis Alpine" \
+        "Open interactive bash inside running container|Use 'sh' instead of 'bash' for Alpine-based images|Alias: dex=docker exec -it" \
+        "Buka bash interaktif di dalam container berjalan|Gunakan 'sh' bukan 'bash' untuk image berbasis Alpine|Alias: dex=docker exec -it" \
+        "" "docker"
+    add "docker" "docker compose / dc" \
+        "Docker Compose shortcut" "Singkatan Docker Compose" \
+        "Alias: dc=docker compose. Usage: dc up -d, dc down, dc logs" \
+        "Alias: dc=docker compose. Pemakaian: dc up -d, dc down, dc logs" \
         "" "docker"
     add "docker" "docker system prune" \
         "Clean Docker junk" "Bersihkan sampah Docker" \
@@ -346,8 +431,8 @@ build_guide_data() {
     # ══════════════════════════════════════════════════════
     add "node" "fnm use --lts" \
         "Switch to LTS Node" "Beralih ke Node LTS" \
-        "Fast Node Manager: instantly switch Node.js versions|fnm install 20 → install Node 20|fnm list → show installed versions" \
-        "Fast Node Manager: beralih versi Node.js secara instan|fnm install 20 → install Node 20|fnm list → tampilkan versi terinstall" \
+        "Fast Node Manager: instantly switch Node.js versions|fnm install --lts → install latest LTS|fnm list → show installed versions|Default: LTS (installed by setup)" \
+        "Fast Node Manager: beralih versi Node.js secara instan|fnm install --lts → install LTS terbaru|fnm list → tampilkan versi terinstall|Default: LTS (terinstall oleh setup)" \
         "fnm use --lts" "fnm"
     add "node" "pnpm install" \
         "Install dependencies" "Install dependensi" \
@@ -617,15 +702,6 @@ build_guide_data() {
         "Create snapshots like macOS Time Machine|Restore from GRUB if system breaks|Auto-snapshots via systemd timer" \
         "Buat snapshot seperti macOS Time Machine|Restore dari GRUB jika sistem rusak|Auto-snapshot via systemd timer" \
         "sudo timeshift --create" "timeshift"
-    add "system" "duf" \
-        "Disk usage overview" "Ringkasan penggunaan disk" \
-        "Colorful overview: filesystem, mount point, size, used, available" "Ringkasan berwarna: filesystem, mount point, ukuran, terpakai, tersedia" \
-        "duf" "duf"
-    add "system" "dust <dir>" \
-        "Directory size analyzer" "Analisis ukuran direktori" \
-        "Visual tree showing which folders use most space|Like 'du' but beautiful and intuitive" \
-        "Pohon visual menampilkan folder yang pakai ruang terbanyak|Seperti 'du' tapi cantik dan intuitif" \
-        "dust" "dust"
     add "system" "nmcli d wifi list" \
         "List WiFi networks" "Daftar jaringan WiFi" \
         "Show available networks with signal strength, security type" "Tampilkan jaringan tersedia dengan kekuatan sinyal, tipe keamanan" \
@@ -653,7 +729,7 @@ build_guide_data() {
         "grim ~/Pictures/Screenshots/\$(date +%Y%m%d-%H%M%S).png" "grim"
 
     # ══════════════════════════════════════════════════════
-    # ECOSYSTEM — Living Ecosystem (6 Integrated Tools)
+    # ECOSYSTEM — Living Ecosystem (9 Integrated Tools)
     # ══════════════════════════════════════════════════════
     add "ecosystem" "theme-switch" \
         "Dynamic Theme Switcher" "Pengubah Tema Dinamis" \
@@ -685,6 +761,21 @@ build_guide_data() {
         "Validates: GPU drivers, Hyprland/Waybar config, critical packages, kernel modules, services, backups, disk space|Auto-runs via pacman hook after kernel/Hyprland/Waybar/NVIDIA updates|Run from Nexus (Super+X → Health Check) or terminal" \
         "Validasi: driver GPU, config Hyprland/Waybar, paket kritis, modul kernel, layanan, backup, ruang disk|Otomatis jalan via hook pacman setelah update kernel/Hyprland/Waybar/NVIDIA|Jalankan dari Nexus (Super+X → Health Check) atau terminal" \
         "health-check" ""
+    add "ecosystem" "wallpaper-picker" \
+        "Wallpaper Picker" "Pemilih Wallpaper" \
+        "Browse and apply wallpapers from ~/Pictures/Wallpapers/ via Rofi|Instantly updates Hyprpaper|Run from Nexus (Super+X → Change Wallpaper) or terminal" \
+        "Jelajahi dan terapkan wallpaper dari ~/Pictures/Wallpapers/ via Rofi|Langsung update Hyprpaper|Jalankan dari Nexus (Super+X → Change Wallpaper) atau terminal" \
+        "wallpaper-picker" ""
+    add "ecosystem" "nexus-chat" \
+        "Nexus AI Chat" "Nexus Obrolan AI" \
+        "Interactive AI chat launcher — select model (qwen3, deepseek-r1, qwen2.5-coder) then chat|Accessible from Nexus (Super+X → AI Chat) or terminal" \
+        "Peluncur obrolan AI interaktif — pilih model (qwen3, deepseek-r1, qwen2.5-coder) lalu chat|Akses dari Nexus (Super+X → AI Chat) atau terminal" \
+        "nexus-chat" "ollama"
+    add "ecosystem" "post-install" \
+        "Post-Install Wizard" "Wizard Pasca-Instalasi" \
+        "First-boot setup wizard: sync dotfiles, set wallpaper, verify ecosystem|Runs automatically after first install, or invoke manually" \
+        "Wizard setup pertama: sinkron dotfiles, atur wallpaper, verifikasi ekosistem|Berjalan otomatis setelah install pertama, atau panggil manual" \
+        "post-install" ""
 
     echo -e "$data"
 }

@@ -4,6 +4,7 @@
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 source "$(dirname "$0")/00-common.sh"
 set -euo pipefail
+skip_if_current
 
 header "System Foundation & Hardware Optimization"
 
@@ -39,7 +40,14 @@ if echo "$GPU_VENDOR" | grep -qi 'nvidia'; then
         if [ ! -f /root/mok.der ]; then
             # Ask for user confirmation before generating cryptographic keys
             mok_confirm="y"
-            if [ -t 0 ]; then
+            if command -v zenity &>/dev/null; then
+                zenity --question \
+                    --title="🔐 Secure Boot — MOK Key" \
+                    --text="Secure Boot is enabled.\nGenerate a Machine Owner Key (MOK) for NVIDIA DKMS modules?\n\nYou will need to enroll it on next reboot." \
+                    --ok-label="Yes, generate" \
+                    --cancel-label="Skip" \
+                    --width=450 2>/dev/null || mok_confirm="n"
+            elif [ -t 0 ]; then
                 echo -n "  Generate MOK signing key for Secure Boot NVIDIA? [Y/n]: "
                 read -r mok_confirm
                 mok_confirm="${mok_confirm:-y}"
@@ -73,10 +81,13 @@ fi
 # Ensure paru is available
 if ! command -v paru &>/dev/null; then
     log "Installing paru (AUR helper)..."
-    cd /tmp
-    git clone https://aur.archlinux.org/paru-bin.git
-    cd paru-bin && makepkg -si --noconfirm
-    cd ~ && rm -rf /tmp/paru-bin
+    (
+        cd /tmp
+        rm -rf paru-bin
+        git clone https://aur.archlinux.org/paru-bin.git
+        cd paru-bin && makepkg -si --noconfirm
+    )
+    rm -rf /tmp/paru-bin
 fi
 
 # Optimize makepkg for all available threads
@@ -87,3 +98,4 @@ sudo sed -i 's/^COMPRESSXZ=.*/COMPRESSXZ=(xz -c -z - --threads=0)/' /etc/makepkg
 sudo sed -i 's/^COMPRESSZST=.*/COMPRESSZST=(zstd -c -z -q - --threads=0)/' /etc/makepkg.conf 2>/dev/null || true
 
 ok "System foundation ready"
+mark_module_done

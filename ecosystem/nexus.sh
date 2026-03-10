@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #  Nexus v2 — Smart Command Center for CachyOS Workstation
 #  Trigger: Super+X (Hyprland keybind)
@@ -78,7 +78,7 @@ build_menu() {
     local disk=$(get_disk)
     local temp=$(get_cpu_temp)
     entries+="── $bat  │  $ram  │  $disk  │  $temp ──\n"
-    entries+="─────────────────────────────────────────\n"
+    entries+="\0nonselectable\x1f─────────────────────────────────────────\n"
 
     # ── Quick Actions ──
     entries+="  System Update (pacman + flatpak)\n"
@@ -87,7 +87,7 @@ build_menu() {
     entries+="  Power Off\n"
     entries+="  Reboot\n"
     entries+="  Logout (Hyprland)\n"
-    entries+="─────────────────────────────────────────\n"
+    entries+="\0nonselectable\x1f─────────────────────────────────────────\n"
 
     # ── Smart Screenshot & Recording ──
     entries+="  Screenshot — Region (slurp)\n"
@@ -100,7 +100,7 @@ build_menu() {
         entries+="  Record Screen (full)\n"
         entries+="  Record Region (select area)\n"
     fi
-    entries+="─────────────────────────────────────────\n"
+    entries+="\0nonselectable\x1f─────────────────────────────────────────\n"
 
     # ── AI Tools (only show if ollama installed) ──
     if command -v ollama &>/dev/null; then
@@ -110,12 +110,10 @@ build_menu() {
         else
             ollama_status="🔴"
         fi
-        entries+="  󰧑  AI Chat — Reasoning (qwen3) $ollama_status\n"
-        entries+="  󰧑  AI Chat — Code (qwen2.5-coder) $ollama_status\n"
-        entries+="  󰧑  AI Chat — Math/Logic (deepseek-r1) $ollama_status\n"
+        entries+="  󰧑  Nexus AI Chat (Select Model) $ollama_status\n"
         entries+="  🧠 AI Auto-Tuner (Suggest Optimizations) $ollama_status\n"
     fi
-    entries+="─────────────────────────────────────────\n"
+    entries+="\0nonselectable\x1f─────────────────────────────────────────\n"
     command -v health-check &>/dev/null && entries+="  🩺 System Health Check\n"
     entries+="  📊 System Dashboard\n"
 
@@ -136,16 +134,19 @@ build_menu() {
     command -v flutter &>/dev/null && entries+="  Flutter Doctor\n"
     command -v scrcpy &>/dev/null && entries+="  Phone Mirror (scrcpy)\n"
     entries+="  🏪 GUI App Store (Browse & Install)\n"
-    entries+="─────────────────────────────────────────\n"
+    entries+="\0nonselectable\x1f─────────────────────────────────────────\n"
 
     # ── Apps (dynamic detection) ──
     command -v zen-browser &>/dev/null && entries+="  Zen Browser\n"
     command -v firefox &>/dev/null && ! command -v zen-browser &>/dev/null && entries+="  Firefox\n"
     command -v thunar &>/dev/null && entries+="  File Manager\n"
-    command -v obsidian &>/dev/null && entries+="  Obsidian Notes\n" || \
-        flatpak list 2>/dev/null | grep -qi obsidian && entries+="  Obsidian Notes\n"
+    if command -v obsidian &>/dev/null; then
+        entries+="  Obsidian Notes\n"
+    elif flatpak list 2>/dev/null | grep -qi obsidian; then
+        entries+="  Obsidian Notes\n"
+    fi
     command -v keepassxc &>/dev/null && entries+="  Password Manager\n"
-    entries+="─────────────────────────────────────────\n"
+    entries+="\0nonselectable\x1f─────────────────────────────────────────\n"
 
     # ── Gaming (dynamic detection) ──
     local has_gaming=false
@@ -155,7 +156,7 @@ build_menu() {
     command -v prismlauncher &>/dev/null && { entries+="  Minecraft\n"; has_gaming=true; }
     command -v pcsx2 &>/dev/null && { entries+="  PS2 Emulator\n"; has_gaming=true; }
     flatpak list 2>/dev/null | grep -qi sober && { entries+="  Roblox\n"; has_gaming=true; }
-    $has_gaming && entries+="─────────────────────────────────────────\n"
+    $has_gaming && entries+="\0nonselectable\x1f─────────────────────────────────────────\n"
 
     # ── System & Productivity ──
     if command -v virt-manager &>/dev/null; then
@@ -172,7 +173,7 @@ build_menu() {
     command -v libreoffice &>/dev/null && entries+="  LibreOffice\n"
     command -v obs &>/dev/null && entries+="  OBS Studio\n"
     command -v kdeconnect-cli &>/dev/null && entries+="  KDE Connect\n"
-    entries+="─────────────────────────────────────────\n"
+    entries+="\0nonselectable\x1f─────────────────────────────────────────\n"
 
     # ── System Tools ──
     entries+="  🛡️ Time Machine (Config Rollback)\n"
@@ -184,11 +185,12 @@ build_menu() {
     entries+="  Audio Settings\n"
     entries+="  WiFi Settings\n"
     command -v blueman-manager &>/dev/null && entries+="  Bluetooth\n"
+    entries+="  󰸉  Change Wallpaper\n"
     entries+="  🎨 Dynamic Theme Switcher\n"
-    entries+="─────────────────────────────────────────\n"
+    entries+="\0nonselectable\x1f─────────────────────────────────────────\n"
     
     # ── Search ──
-    entries+="  Guide Popup (160+ entries)\n"
+    entries+="  Guide Popup (130+ entries)\n"
     entries+="  Guide in Terminal (fzf + preview)\n"
     entries+="  cheat.sh Web Lookup\n"
 
@@ -230,8 +232,30 @@ execute_action() {
         *"Dynamic Theme Switcher"*)
             theme-switch &
             ;;
+        *"Change Wallpaper"*)
+            wallpaper-picker &
+            ;;
         *"System Update"*)
-            kitty --hold -e bash -c 'echo "🔄 Updating system..."; sudo pacman -Syu && flatpak update -y 2>/dev/null && rustup update 2>/dev/null; echo ""; echo "✅ Update complete!"' ;;
+            # Gather pending updates for preview
+            pending=$(pacman -Qu 2>/dev/null | head -20) || pending=""
+            pkg_count=$(pacman -Qu 2>/dev/null | wc -l) || pkg_count="?"
+            if [ -n "$pending" ]; then
+                preview_text="$pkg_count package(s) pending update:\n\n$pending"
+                [ "$pkg_count" -gt 20 ] 2>/dev/null && preview_text+="\n... and $((pkg_count - 20)) more"
+            else
+                preview_text="No pending updates found (already up to date?)"
+            fi
+
+            # Confirm before running system update on rolling distro
+            if zenity --question \
+                --title="⚠️ System Update" \
+                --text="$preview_text\n\n━━━━━━━━━━━━━━━━━━━━━━━\nThis will run:\n  sudo pacman -Syu\n  flatpak update\n  rustup update\n\nOn a rolling release, this can break things.\nAre you sure?" \
+                --ok-label="Yes, Update" \
+                --cancel-label="Cancel" \
+                --width=500 --height=400 2>/dev/null; then
+                kitty --hold -e bash -c 'echo "🔄 Updating system..."; sudo pacman -Syu && flatpak update -y 2>/dev/null && rustup update 2>/dev/null; echo ""; echo "✅ Update complete!"'
+            fi
+            ;;
         *"Cleanup"*)
             kitty --hold -e bash -c 'echo "🧹 Cleaning up..."; sudo pacman -Sc --noconfirm; pacman -Qdtq | xargs -r sudo pacman -Rns --noconfirm 2>/dev/null; echo "✅ Cleanup done"' ;;
         *"Lock Screen"*)
@@ -263,15 +287,9 @@ execute_action() {
             notify-send "🎥 Recording region" "Super+X → Stop to end" ;;
         
         # AI
-        *"AI Chat"*"Reasoning"*|*"qwen3"*)
-            if ! pgrep -x ollama &>/dev/null; then ollama serve &>/dev/null & sleep 1; fi
-            kitty -e ollama run qwen3:30b-a3b ;;
-        *"AI Chat"*"Code"*|*"qwen2.5-coder"*)
-            if ! pgrep -x ollama &>/dev/null; then ollama serve &>/dev/null & sleep 1; fi
-            kitty -e ollama run qwen2.5-coder:7b ;;
-        *"AI Chat"*"Math"*|*"deepseek-r1"*)
-            if ! pgrep -x ollama &>/dev/null; then ollama serve &>/dev/null & sleep 1; fi
-            kitty -e ollama run deepseek-r1:7b ;;
+        *"Nexus AI Chat"*)
+            nexus-chat &
+            ;;
         
         # Dev
         *"Antigravity"*)     antigravity & ;;

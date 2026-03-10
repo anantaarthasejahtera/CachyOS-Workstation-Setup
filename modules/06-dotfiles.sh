@@ -2,6 +2,7 @@
 # Module 06: Shell, Terminal & Dotfiles
 source "$(dirname "$0")/00-common.sh"
 set -euo pipefail
+skip_if_current
 # Shell, Terminal & Dotfiles Configuration
 # =====================================================================
 header "Shell & Terminal Aesthetic"
@@ -138,7 +139,6 @@ ok "Kitty config written"
 
 # --- Starship config ---
 log "Writing Starship config..."
-mkdir -p "$HOME/.config"
 safe_config "$HOME/.config/starship.toml"
 cat > "$HOME/.config/starship.toml" << 'STAREOF'
 # — Starship — Catppuccin Mocha —
@@ -172,8 +172,8 @@ $character"""
 disabled = false
 style = "bg:#89B4FA fg:#1E1E2E"
 [os.symbols]
-Arch = "ó°£‡ "
-Linux = " "
+Arch = "󰣇 "
+Linux = "🐧 "
 
 [username]
 show_always = true
@@ -189,7 +189,7 @@ truncation_length = 3
 truncation_symbol = "—/"
 
 [git_branch]
-symbol = ""
+symbol = "🌱 "
 style = "bg:#F5C2E7 fg:#1E1E2E"
 format = '[ $symbol $branch ]($style)'
 
@@ -198,42 +198,42 @@ style = "bg:#F5C2E7 fg:#1E1E2E"
 format = '[$all_status$ahead_behind ]($style)'
 
 [nodejs]
-symbol = ""
+symbol = "󰎙 "
 style = "bg:#F38BA8 fg:#1E1E2E"
 format = '[ $symbol ($version) ]($style)'
 
 [python]
-symbol = ""
+symbol = "󰌠 "
 style = "bg:#F38BA8 fg:#1E1E2E"
 format = '[ $symbol ($version) ]($style)'
 
 [rust]
-symbol = "ðŸ¦€"
+symbol = "🦀 "
 style = "bg:#F38BA8 fg:#1E1E2E"
 format = '[ $symbol ($version) ]($style)'
 
 [golang]
-symbol = ""
+symbol = "󰟓 "
 style = "bg:#F38BA8 fg:#1E1E2E"
 format = '[ $symbol ($version) ]($style)'
 
 [docker_context]
-symbol = ""
+symbol = "󰡨 "
 style = "bg:#F38BA8 fg:#1E1E2E"
 format = '[ $symbol $context ]($style)'
 
 [java]
-symbol = ""
+symbol = " "
 style = "bg:#F38BA8 fg:#1E1E2E"
 format = '[ $symbol ($version) ]($style)'
 
 [kotlin]
-symbol = ""
+symbol = "🅺 "
 style = "bg:#F38BA8 fg:#1E1E2E"
 format = '[ $symbol ($version) ]($style)'
 
 [dart]
-symbol = ""
+symbol = "🎯 "
 style = "bg:#F38BA8 fg:#1E1E2E"
 format = '[ $symbol ($version) ]($style)'
 
@@ -241,7 +241,7 @@ format = '[ $symbol ($version) ]($style)'
 disabled = false
 time_format = "%R"
 style = "bg:#F9E2AF fg:#1E1E2E"
-format = '[ ó°¥” $time ]($style)'
+format = '[ 󰥔 $time ]($style)'
 
 [character]
 success_symbol = '[—](bold #A6E3A1)'
@@ -328,6 +328,12 @@ export PATH="$HOME/.flutter-sdk/bin:$PATH"
 export JAVA_HOME="/usr/lib/jvm/java-17-openjdk"
 export CHROME_EXECUTABLE="$(which zen-browser 2>/dev/null || which firefox 2>/dev/null || echo '')"
 
+# ── System defaults (enforced by setup) ───────────────────
+export EDITOR="nvim"
+export VISUAL="nvim"
+export TERMINAL="kitty"
+export BROWSER="$(which zen-browser 2>/dev/null || which firefox 2>/dev/null || echo 'firefox')"
+
 # — Modern Aliases —
 alias ls='eza --icons --group-directories-first'
 alias ll='eza -la --icons --group-directories-first --git'
@@ -341,8 +347,8 @@ alias du='dust'
 alias df='duf'
 alias ps='procs'
 alias cd='z'
-alias ..='cd ..'
-alias ...='cd ../..'
+alias ..='z ..'
+alias ...='z ../..'
 alias mkdir='mkdir -pv'
 
 # Git aliases
@@ -355,9 +361,10 @@ alias ga='git add'
 alias gco='git checkout'
 alias gb='git branch'
 alias gpl='git pull'
+alias lg='lazygit'
 
 # System aliases
-alias update='sudo pacman -Syu && flatpak update -y && rustup update 2>/dev/null; echo "— System updated"'
+alias update='echo "🔄 Checking for updates..."; sudo pacman -Sy && echo "" && echo "📦 Packages to update:" && pacman -Qu 2>/dev/null | head -20; echo ""; read -p "Proceed with full update? [y/N] " ans && [[ "$ans" =~ ^[Yy] ]] && sudo pacman -Su && flatpak update -y 2>/dev/null && rustup update 2>/dev/null && echo "✅ System updated" || echo "— Update cancelled"'
 alias cleanup='sudo pacman -Sc --noconfirm && pacman -Qdtq | xargs -r sudo pacman -Rns --noconfirm 2>/dev/null; echo "— Cleanup done"'
 alias ff='fastfetch'
 alias keys='cat ~/.config/hypr/cheatsheet.txt 2>/dev/null || echo "Hyprland cheatsheet not found"'
@@ -390,8 +397,8 @@ export FZF_DEFAULT_OPTS=" \
   --color=marker:#f5e0dc,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8 \
   --border rounded --margin 1 --padding 1"
 
-# — Greeting —
-command -v fastfetch &>/dev/null && fastfetch || true
+# — Greeting (safe: won't break shell if fastfetch fails) —
+if command -v fastfetch &>/dev/null; then fastfetch 2>/dev/null; fi
 ZSHEOF
 ok ".zshrc written"
 
@@ -440,4 +447,5 @@ cat > "$HOME/.config/fastfetch/config.jsonc" << 'FFEOF'
 FFEOF
 
 ok "All dotfiles written"
+mark_module_done
 

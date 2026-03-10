@@ -9,8 +9,23 @@ set -euo pipefail
 WIZARD_DONE="$HOME/.config/cachy-setup/.wizard-done"
 
 # Skip if already completed
-if [ -f "$WIZARD_DONE" ]; then
+if [ -f "$WIZARD_DONE" ] && [[ "${1:-}" != "--force" ]]; then
     exit 0
+fi
+
+# ─── Step 0: Service Sanity Check ──────────────────────
+log_wizard() { notify-send -a "Cachy Wizard" "$1"; }
+
+# Check Hyprland environment
+if [ -z "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
+    rofi -e "⚠️ Warning: You are not running inside Hyprland.
+Some features like Wallpaper changing might not work as expected.
+Please log in to Hyprland first for the best experience."
+fi
+
+# Check services
+if ! systemctl is-active --quiet NetworkManager; then
+    log_wizard "NetworkManager is not active!"
 fi
 
 mkdir -p "$HOME/.config/cachy-setup"
@@ -35,6 +50,7 @@ if [ -z "$current_name" ] || [ "$current_name" = "Your Name" ]; then
     git_name=$(rofi -dmenu -p "👤 Your Full Name" -theme-str 'entry { placeholder: "e.g., John Doe"; }' -width 500)
     if [ -n "$git_name" ]; then
         git config --global user.name "$git_name"
+        current_name="$git_name"
     fi
 fi
 
@@ -42,7 +58,25 @@ if [ -z "$current_email" ] || [ "$current_email" = "you@example.com" ]; then
     git_email=$(rofi -dmenu -p "📧 Your Git Email" -theme-str 'entry { placeholder: "e.g., john@example.com"; }' -width 500)
     if [ -n "$git_email" ]; then
         git config --global user.email "$git_email"
+        current_email="$git_email"
     fi
+fi
+
+# Sync identity to .env if setup dir exists (keeps .env as source of truth)
+# Check both possible install locations (install.sh uses .cache, manual clone uses $HOME)
+SETUP_DIR=""
+if [ -d "$HOME/.cache/cachy-workstation-setup" ]; then
+    SETUP_DIR="$HOME/.cache/cachy-workstation-setup"
+elif [ -d "$HOME/CachyOS-Workstation-Setup" ]; then
+    SETUP_DIR="$HOME/CachyOS-Workstation-Setup"
+fi
+if [ -n "$SETUP_DIR" ] && [ -n "$current_name" ] && [ -n "$current_email" ]; then
+    cat > "$SETUP_DIR/.env" << ENVEOF
+# CachyOS Workstation — User Configuration
+# This file is auto-generated and gitignored. Safe to edit manually.
+GIT_NAME="$current_name"
+GIT_EMAIL="$current_email"
+ENVEOF
 fi
 
 # ─── Step 3: Default Ollama Model ────────────────────────
@@ -75,8 +109,8 @@ fi
 
 # ─── Step 4: Wallpaper ──────────────────────────────────
 wallpaper_dir="$HOME/Pictures/Wallpapers"
-if [ -d "$wallpaper_dir" ] && [ "$(ls -1 "$wallpaper_dir" 2>/dev/null | wc -l)" -gt 0 ]; then
-    selected_wp=$(ls -1 "$wallpaper_dir" | rofi -dmenu -i -p "🖼️ Choose Wallpaper" -width 500)
+if [ -d "$wallpaper_dir" ] && [ "$(find "$wallpaper_dir" -type f \( -name '*.jpg' -o -name '*.png' -o -name '*.jpeg' -o -name '*.webp' -o -name '*.avif' \) 2>/dev/null | wc -l)" -gt 0 ]; then
+    selected_wp=$(find "$wallpaper_dir" -type f \( -name '*.jpg' -o -name '*.png' -o -name '*.jpeg' -o -name '*.webp' -o -name '*.avif' \) -printf "%f\n" | sort | rofi -dmenu -i -p "🖼️ Choose Wallpaper" -width 500)
     if [ -n "$selected_wp" ] && [ -f "$wallpaper_dir/$selected_wp" ]; then
         # Set via hyprpaper or swaybg
         if command -v hyprctl &>/dev/null; then
@@ -107,6 +141,6 @@ Your workstation is personalized. Quick reminders:
   Super+X     → Nexus Command Center
   Super+D     → App Launcher
   Super+L     → Lock Screen
-  guide       → 160+ searchable entries
+  guide       → 130+ searchable entries
 
 Enjoy your CachyOS workstation! 🚀"

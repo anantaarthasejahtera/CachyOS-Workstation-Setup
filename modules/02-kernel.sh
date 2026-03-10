@@ -2,6 +2,7 @@
 # Module 02: Kernel & Performance Tuning
 source "$(dirname "$0")/00-common.sh"
 set -euo pipefail
+skip_if_current
 header "Performance & Deep System Tuning"
 
 # --- Power management ---
@@ -24,6 +25,7 @@ ok "GameMode installed (use: gamemoderun ./game)"
 # --- PipeWire low-latency audio ---
 log "Configuring PipeWire low-latency..."
 mkdir -p "$HOME/.config/pipewire/pipewire.conf.d"
+safe_config "$HOME/.config/pipewire/pipewire.conf.d/99-lowlatency.conf"
 cat > "$HOME/.config/pipewire/pipewire.conf.d/99-lowlatency.conf" << 'PWEOF'
 context.properties = {
     default.clock.rate          = 48000
@@ -105,4 +107,5 @@ if lspci | grep -qi 'intel.*graphics\|intel.*iris'; then
 fi
 
 ok "Deep system tuning complete"
+mark_module_done
 

@@ -29,14 +29,26 @@ jobs:
       - name: Extract Release Notes from CHANGELOG
         id: extract_notes
         run: |
-          # Dapatkan tag yang sedang di-push (misal: v1.1.0)
+          # Get the tag being pushed (e.g. v1.1.0)
           VERSION="${GITHUB_REF_NAME}"
           echo "Extracting release notes for $VERSION from CHANGELOG.md..."
-          
-          # Gunakan AWK untuk mengekstrak teks di antara judul rilis saat ini dan rilis berikutnya
-          awk -v ver="\\[$VERSION\\]" '/^## \[/ { if (p) { exit }; if ($2 == ver) { p=1; next } } p' CHANGELOG.md > release_body.txt
-          
-          echo "Catatan Rilis berhasil diekstrak."
+
+          # Use AWK to extract text between current and next release heading
+          # Pattern: match "## [v1.1.0]" then print until next "## [" heading
+          awk -v ver="$VERSION" '
+            /^## \[/ {
+              if (printing) exit
+              if (index($0, ver)) { printing=1; next }
+            }
+            printing
+          ' CHANGELOG.md > release_body.txt
+
+          if [ ! -s release_body.txt ]; then
+            echo "No matching CHANGELOG entry found for $VERSION, using auto-generated notes."
+            echo "Release $VERSION" > release_body.txt
+          fi
+
+          echo "Release notes extracted successfully."
 
       - name: Generate Release
         uses: softprops/action-gh-release@v2

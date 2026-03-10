@@ -27,8 +27,8 @@ for f in "$BACKUP_DIR"/*; do
     bname=$(basename "$f")
     # Replace __ with / to get actual path
     actual_path="${bname//__//}"
-    # Replace $HOME with ~ for cleaner display
-    display_path="${actual_path/#$HOME/\~}"
+    # Replace $HOME prefix with ~ for cleaner display (use parameter expansion)
+    display_path="${actual_path/#$HOME/~}"
     
     FILE_MAP["$display_path"]="$actual_path"
     entries+="$display_path\n"
@@ -52,9 +52,9 @@ if [[ "$chosen_file" == *"Restore ALL"* ]]; then
     count=0
     for display_path in "${!FILE_MAP[@]}"; do
         actual_path="${FILE_MAP[$display_path]}"
-        # Expand tilde to $HOME (display_path uses ~ but cp needs full path)
+        # Expand ~ to $HOME for file operations
         actual_path="${actual_path/#\~/$HOME}"
-        bname=$(echo "$actual_path" | sed 's|/|__|g')
+        bname=$(echo "$actual_path" | sed "s|/|__|g")
         mkdir -p "$(dirname "$actual_path")"
         cp "$BACKUP_DIR/$bname" "$actual_path"
         count=$((count+1))
@@ -63,9 +63,21 @@ if [[ "$chosen_file" == *"Restore ALL"* ]]; then
 else
     # Restore single file
     actual_path="${FILE_MAP[$chosen_file]}"
-    # Expand tilde to $HOME
+    # Expand ~ to $HOME for file operations
     actual_path="${actual_path/#\~/$HOME}"
-    bname=$(echo "$actual_path" | sed 's|/|__|g')
+    bname=$(echo "$actual_path" | sed "s|/|__|g")
+
+    # Show diff preview before restoring (if current file exists and diff is available)
+    if [ -f "$actual_path" ] && command -v diff &>/dev/null; then
+        diff_output=$(diff --color=never -u "$actual_path" "$BACKUP_DIR/$bname" 2>/dev/null | head -40 || true)
+        if [ -n "$diff_output" ]; then
+            preview="Changes that will be applied:\n\n$diff_output"
+            [ "$(echo "$diff_output" | wc -l)" -ge 40 ] && preview+="\n... (truncated)"
+            confirm=$(echo -e "Yes, restore\nCancel" | rofi -dmenu -i -p "📋 Preview diff for $chosen_file" -mesg "$preview" -width 800)
+            [[ "$confirm" != *"Yes"* ]] && exit 0
+        fi
+    fi
+
     mkdir -p "$(dirname "$actual_path")"
     cp "$BACKUP_DIR/$bname" "$actual_path"
     rofi -e "✅ Restored $chosen_file"

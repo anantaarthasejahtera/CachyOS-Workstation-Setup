@@ -13,7 +13,7 @@
   <img src="https://img.shields.io/badge/Theme-Catppuccin%20Mocha-cba6f7?style=for-the-badge" alt="Catppuccin"/>
   <img src="https://img.shields.io/badge/Modules-15-a6e3a1?style=for-the-badge" alt="Modules"/>
   <img src="https://img.shields.io/badge/Tools-50+-89b4fa?style=for-the-badge" alt="Tools"/>
-  <img src="https://img.shields.io/badge/Guide-160+%20entries-f5c2e7?style=for-the-badge" alt="Guide"/>
+  <img src="https://img.shields.io/badge/Guide-130+%20entries-f5c2e7?style=for-the-badge" alt="Guide"/>
   <img src="https://img.shields.io/badge/Language-EN%20%7C%20ID-f9e2af?style=for-the-badge" alt="Bilingual"/>
   <img src="https://img.shields.io/badge/License-GPL_v3-f9e2af?style=for-the-badge" alt="License"/>
   <br/>
@@ -30,10 +30,10 @@ A **modular installer** that transforms a fresh CachyOS installation into a full
 
 Features:
 
-- **TUI installer** — Catppuccin-themed module selector with bilingual support (EN/ID) and progress bars
+- **GUI installer** — Catppuccin-themed zenity-based module selector with bilingual support (EN/ID) and progress bars
 - **Nexus v2** — Smart command center popup with 45+ actions and live system stats
-- **Guide v3** — 160+ searchable entries, executable, bilingual (EN/ID)
-- **Living Ecosystem (v4)** — 7 integrated tools: theming, rollback, cloud sync, AI tuning, app store, health check, post-install wizard
+- **Guide v3** — 130+ searchable entries, executable, bilingual (EN/ID)
+- **Living Ecosystem (v4)** — 9 integrated tools: theming, rollback, cloud sync, AI tuning, app store, health check, wallpaper picker, AI chat, post-install wizard
 - **15 modules** — each independently runnable, fully idempotent
 - **Hardware-aware** — GPU auto-detect, dynamic hugepages, Secure Boot MOK, GPU-scaled configs
 - **Automated CI/CD** — Secure branch protection, Dependabot, and Automated GitHub Releases pipeline
@@ -97,7 +97,7 @@ Features:
 curl -fsSL https://raw.githubusercontent.com/anantaarthasejahtera/CachyOS-Workstation-Setup/main/install.sh | bash
 ```
 
-> Auto-installs dependencies, prompts for your identity, and launches the TUI module selector.
+> Auto-installs dependencies, prompts for your identity, and launches the GUI module selector.
 >
 > ⚠️ **Security note**: It is always a good practice to [inspect the install.sh script](https://github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/blob/main/install.sh) before piping `curl` to `bash`. We encourage you to review the source first.
 
@@ -111,10 +111,8 @@ curl -fsSL https://raw.githubusercontent.com/anantaarthasejahtera/CachyOS-Workst
 git clone https://github.com/anantaarthasejahtera/CachyOS-Workstation-Setup.git
 cd CachyOS-Workstation-Setup
 
-# Edit your identity
-nano setup.sh
-# Change: GIT_NAME="Your Name"
-# Change: GIT_EMAIL="your@email.com"
+# The GUI wizard will prompt for your Git identity
+# Or edit setup.sh / .env manually if you prefer
 
 # Run (interactive module selector)
 chmod +x setup.sh
@@ -124,29 +122,29 @@ chmod +x setup.sh
 ./setup.sh --all
 ```
 
-### TUI Module Selector
+### GUI Module Selector
 
-When you run `./setup.sh`, a Catppuccin-themed TUI appears:
+When you run `./setup.sh`, the zenity-based GUI installer guides you through module selection:
 
 ```
 ╔══════════════════════════════════════════════════════╗
-║  📦 Select Modules                                  ║
+║  📦 Select Modules                                   ║
 ╠══════════════════════════════════════════════════════╣
-║  [x] 01  Base & GPU Drivers         [~2 GB]         ║
-║  [x] 02  Kernel & Performance       [~0 MB]         ║
-║  [x] 03  Security & Maintenance     [~50 MB]        ║
-║  [x] 04  Dev Tools (Node,Py,Rust)   [~4 GB]         ║
-║  [x] 05  Mobile Dev (Flutter)       [~5 GB]         ║
-║  [x] 06  Shell & Dotfiles           [~100 MB]       ║
-║  [x] 07  Editors (Antigravity)      [~700 MB]       ║
-║  [x] 08  Desktop Theme (KDE)        [~300 MB]       ║
-║  [x] 09  Hyprland WM                [~200 MB]       ║
-║  [x] 10  Extra Apps                 [~500 MB]       ║
-║  [ ] 11  Gaming (Steam, PCSX2)      [~3 GB]         ║
-║  [ ] 12  Windows VM & Bottles       [~2 GB]         ║
-║  [x] 13  Waybar Status Bar          [~5 MB]         ║
-║  [x] 14  Nexus & Guide              [~1 MB]         ║
-║  [x] 15  Living Ecosystem Utils     [~1 MB]         ║
+║  [x] 01  Base & GPU Drivers         [~2 GB]          ║
+║  [x] 02  Kernel & Performance       [~0 MB]          ║
+║  [x] 03  Security & Maintenance     [~50 MB]         ║
+║  [x] 04  Dev Tools (Node,Py,Rust)   [~4 GB]          ║
+║  [x] 05  Mobile Dev (Flutter)       [~5 GB]          ║
+║  [x] 06  Shell & Dotfiles           [~100 MB]        ║
+║  [x] 07  Editors (Antigravity)      [~700 MB]        ║
+║  [x] 08  Desktop Theme (KDE)        [~300 MB]        ║
+║  [x] 09  Hyprland WM                [~200 MB]        ║
+║  [x] 10  Extra Apps                 [~500 MB]        ║
+║  [ ] 11  Gaming (Steam, PCSX2)      [~3 GB]          ║
+║  [ ] 12  Windows VM & Bottles       [~2 GB]          ║
+║  [x] 13  Waybar Status Bar          [~5 MB]          ║
+║  [x] 14  Nexus & Guide              [~1 MB]          ║
+║  [x] 15  Living Ecosystem Utils     [~1 MB]          ║
 ║                                                      ║
 ║  Space = toggle  ·  Enter = confirm                  ║
 ╚══════════════════════════════════════════════════════╝
@@ -160,19 +158,22 @@ When you run `./setup.sh`, a Catppuccin-themed TUI appears:
 CachyOS-Workstation-Setup/
 ├── install.sh                # One-liner bootstrap (curl | bash)
 ├── setup.sh                  # Main entry point (edit config here)
-├── installer.sh              # TUI installer (dialog-based)
+├── installer.sh              # GUI installer (zenity-based)
 ├── uninstall.sh              # Safe ecosystem remover
 ├── Makefile                  # Dev commands (install, lint, init)
 ├── CHANGELOG.md              # Release history
-├── ecosystem/                # Living Ecosystem (9 tools)
+├── ecosystem/                # Living Ecosystem (12 tools)
 │   ├── nexus.sh              # Nexus v2 Command Center (Super+X)
+│   ├── nexus-chat.sh         # AI chat session launcher
 │   ├── guide.sh              # Guide v3 — bilingual reference (EN/ID)
 │   ├── theme-switch.sh       # Dynamic Catppuccin flavor hot-swapper
 │   ├── config-rollback.sh    # Time Machine config restoration GUI
 │   ├── dotfiles-sync.sh      # Cloud Git sync for ~/.config
 │   ├── ai-tuner.sh           # Local AI system telemetry analysis
+│   ├── ai-power-fix.sh       # GPU power state fix for AI inference
 │   ├── app-store.sh          # Curated GUI App Store (Pacman/AUR/Flatpak)
 │   ├── health-check.sh       # Post-update system integrity validator
+│   ├── wallpaper-picker.sh   # Wallpaper selection and application
 │   └── post-install.sh       # First-boot post-install wizard
 ├── modules/
 │   ├── 00-common.sh          # Shared functions & helpers
@@ -199,6 +200,8 @@ CachyOS-Workstation-Setup/
 │   └── SUPPORT.md
 ├── .githooks/                # Local development Git hooks
 │   └── pre-commit            # Pre-commit checks (ShellCheck, syntax)
+├── assets/                   # Bundled wallpapers and static assets
+│   └── wallpapers/           # Catppuccin-themed wallpapers
 ├── docs/                     # Official VitePress documentation source
 ├── .gitignore
 └── .gitattributes            # Enforce LF line endings for .sh files
@@ -211,7 +214,7 @@ flowchart TB
     subgraph Entry["Entry Points"]
         CURL["curl \| bash<br/>install.sh"] --> SETUP
         MANUAL["git clone + ./setup.sh"] --> SETUP
-        SETUP["setup.sh"] --> TUI["installer.sh<br/>TUI Module Selector"]
+        SETUP["setup.sh"] --> GUI["installer.sh<br/>GUI Module Selector (zenity)"]
     end
 
     subgraph Modules["15 Independent Modules"]
@@ -223,7 +226,7 @@ flowchart TB
         M14["14-15<br/>Nexus+Guide · Ecosystem"]
     end
 
-    TUI --> Modules
+    GUI --> Modules
 
     subgraph Ecosystem["Living Ecosystem — /usr/local/bin/"]
         direction LR
@@ -233,13 +236,16 @@ flowchart TB
         AT["🧠 ai-tuner"]
         AS["🏪 app-store"]
         HC["🩺 health-check"]
+        WP["🖼️ wallpaper-picker"]
+        NC["💬 nexus-chat"]
+        PI["🧙 post-install"]
     end
 
     M14 --> Ecosystem
 
     subgraph Runtime["Runtime Layer"]
         NEXUS["Nexus v2<br/>Super+X Command Center"] --> Ecosystem
-        GUIDE["Guide v3<br/>160+ bilingual entries"]
+        GUIDE["Guide v3<br/>130+ bilingual entries"]
         HOOK["Pacman Hook<br/>Auto health-check"]
     end
 
@@ -259,7 +265,7 @@ flowchart TB
 | 01 | Base & GPU | ~2 GB | GPU auto-detect (Intel/AMD/NVIDIA), Secure Boot MOK, paru, base-devel |
 | 02 | Kernel | ~0 MB | sysctl tuning, NVMe optimization, THP, GuC/HuC |
 | 03 | Security | ~50 MB | UFW, SSH key (ed25519), Cloudflare DNS, Zram, Timeshift |
-| 04 | Dev Tools | ~4 GB | Docker, Node/fnm/pnpm, Python/uv, Rust, Go, CLI power tools |
+| 04 | Dev Tools | ~4 GB | Docker, Node/fnm/pnpm, Python/uv, Rust, Go, lazygit, CLI power tools |
 | 05 | Mobile | ~5 GB | Flutter, Android SDK (API 34), Kotlin, JDK 17, scrcpy |
 | 06 | Dotfiles | ~100 MB | Kitty, Zsh/Oh-My-Zsh, Starship prompt, fzf-tab |
 | 07 | Editors | ~700 MB | [Antigravity](https://antigravity.google/blog) (Google's AI-powered VS Code fork), Neovim (lazy.nvim) |
@@ -267,16 +273,16 @@ flowchart TB
 | 09 | Hyprland | ~200 MB | Tiling WM, keybinds, Rofi, Hyprlock, Hypridle |
 | 10 | Apps | ~500 MB | Zen Browser, tmux, Spotify/Telegram/Discord (Flatpak) |
 | 11 | Gaming | ~3 GB | Steam (Proton), PCSX2 (GPU-aware config), PrismLauncher, Roblox, MangoHud |
-| 12 | VM | ~2 GB | QEMU/KVM (dynamic hugepages, CPU pinning), Bottles, LibreOffice |
+| 12 | VM | ~2 GB | QEMU/KVM via qemu-desktop (hugepages, CPU pinning), Bottles, LibreOffice |
 | 13 | Waybar | ~5 MB | Glassmorphism status bar with gradient CSS |
-| 14 | Nexus + Guide | ~1 MB | Smart command center + 160-entry bilingual guide |
-| 15 | Ecosystem | ~1 MB | Theme Engine, Config Rollback, Dotfiles Sync, AI Tuner, App Store, Health Check |
+| 14 | Nexus + Guide | ~1 MB | Smart command center + 130+ entry bilingual guide |
+| 15 | Ecosystem | ~1 MB | Theme Engine, Config Rollback, Dotfiles Sync, AI Tuner, App Store, Health Check, Wallpaper Picker, AI Chat, Post-Install |
 
 ---
 
 ## 🌍 The Living Ecosystem (v4)
 
-The project has evolved into a "Living Ecosystem" with 6 integrated pillars, completely transforming how you manage your Arch setup. All features are natively integrated into the **Nexus Command Center (`Super+X`)**.
+The project has evolved into a "Living Ecosystem" with 9 integrated pillars, completely transforming how you manage your Arch setup. All features are natively integrated into the **Nexus Command Center (`Super+X`)**.
 
 ### 1. 🎨 Dynamic Theming Engine (`theme-switch`)
 Ditch hardcoded palettes. Seamlessly swap between Catppuccin flavors (Mocha, Macchiato, Frappe, Latte), Dracula, Tokyo Night, and Rosé Pine.
@@ -308,6 +314,22 @@ Post-update system integrity validator.
 - **Pacman hook**: Auto-runs after kernel, Hyprland, Waybar, or NVIDIA updates — you'll see the health report right in your terminal after `pacman -Syu`.
 - Also available via **Nexus** → System Health Check, or terminal: `health-check`.
 
+### 7. 🖼️ Wallpaper Picker (`wallpaper-picker`)
+Visual wallpaper selection.
+- Browse all images in `~/Pictures/Wallpapers/` via Rofi, apply instantly.
+- Updates Hyprpaper config for persistence across reboots.
+
+### 8. 💬 Nexus AI Chat (`nexus-chat`)
+Interactive local AI chat.
+- Select from installed Ollama models (qwen3, deepseek-r1, qwen2.5-coder) via Rofi.
+- Choose mode: Normal Chat, Debate Mode, or Terminal Access.
+- Auto-starts Ollama service if needed, manages CPU power governor.
+
+### 9. 🧙 Post-Install Wizard (`post-install`)
+First-boot onboarding.
+- Syncs dotfiles, sets wallpaper, verifies ecosystem tools are working.
+- Runs automatically after first install, or invoke manually: `post-install`.
+
 ---
 
 ## 🎮 Nexus v2 — Command Center
@@ -316,29 +338,29 @@ Press **`Super+X`** for a smart popup with **live system stats**:
 
 ```
 ╭── 🔍 Nexus ───────────────────────────────────╮
-│  Super+X · 󰁹 87% · 󰍛 4.2/16GB               │
-│────────────────────────────────────────────────│
-│  ── 󰁹 87%  │  󰍛 4.2/16GB  │  󰋊 420G free ── │
-│  ────────────────────────────────────────────  │
+│  Super+X · 󰁹 87% · 󰍛 4.2/16GB                 │
+│───────────────────────────────────────────────│
+│  ── 󰁹 87%  │  󰍛 4.2/16GB  │  󰋊 420G free ──   │
+│  ──────────────────────────────────────────── │
 │    System Update (pacman + flatpak)           │
 │    Cleanup Packages & Cache                   │
-│  ────────────────────────────────────────────  │
+│  ──────────────────────────────────────────── │
 │    Screenshot — Region                        │
 │    Record Screen (or ⏹ Stop if recording)     │
-│  ────────────────────────────────────────────  │
-│  󰧑  AI Chat — Reasoning (qwen3) 🟢           │
+│  ──────────────────────────────────────────── │
+│  󰧑  AI Chat — Reasoning (qwen3) 🟢            │
 │    Docker Manager 🟢                          │
 │    VM Manager 🔴                              │
-│  ────────────────────────────────────────────  │
+│  ──────────────────────────────────────────── │
 │  🏪  GUI App Store (Browse & Install)         │
 │  🎨  Dynamic Theme Switcher                   │
-│  🛡️  Time Machine (Config Rollback)            │
-│  ☁️  Dotfiles Cloud Sync                       │
+│  🛡️  Time Machine (Config Rollback)           │
+│  ☁️  Dotfiles Cloud Sync                      │
 │  🧠  AI Auto-Tuner                            │
 │  🩺  System Health Check                      │
-│  ────────────────────────────────────────────  │
-│    Guide Popup (160+ entries)                 │
-╰────────────────────────────────────────────────╯
+│  ───────────────────────────────────────────  │
+│    Guide Popup (130+ entries)                 │
+╰───────────────────────────────────────────────╯
 ```
 
 ### Nexus Features
@@ -381,7 +403,7 @@ guide --lang en    # 🇬🇧 English
 
 | Feature | Description |
 |---------|-------------|
-| **160+ entries** | 18 categories (hyprland, shell, git, docker, node, python, rust, go, flutter, editor, ai, gaming, vm, apps, system, ecosystem, terminal, record) |
+| **130+ entries** | 18 categories (hyprland, shell, git, docker, node, python, rust, go, flutter, editor, ai, gaming, vm, apps, system, ecosystem, terminal, record) |
 | **Executable** | Press Enter on any ▶ entry to run the command directly |
 | **Preview pane** | fzf right panel shows detailed explanation + examples |
 | **Bilingual** | Full English and Indonesian translations (auto-detected from locale) |
@@ -416,9 +438,11 @@ guide --lang en    # 🇬🇧 English
 | `Super + F` | Fullscreen |
 | `Super + L` | Lock screen (Hyprlock) |
 | `Super + E` | File manager (Thunar) |
-| `Super + V` | Clipboard history |
+| `Super + V` | Clipboard history (cliphist via Rofi) |
+| `Super + N` | Notification history (dunstctl) |
 | `Super + /` | Keybind cheatsheet |
 | `Super + Shift+S` | Screenshot (region) |
+| `Super + M` | Exit Hyprland (logout) |
 | `Super + 1-9` | Switch workspace |
 
 ---
@@ -567,7 +591,7 @@ After `pacman -Syu`, the health check automatically runs and detects issues. Rec
 
 ## 🤝 Contributing
 
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+We welcome contributions! See [CONTRIBUTING.md](.github/CONTRIBUTING.md) for detailed guidelines.
 
 ```bash
 git checkout -b feature/your-idea
@@ -583,10 +607,10 @@ Each module is **independent** — you can edit one without touching others.
 
 | Document | Description |
 |----------|-------------|
-| [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute, coding conventions, testing |
-| [SUPPORT.md](SUPPORT.md) | Where to get help, report bugs, ask questions |
-| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Community behavior standards |
-| [SECURITY.md](SECURITY.md) | Vulnerability reporting & security policy |
+| [CONTRIBUTING.md](.github/CONTRIBUTING.md) | How to contribute, coding conventions, testing |
+| [SUPPORT.md](.github/SUPPORT.md) | Where to get help, report bugs, ask questions |
+| [CODE_OF_CONDUCT.md](.github/CODE_OF_CONDUCT.md) | Community behavior standards |
+| [SECURITY.md](.github/SECURITY.md) | Vulnerability reporting & security policy |
 
 ---
 

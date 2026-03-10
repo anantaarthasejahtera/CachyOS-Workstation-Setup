@@ -37,9 +37,17 @@ jobs:
               -e SC2016 \
               -e SC2028 \
               -e SC2129 \
-              -e SC2164 \
-              -e SC2206 \
               {} +
+          # Suppressed codes:
+          # SC2034: Variable appears unused (false positives from sourced vars)
+          # SC2155: Declare and assign separately (style preference)
+          # SC1091: Not following sourced file (dynamic paths)
+          # SC2001: See if you can use ${var//} instead of sed (intentional sed usage)
+          # SC2012: Use find instead of ls (ls used for display only)
+          # SC2015: Note that A && B || C is not if-then-else (intentional pattern)
+          # SC2016: Expressions don't expand in single quotes (intentional)
+          # SC2028: echo won't expand escape sequences (we use echo -e explicitly)
+          # SC2129: Consider using { cmd1; cmd2; } >> file (style preference)
           echo "::endgroup::"
           echo "✅ ShellCheck passed on all scripts"
 

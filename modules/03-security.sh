@@ -2,9 +2,17 @@
 # Module 03: Security & Maintenance
 source "$(dirname "$0")/00-common.sh"
 set -euo pipefail
+skip_if_current
 header "Security & Maintenance"
 
-install_pkg ufw timeshift
+install_pkg ufw
+
+# Backup tool: prefer snapper (CachyOS default) over timeshift to avoid conflicts
+if pacman -Qi cachyos-snapper-support &>/dev/null 2>&1 || pacman -Qi snapper &>/dev/null 2>&1; then
+    ok "Snapper (CachyOS backup tool) already installed — skipping timeshift"
+elif ! pacman -Qi timeshift &>/dev/null 2>&1; then
+    install_pkg timeshift 2>/dev/null || warn "Timeshift install skipped (may conflict with snapper)"
+fi
 
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
@@ -18,9 +26,16 @@ ok "Firewall & backup tools configured"
 log "Generating SSH key..."
 if [ ! -f "$HOME/.ssh/id_ed25519" ]; then
     # Let ssh-keygen prompt for passphrase interactively (more secure)
-    # If running non-interactively (piped stdin), use empty passphrase as fallback
+    # If running non-interactively (piped stdin), try zenity for passphrase
     if [ -t 0 ]; then
         ssh-keygen -t ed25519 -C "$GIT_EMAIL" -f "$HOME/.ssh/id_ed25519"
+    elif command -v zenity &>/dev/null; then
+        ssh_pass=""
+        ssh_pass=$(zenity --password \
+            --title="🔑 SSH Key Passphrase" \
+            --text="Enter a passphrase for your SSH key (leave empty for no passphrase):" \
+            --width=400 2>/dev/null) || ssh_pass=""
+        ssh-keygen -t ed25519 -C "$GIT_EMAIL" -f "$HOME/.ssh/id_ed25519" -N "$ssh_pass" -q
     else
         warn "Non-interactive mode: generating SSH key without passphrase"
         ssh-keygen -t ed25519 -C "$GIT_EMAIL" -f "$HOME/.ssh/id_ed25519" -N "" -q
@@ -134,4 +149,5 @@ npm-debug.log*
 GIEOF
 git config --global core.excludesFile "$HOME/.gitignore_global"
 ok "Global .gitignore configured"
+mark_module_done
 

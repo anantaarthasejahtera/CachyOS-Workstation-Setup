@@ -2,26 +2,22 @@
 # Module 08: Desktop Aesthetic (KDE + Catppuccin)
 source "$(dirname "$0")/00-common.sh"
 set -euo pipefail
+skip_if_current
 header "Desktop Aesthetic — Catppuccin Mocha Rice"
 
-# --- Catppuccin KDE Theme ---
-log "Installing Catppuccin theme suite..."
-install_aur catppuccin-kde-theme-mocha 2>/dev/null || true
+# --- Catppuccin Theme Suite (AUR) ---
+log "Installing Catppuccin theme suite (KDE, GTK, Icons, Cursors, Kvantum, SDDM)..."
+install_aur \
+    catppuccin-kde-theme-mocha \
+    papirus-folders-catppuccin \
+    catppuccin-cursors-mocha \
+    kvantum-theme-catppuccin-mocha \
+    catppuccin-gtk-theme-mocha \
+    sddm-theme-catppuccin-mocha \
+    2>/dev/null || true
 
-# --- Icons & Cursors ---
-install_pkg papirus-icon-theme
-install_aur papirus-folders-catppuccin 2>/dev/null || true
-install_aur catppuccin-cursors-mocha 2>/dev/null || true
-
-# --- Kvantum (Qt theming engine) ---
-install_pkg kvantum
-install_aur kvantum-theme-catppuccin-mocha 2>/dev/null || true
-
-# --- GTK theme for consistency ---
-install_aur catppuccin-gtk-theme-mocha 2>/dev/null || true
-
-# --- SDDM Theme ---
-install_aur sddm-theme-catppuccin-mocha 2>/dev/null || true
+# --- Essential dependencies ---
+install_pkg papirus-icon-theme kvantum
 
 # --- Wallpapers (3-tier reliability) ---
 # Ensures the user ALWAYS gets an aesthetic wallpaper on first boot.
@@ -36,23 +32,26 @@ mkdir -p "$WALLPAPER_DIR"
 wallpapers_acquired=false
 
 # --- Tier 1: Clone repos with Catppuccin-matched wallpapers ---
-log "  Tier 1: Trying Catppuccin-matched wallpaper repos..."
-# orangci/walls-catppuccin-mocha — wallpapers COLOR-CONVERTED to Catppuccin Mocha palette
-# dharmx/walls                  — go-to ricing wallpaper repo, widely used with Catppuccin setups
+# NOTE: dharmx/walls is very large. We use shallow clones and pick a selection.
+log "  Tier 1: Cloning Catppuccin wallpaper repositories..."
+MAX_WALLPAPERS=15
+
 for repo in \
     "https://github.com/orangci/walls-catppuccin-mocha.git" \
     "https://github.com/dharmx/walls.git"; do
     if [ "$wallpapers_acquired" = false ]; then
+        log "    Cloning $(basename "$repo" .git)..."
         rm -rf /tmp/cachy-wallpapers-clone
         if git clone --depth=1 "$repo" /tmp/cachy-wallpapers-clone 2>/dev/null; then
-            # Copy only image files (skip READMEs, licenses, scripts, etc.)
+            # Randomly select a few high-quality images to avoid disk bloat
             find /tmp/cachy-wallpapers-clone -type f \( -name '*.png' -o -name '*.jpg' -o -name '*.jpeg' -o -name '*.webp' \) \
-                -exec cp {} "$WALLPAPER_DIR/" \; 2>/dev/null
-            # Verify at least 1 image was copied
+                | shuf -n "$MAX_WALLPAPERS" | xargs -I {} cp {} "$WALLPAPER_DIR/" 2>/dev/null
+
+            # Verify if images were copied
             img_count=$(find "$WALLPAPER_DIR" -type f \( -name '*.png' -o -name '*.jpg' -o -name '*.jpeg' -o -name '*.webp' \) 2>/dev/null | wc -l)
             if [ "$img_count" -gt 0 ]; then
                 wallpapers_acquired=true
-                ok "Downloaded $img_count wallpapers from: $(basename "$repo" .git)"
+                ok "Acquired $img_count aesthetic wallpapers from: $(basename "$repo" .git)"
             fi
         fi
         rm -rf /tmp/cachy-wallpapers-clone
@@ -81,38 +80,32 @@ if [ "$wallpapers_acquired" = false ]; then
     fi
 fi
 
-# --- Tier 3: Generate Catppuccin Mocha gradient (guaranteed, zero-net) ---
+# --- Tier 3: Bundled wallpapers from repo (guaranteed, zero-network) ---
 if [ "$wallpapers_acquired" = false ]; then
-    log "  Tier 3: Generating Catppuccin gradient wallpaper locally..."
-    # Use ImageMagick (convert/magick) which is commonly available
-    if command -v magick &>/dev/null || command -v convert &>/dev/null; then
-        magick_cmd="convert"
-        command -v magick &>/dev/null && magick_cmd="magick"
-        # Catppuccin Mocha gradient: Base (#1e1e2e) → Mauve (#cba6f7) → Blue (#89b4fa)
-        $magick_cmd -size 3840x2160 \
-            xc:'#1e1e2e' \
-            \( -size 3840x2160 gradient:'#302d41'-'#1e1e2e' \) -compose overlay -composite \
-            \( -size 200x200 xc:'#cba6f7' -blur 0x80 -resize 3840x2160! \) -compose softlight -composite \
-            \( -size 200x200 xc:'#89b4fa' -gravity southeast -blur 0x60 -resize 3840x2160! \) -compose softlight -composite \
-            "$WALLPAPER_DIR/catppuccin-mocha-gradient.png" 2>/dev/null
+    log "  Tier 3: Copying bundled Catppuccin wallpapers..."
+    ASSETS_WALLPAPER_DIR="$(dirname "$0")/../assets/wallpapers"
+    if [ -d "$ASSETS_WALLPAPER_DIR" ]; then
+        for wp in "$ASSETS_WALLPAPER_DIR"/*.png "$ASSETS_WALLPAPER_DIR"/*.jpg; do
+            [ -f "$wp" ] || continue
+            cp "$wp" "$WALLPAPER_DIR/" && wallpapers_acquired=true
+        done
+        [ "$wallpapers_acquired" = true ] && ok "Bundled Catppuccin wallpapers installed"
+    fi
+fi
+
+# --- Tier 4: Generate Catppuccin Mocha gradient via ImageMagick (last resort) ---
+if [ "$wallpapers_acquired" = false ]; then
+    log "  Tier 4: Generating Catppuccin gradient wallpaper locally..."
+    # Try with existing ImageMagick, or install it
+    if ! generate_catppuccin_wallpaper "$WALLPAPER_DIR/catppuccin-mocha-gradient.png"; then
+        install_pkg imagemagick 2>/dev/null || true
+        generate_catppuccin_wallpaper "$WALLPAPER_DIR/catppuccin-mocha-gradient.png" || true
+    fi
+    if [ -f "$WALLPAPER_DIR/catppuccin-mocha-gradient.png" ]; then
         wallpapers_acquired=true
         ok "Generated Catppuccin Mocha gradient wallpaper (4K)"
     else
-        # Absolute last resort: install ImageMagick and generate
-        install_pkg imagemagick 2>/dev/null || true
-        if command -v magick &>/dev/null || command -v convert &>/dev/null; then
-            magick_cmd="convert"
-            command -v magick &>/dev/null && magick_cmd="magick"
-            $magick_cmd -size 3840x2160 \
-                xc:'#1e1e2e' \
-                \( -size 3840x2160 gradient:'#302d41'-'#1e1e2e' \) -compose overlay -composite \
-                \( -size 200x200 xc:'#cba6f7' -blur 0x80 -resize 3840x2160! \) -compose softlight -composite \
-                "$WALLPAPER_DIR/catppuccin-mocha-gradient.png" 2>/dev/null
-            wallpapers_acquired=true
-            ok "Generated fallback gradient wallpaper"
-        else
-            warn "Could not generate wallpaper. Place images in ~/Pictures/Wallpapers/ manually."
-        fi
+        warn "Could not generate wallpaper. Place images in ~/Pictures/Wallpapers/ manually."
     fi
 fi
 
@@ -125,22 +118,26 @@ ok "Desktop aesthetic configured"
 log "Installing GRUB Catppuccin theme..."
 GRUB_THEME_DIR="/usr/share/grub/themes/catppuccin-mocha"
 if [ ! -d "$GRUB_THEME_DIR" ]; then
-    cd /tmp
-    git clone --depth=1 https://github.com/catppuccin/grub.git catppuccin-grub 2>/dev/null || true
-    if [ -d "catppuccin-grub/src/catppuccin-mocha-grub-theme" ]; then
-        sudo mkdir -p "$GRUB_THEME_DIR"
-        sudo cp -r catppuccin-grub/src/catppuccin-mocha-grub-theme/* "$GRUB_THEME_DIR/"
-        sudo sed -i 's|^#\?GRUB_THEME=.*|GRUB_THEME="/usr/share/grub/themes/catppuccin-mocha/theme.txt"|' /etc/default/grub
-        sudo grub-mkconfig -o /boot/grub/grub.cfg 2>/dev/null || true
-        ok "GRUB Catppuccin Mocha theme installed"
-    fi
-    rm -rf /tmp/catppuccin-grub
-    cd ~
+    (
+        cd /tmp || exit 1
+        git clone --depth=1 https://github.com/catppuccin/grub.git catppuccin-grub 2>/dev/null || true
+        if [ -d "catppuccin-grub/src/catppuccin-mocha-grub-theme" ]; then
+            log "  Applying GRUB theme..."
+            sudo mkdir -p "$GRUB_THEME_DIR"
+            sudo cp -r catppuccin-grub/src/catppuccin-mocha-grub-theme/* "$GRUB_THEME_DIR/"
+            sudo sed -i 's|^#\?GRUB_THEME=.*|GRUB_THEME="/usr/share/grub/themes/catppuccin-mocha/theme.txt"|' /etc/default/grub
+            log "  Updating GRUB config (this may take a minute)..."
+            sudo grub-mkconfig -o /boot/grub/grub.cfg 2>/dev/null || true
+            ok "GRUB Catppuccin Mocha theme installed"
+        fi
+        rm -rf /tmp/catppuccin-grub
+    )
 fi
 
 # --- GTK/Qt Font Configuration ---
 log "Configuring system fonts..."
 mkdir -p "$HOME/.config/gtk-3.0" "$HOME/.config/gtk-4.0"
+safe_config "$HOME/.config/gtk-3.0/settings.ini"
 
 # GTK-3 settings
 cat > "$HOME/.config/gtk-3.0/settings.ini" << 'GTK3EOF'
@@ -156,6 +153,7 @@ gtk-enable-animations=1
 GTK3EOF
 
 # GTK-4 settings (same)
+safe_config "$HOME/.config/gtk-4.0/settings.ini"
 cp "$HOME/.config/gtk-3.0/settings.ini" "$HOME/.config/gtk-4.0/settings.ini"
 
 # Qt font via qt6ct
@@ -173,4 +171,5 @@ general="Inter,10,-1,5,50,0,0,0,0,0"
 QTEOF
 
 ok "System fonts configured (Inter + JetBrains Mono)"
+mark_module_done
 

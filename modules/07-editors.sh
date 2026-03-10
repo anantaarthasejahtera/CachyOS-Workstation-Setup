@@ -2,6 +2,7 @@
 # Module 07: Editors (Antigravity, Neovim, VS Code Catppuccin)
 source "$(dirname "$0")/00-common.sh"
 set -euo pipefail
+skip_if_current
 header "Editors — Antigravity, Neovim, VS Code Config"
 
 # ─── Antigravity (AI Coding Agent) ───────────────────────
@@ -14,25 +15,31 @@ if command -v antigravity &>/dev/null; then
 elif install_aur antigravity-bin 2>/dev/null; then
     ok "Antigravity installed from AUR"
 else
-    # Try extracting from official Debian package
+    # Try extracting from official tar.gz package
     AG_TMP="/tmp/antigravity-install"
     mkdir -p "$AG_TMP"
-    AG_DEB_URL="https://us-central1-apt.pkg.dev/projects/antigravity-auto-updater-dev/antigravity-debian/pool/antigravity_latest_amd64.deb"
-    if curl -fsSL -o "$AG_TMP/antigravity.deb" "$AG_DEB_URL" 2>/dev/null; then
-        cd "$AG_TMP"
-        ar x antigravity.deb 2>/dev/null || true
-        tar xf data.tar.* 2>/dev/null || true
-        if [ -f "$AG_TMP/usr/bin/antigravity" ]; then
+    AG_URL="https://edgedl.me.gvt1.com/edgedl/release2/j0qc3/antigravity/stable/1.20.4-5535391095848960/linux-x64/Antigravity.tar.gz"
+    if curl -fsSL -o "$AG_TMP/antigravity.tar.gz" "$AG_URL" 2>/dev/null; then
+        (
+            cd "$AG_TMP"
+            tar xf antigravity.tar.gz 2>/dev/null || true
+        )
+        if [ -d "$AG_TMP/Antigravity" ]; then
+            sudo rm -rf /opt/Antigravity
+            sudo mv "$AG_TMP/Antigravity" /opt/
+            [ -f /opt/Antigravity/antigravity ] && sudo ln -sf /opt/Antigravity/antigravity /usr/local/bin/antigravity
+            [ -f /opt/Antigravity/Antigravity ] && sudo ln -sf /opt/Antigravity/Antigravity /usr/local/bin/antigravity
+            ok "Antigravity installed from official .tar.gz extract"
+        elif [ -f "$AG_TMP/usr/bin/antigravity" ]; then
             sudo cp "$AG_TMP/usr/bin/antigravity" /usr/local/bin/
             sudo chmod +x /usr/local/bin/antigravity
-            ok "Antigravity installed from official .deb extract"
+            ok "Antigravity installed from official tarball extract"
         else
-            warn "Antigravity .deb structure unknown. Trying cursor-bin as alternative..."
+            warn "Antigravity structure unknown. Trying cursor-bin as alternative..."
             install_aur cursor-bin 2>/dev/null || \
             warn "Antigravity/Cursor install failed. Visit: https://antigravity.google for manual install"
         fi
         rm -rf "$AG_TMP"
-        cd ~
     else
         warn "Could not download Antigravity. Trying cursor-bin as alternative..."
         install_aur cursor-bin 2>/dev/null || \
@@ -46,6 +53,7 @@ ok "AI editor module done"
 log "Configuring editor aesthetic (Catppuccin Mocha)..."
 VSCODE_DIR="$HOME/.config/Code/User"
 mkdir -p "$VSCODE_DIR"
+safe_config "$VSCODE_DIR/settings.json"
 cat > "$VSCODE_DIR/settings.json" << 'VSCEOF'
 {
     "workbench.colorTheme": "Catppuccin Mocha",
@@ -66,7 +74,6 @@ cat > "$VSCODE_DIR/settings.json" << 'VSCEOF'
     "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font'",
     "terminal.integrated.fontSize": 13,
     "terminal.integrated.cursorStyle": "line",
-    "terminal.integrated.defaultProfile.linux": "zsh",
     "window.titleBarStyle": "custom",
     "window.menuBarVisibility": "toggle",
     "workbench.list.smoothScrolling": true,
@@ -93,6 +100,7 @@ log "Configuring Neovim with Catppuccin..."
 install_pkg neovim
 NVIM_DIR="$HOME/.config/nvim"
 mkdir -p "$NVIM_DIR/lua/plugins"
+safe_config "$NVIM_DIR/init.lua"
 
 cat > "$NVIM_DIR/init.lua" << 'NVIMINIT'
 -- — Neovim — Catppuccin Mocha —
@@ -172,23 +180,30 @@ ok "Neovim + lazy.nvim + Catppuccin configured"
 
 # ─── Ollama (Local AI / LLM) ────────────────────────────
 log "Installing Ollama (run AI models locally)..."
-curl -fsSL https://ollama.com/install.sh | sh 2>/dev/null || install_aur ollama-bin 2>/dev/null || true
+
+# CachyOS Optimization: Check for x86-64-v4 (AVX-512) support
+if grep -q "avx512" /proc/cpuinfo && pacman -Sg cachyos-v4 &>/dev/null; then
+    log "  Detected AVX-512 support. Using CachyOS-v4 optimized Ollama..."
+    install_pkg ollama-vulkan # Often uses GPU/iGPU if available, or fallbacks to v4 CPU
+else
+    if command -v ollama &>/dev/null; then
+        ok "Ollama already installed, skipping download."
+    else
+        curl -fsSL https://ollama.com/install.sh | sh 2>/dev/null || install_aur ollama-bin 2>/dev/null || true
+    fi
+fi
+
 if command -v ollama &>/dev/null; then
     sudo systemctl enable --now ollama.service 2>/dev/null || true
-    # Pull 3 optimal models for 16GB RAM in background
-    log "Pulling AI models in background (this may take a while)..."
-    log "  1. qwen3:30b-a3b   → MoE reasoning beast (debat, strategi, filosofi)"
-    log "  2. deepseek-r1:7b  → Reasoning & math specialist"
-    log "  3. qwen2.5-coder:7b → Coding specialist (setara GPT-4o)"
-    (
-        ollama pull qwen2.5-coder:7b 2>/dev/null
-        ollama pull deepseek-r1:7b 2>/dev/null
-        ollama pull qwen3:30b-a3b 2>/dev/null
-    ) &
-    ok "Ollama installed (3 models downloading in background)"
-    log "  Quick start: ollama run qwen3:30b-a3b"
+    ok "Ollama installed and running"
+    log "  Pull models on-demand (not auto-downloaded to save bandwidth):"
+    log "    ollama pull qwen2.5-coder:7b    # coding assistant (~4 GB)"
+    log "    ollama pull deepseek-r1:7b       # reasoning (~4 GB)"
+    log "    ollama pull qwen3:30b-a3b        # general purpose (~17 GB)"
+    log "  Quick start: ollama run qwen2.5-coder:7b"
 else
     warn "Ollama install failed. Try manually: curl -fsSL https://ollama.com/install.sh | sh"
 fi
 
 ok "Editors module complete"
+mark_module_done

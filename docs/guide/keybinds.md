@@ -32,7 +32,8 @@ The `SUPER` key (Windows/Cmd key) acts as your primary modifier.
 | **File Manager** | `SUPER + E` | Opens Thunar |
 | **Screenshot (Region)**| `SUPER + SHIFT + S` | Captures a rectangular region via `grimblast` to clipboard |
 | **Screenshot (Full)** | `PrintScreen` | Captures all monitors to `~/Pictures/Screenshots` |
-| **Clipboard History** | `SUPER + C` | Opens Rofi clipboard manager (`cliphist`) |
+| **Clipboard History** | `SUPER + V` | Opens Rofi clipboard manager (`cliphist`) |
+| **Notification History** | `SUPER + N` | Shows recent notifications (`dunstctl history-pop`) |
 
 ## 💻 Terminal Aliases (`.zshrc`)
 
@@ -42,6 +43,7 @@ The `SUPER` key (Windows/Cmd key) acts as your primary modifier.
 | `git status` | `gs` | Fast git checking |
 | `git add .` | `ga.` | Stage all files |
 | `sudo pacman -Syu`| `update` | Standard system update |
+| `fastfetch` | `ff` | System information display |
 | `clear` | `cls` | Clears terminal screen |
 
 ## 🧠 AI Commands (Ollama)

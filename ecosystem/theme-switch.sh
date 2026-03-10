@@ -82,9 +82,9 @@ fi
 # --- 8. Verification & Notification ---
 # Count how many targets were actually modified
 changes=0
-[ -f "$ROFI_CONF" ] && grep -q "${bg:0:7}" "$ROFI_CONF" 2>/dev/null && ((changes++)) || true
-[ -f "$HYPR_CONF" ] && grep -q "$b1" "$HYPR_CONF" 2>/dev/null && ((changes++)) || true
-[ -f "$WAYBAR_CSS" ] && grep -q "${bg:0:7}" "$WAYBAR_CSS" 2>/dev/null && ((changes++)) || true
+[ -f "$ROFI_CONF" ] && grep -q "${bg:0:7}" "$ROFI_CONF" 2>/dev/null && changes=$((changes + 1)) || true
+[ -f "$HYPR_CONF" ] && grep -q "$b1" "$HYPR_CONF" 2>/dev/null && changes=$((changes + 1)) || true
+[ -f "$WAYBAR_CSS" ] && grep -q "${bg:0:7}" "$WAYBAR_CSS" 2>/dev/null && changes=$((changes + 1)) || true
 
 if [ "$changes" -gt 0 ]; then
     command -v notify-send >/dev/null && \

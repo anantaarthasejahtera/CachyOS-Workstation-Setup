@@ -2,11 +2,14 @@
 # Module 05: Flutter & Android Development
 source "$(dirname "$0")/00-common.sh"
 set -euo pipefail
+skip_if_current
 header "Flutter & Android Development"
 
 # --- JDK 17 (required by Gradle/Android) ---
 log "Installing JDK 17..."
-install_pkg jdk17-openjdk jdk17-openjdk-doc
+install_pkg jdk17-openjdk
+# Optional: JDK docs (may not exist on all Arch-based repos)
+install_pkg jdk17-openjdk-doc 2>/dev/null || true
 sudo archlinux-java set java-17-openjdk 2>/dev/null || true
 ok "JDK 17 set as default"
 
@@ -28,46 +31,34 @@ mkdir -p "$ANDROID_HOME/cmdline-tools"
 # Download latest cmdline-tools
 CMDLINE_URL="https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip"
 if [ ! -d "$ANDROID_HOME/cmdline-tools/latest" ]; then
-    cd /tmp
-    curl -fsSL -o cmdline-tools.zip "$CMDLINE_URL"
-    unzip -q cmdline-tools.zip -d "$ANDROID_HOME/cmdline-tools/"
-    mv "$ANDROID_HOME/cmdline-tools/cmdline-tools" "$ANDROID_HOME/cmdline-tools/latest"
-    rm cmdline-tools.zip
-    cd ~
+    (
+        cd /tmp || exit 1
+        curl -fsSL --retry 3 --retry-delay 2 -o cmdline-tools.zip "$CMDLINE_URL"
+        unzip -q cmdline-tools.zip -d "$ANDROID_HOME/cmdline-tools/"
+        mv "$ANDROID_HOME/cmdline-tools/cmdline-tools" "$ANDROID_HOME/cmdline-tools/latest"
+        rm cmdline-tools.zip
+    )
 fi
 
 # Add to PATH for current session
 export ANDROID_HOME="$HOME/Android/Sdk"
 export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
 
-# Persist PATH to .zshrc if it exists (Module 06 will rewrite it later, but this covers
-# the case where user runs Module 05 standalone without Module 06)
-if [ -f "$HOME/.zshrc" ] && ! grep -q 'ANDROID_HOME' "$HOME/.zshrc" 2>/dev/null; then
-    cat >> "$HOME/.zshrc" << 'ANDROIDPATH'
+# NOTE: Android PATH is set in module 06's .zshrc — no need to append here
 
-# Android SDK (added by Module 05)
-export ANDROID_HOME="$HOME/Android/Sdk"
-export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
-ANDROIDPATH
-    log "Android PATH persisted to .zshrc"
-fi
-
-# Accept licenses & install SDK components
+# Accept licenses & install SDK components (essentials only — emulator on-demand)
 yes | sdkmanager --licenses 2>/dev/null || true
 sdkmanager --install \
     "platform-tools" \
     "build-tools;34.0.0" \
     "platforms;android-34" \
     "sources;android-34" \
-    "emulator" \
-    "system-images;android-34;google_apis;x86_64" \
     2>/dev/null || true
 ok "Android SDK installed (API 34)"
 
-# --- Create AVD (Android Virtual Device) ---
-log "Creating Android emulator..."
-avdmanager create avd -n "Pixel_7" -k "system-images;android-34;google_apis;x86_64" -d "pixel_7" --force 2>/dev/null || true
-ok "Android emulator 'Pixel_7' created"
+# NOTE: Emulator image skipped (~1.5 GB). Install on-demand:
+log "  To set up emulator: sdkmanager 'system-images;android-34;google_apis;x86_64'"
+log "  Then create AVD: avdmanager create avd -n Pixel_7 -k 'system-images;android-34;google_apis;x86_64' -d pixel_7"
 
 # --- Flutter SDK ---
 log "Installing Flutter..."
@@ -99,4 +90,5 @@ log "Running flutter doctor..."
 flutter doctor 2>&1 | tee -a "$LOGFILE" || true
 
 ok "Flutter & Android development ready"
+mark_module_done
 

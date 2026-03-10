@@ -1,0 +1,78 @@
+name: 🐛 Bug Report
+description: Create a report to help us improve
+title: "[BUG] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a bug! Please fill out the form below so we can investigate.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what the bug is.
+      placeholder: "When I run module 09-hyprland.sh, the window rules fail to apply..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: How can we reproduce this behavior?
+      placeholder: |
+        1. Run `bash setup.sh`
+        2. Select module 09
+        3. Reboot
+        4. See error in Hyprland log
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs & system info
+      description: |
+        Please paste relevant output from:
+        - `~/cachy-setup.log`
+        - `fastfetch` output
+        - `journalctl --user -xe` (if Hyprland related)
+      render: text
+    validations:
+      required: false
+
+  - type: input
+    id: module
+    attributes:
+      label: Affected module(s)
+      description: "Which module(s) triggered the issue? (e.g., 09-hyprland, 04-dev)"
+      placeholder: "09-hyprland.sh"
+    validations:
+      required: false
+
+  - type: textarea
+    id: hardware
+    attributes:
+      label: Hardware info
+      description: "GPU, CPU, RAM — paste `lspci | grep -i vga` and `free -h` output"
+      render: text
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Add any other context about the problem here (screenshots, config snippets, etc.)
+    validations:
+      required: false

@@ -51,7 +51,7 @@ The Waybar configuration is built using advanced CSS Variables injected by the `
 
 > **Note**: Do not hardcode colors (e.g., `#f38ba8`) in `style.css`. Instead, use the CSS variables like `@define-color red;` which are dynamically hot-swapped by the Theme Engine depending on if you are using Frappe, Macchiato, or Dracula.
 
-## Shell Aliases (ZSH)
+## Shell Aliases (ZSH / Fish)
 
 Your `.zshrc` (installed via Module 06) is heavily optimized for speed. Custom aliases can be appended to the bottom:
 
@@ -62,3 +62,5 @@ alias docker-kill="docker kill \$(docker ps -q)"
 ```
 
 After modifying the file, run `source ~/.zshrc` to reload it.
+
+> **Fish Users**: If you use Fish shell instead of ZSH, add aliases to `~/.config/fish/config.fish` using the Fish syntax: `alias update "sudo pacman -Syu; and flatpak update"`. Fish does not use `&&` — use `; and` instead.

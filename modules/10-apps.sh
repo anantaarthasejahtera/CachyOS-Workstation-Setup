@@ -1,11 +1,55 @@
 #!/usr/bin/env bash
 # Module 10: Extra Apps (Browser, Flatpak, tmux)
 source "$(dirname "$0")/00-common.sh"
+set -euo pipefail
+skip_if_current
 header "Extra Apps — Browser, Multiplexer, Tools"
+
+# ── Deprecated packages (auto-removed on re-run) ──────────
+# CachyOS BORE scheduler + gamemode handles power management; auto-cpufreq conflicts.
+cleanup_deprecated \
+    auto-cpufreq    # redundant with BORE scheduler + gamemode
 
 # --- Zen Browser ---
 log "Installing Zen Browser..."
 install_aur zen-browser-bin 2>/dev/null || warn "Zen Browser AUR install failed, try manually"
+
+# --- Set XDG MIME defaults (system defaults for desktop apps) ---
+log "Setting XDG MIME defaults..."
+mkdir -p "$HOME/.config"
+
+# Determine browser .desktop file
+browser_desktop="zen-browser.desktop"
+if ! command -v zen-browser &>/dev/null; then
+    browser_desktop="firefox.desktop"
+fi
+
+# Write mimeapps.list — sets defaults for URLs, file manager, text editor
+safe_config "$HOME/.config/mimeapps.list"
+cat > "$HOME/.config/mimeapps.list" << MIMEEOF
+[Default Applications]
+# Browser — all web-related MIME types
+x-scheme-handler/http=${browser_desktop}
+x-scheme-handler/https=${browser_desktop}
+x-scheme-handler/about=${browser_desktop}
+x-scheme-handler/unknown=${browser_desktop}
+text/html=${browser_desktop}
+application/xhtml+xml=${browser_desktop}
+
+# File manager — Thunar
+inode/directory=thunar.desktop
+
+# Terminal — Kitty
+x-scheme-handler/terminal=kitty.desktop
+
+# Text editor — Neovim (terminal) / Antigravity (GUI)
+text/plain=nvim.desktop
+application/x-shellscript=nvim.desktop
+MIMEEOF
+
+# Also set via xdg-settings for maximum compatibility
+xdg-settings set default-web-browser "${browser_desktop}" 2>/dev/null || true
+ok "XDG MIME defaults set (browser: ${browser_desktop}, files: thunar, editor: nvim)"
 
 # --- Tmux + Catppuccin ---
 log "Installing tmux..."
@@ -17,6 +61,7 @@ if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
 fi
 
 mkdir -p "$HOME/.config/tmux"
+safe_config "$HOME/.config/tmux/tmux.conf"
 cat > "$HOME/.config/tmux/tmux.conf" << 'TMUXEOF'
 # — Tmux — Catppuccin Mocha —
 set -g default-terminal "tmux-256color"
@@ -74,11 +119,8 @@ log "Installing direnv..."
 install_pkg direnv
 ok "direnv installed"
 
-# --- auto-cpufreq (battery optimization) ---
-log "Installing auto-cpufreq (battery optimizer)..."
-install_aur auto-cpufreq 2>/dev/null || true
-sudo systemctl enable --now auto-cpufreq.service 2>/dev/null || true
-ok "auto-cpufreq enabled"
+# auto-cpufreq: redundant — CachyOS BORE scheduler + gamemode handles power management.
+# cleanup_deprecated auto-disables the service before removal.
 
 # --- Bluetooth ---
 log "Setting up Bluetooth..."
@@ -94,4 +136,26 @@ flatpak install --user -y flathub com.spotify.Client 2>/dev/null || true
 flatpak install --user -y flathub org.telegram.desktop 2>/dev/null || true
 flatpak install --user -y flathub com.discordapp.Discord 2>/dev/null || true
 ok "Flatpak apps installed (Spotify, Telegram, Discord)"
+
+# --- Productivity apps (moved from module 12 for better organization) ---
+log "Installing productivity apps..."
+install_pkg libreoffice-fresh
+ok "LibreOffice installed (opens .docx, .xlsx, .pptx natively)"
+
+install_pkg kdeconnect
+ok "KDE Connect installed (pair phone for file transfer, notifications)"
+
+install_aur obsidian-bin 2>/dev/null || \
+    flatpak install --user -y flathub md.obsidian.Obsidian 2>/dev/null || true
+ok "Obsidian installed (markdown note-taking)"
+
+install_pkg keepassxc
+ok "KeePassXC installed (encrypted password manager, works offline)"
+
+# --- Screen recording ---
+log "Installing screen recording tools..."
+install_pkg obs-studio wf-recorder
+ok "OBS Studio + wf-recorder installed"
+
+mark_module_done
 

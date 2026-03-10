@@ -84,8 +84,8 @@ curl -fsSL https://raw.githubusercontent.com/anantaarthasejahtera/CachyOS-Workst
 # Option B: Clone and customize (recommended)
 git clone https://github.com/anantaarthasejahtera/CachyOS-Workstation-Setup.git
 cd CachyOS-Workstation-Setup
-nano setup.sh   # Edit GIT_NAME and GIT_EMAIL
-bash setup.sh   # Launch TUI module selector
+# The GUI wizard will prompt for your Git identity
+bash setup.sh   # Launch GUI module selector (zenity)
 ```
 
 ### Important
@@ -109,6 +109,7 @@ After reboot, you'll be in Hyprland. Key shortcuts:
 | `Super+D` | App Launcher (Rofi) |
 | `Super+Return` | Open Kitty terminal |
 | `Super+L` | Lock screen |
+| `Super+N` | Show notification history (dunst) |
 | `guide` | Searchable help (160+ entries) |
 | `ff` | System info (fastfetch) |
 
