@@ -286,7 +286,8 @@ confirm_install() {
 # ─── Run Modules with Progress ───────────────────────────
 run_modules() {
     local selected="$1"
-    local modules=($selected)
+    local -a modules
+    read -ra modules <<< "$selected"
     local total=${#modules[@]}
     # Temp file for error dialog communication between subshell and parent
     local error_flag_file
@@ -354,8 +355,7 @@ run_modules() {
         case "$choice" in
             "Retry")
                 # Retry failed module, then continue with remaining modules
-                FORCE_RERUN="${FORCE_RERUN:-0}" bash "$MODULES_DIR/$failed_script" >> "$LOGFILE" 2>&1
-                if [ $? -ne 0 ]; then
+                if ! FORCE_RERUN="${FORCE_RERUN:-0}" bash "$MODULES_DIR/$failed_script" >> "$LOGFILE" 2>&1; then
                     zenity --warning \
                         --title="$(loc '⚠️ Retry Failed' '⚠️ Percobaan Ulang Gagal')" \
                         --text="$(loc "Module $failed_script failed again. Continuing with remaining modules." "Modul $failed_script gagal lagi. Melanjutkan modul berikutnya.")" \
@@ -390,7 +390,7 @@ run_modules() {
     fi
 
     rm -f "$error_flag_file"
-    if [ $pipe_exit -ne 0 ]; then
+    if [ "$pipe_exit" -ne 0 ]; then
         zenity --error \
             --title="$(loc '❌ Installation Aborted' '❌ Instalasi Dibatalkan')" \
             --text="$(loc 'Installation was stopped. Check log:' 'Instalasi dihentikan. Cek log:')\n$LOGFILE" \

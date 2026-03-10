@@ -49,7 +49,7 @@ selections=$(zenity --list --checklist \
     TRUE "ecosystem"  "Ecosystem Tools"        "/usr/local/bin/ scripts" \
     TRUE "hooks"      "Pacman Hooks"           "99-cachy-health.hook" \
     TRUE "rofi"       "Rofi UI Themes"         "Custom Rofi configs" \
-    TRUE "state"      "State Tracking"         "~/.config/cachy-setup/" \
+    TRUE "state"      "State Tracking"         "\$HOME/.config/cachy-setup/" \
     TRUE "keybinds"   "Hyprland Keybinds"      "Nexus & Guide bindings" \
     2>/dev/null) || exit 0
 

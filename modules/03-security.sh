@@ -30,7 +30,7 @@ if [ ! -f "$HOME/.ssh/id_ed25519" ]; then
     if [ -t 0 ]; then
         ssh-keygen -t ed25519 -C "$GIT_EMAIL" -f "$HOME/.ssh/id_ed25519"
     elif command -v zenity &>/dev/null; then
-        local ssh_pass=""
+        ssh_pass=""
         ssh_pass=$(zenity --password \
             --title="🔑 SSH Key Passphrase" \
             --text="Enter a passphrase for your SSH key (leave empty for no passphrase):" \
