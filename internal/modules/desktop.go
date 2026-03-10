@@ -37,10 +37,10 @@ func setupTerminalAndShell() {
 	os.MkdirAll(filepath.Join(home, ".config/bottom"), 0755)
 	os.MkdirAll(filepath.Join(home, ".config/fastfetch"), 0755)
 
-	// We use exec.Command for writing large configs originally handled by cat EOF 
+	// We use exec.Command for writing large configs originally handled by cat EOF
 	// to avoid massive file bloat in this Go file, drawing from the ecosystem dots
 	// Actually, porting them as pure Go strings ensures 100% dependency-free binary.
-	
+
 	writeConfig(filepath.Join(home, ".config/kitty/kitty.conf"), kittyConf)
 	writeConfig(filepath.Join(home, ".config/starship.toml"), starshipConf)
 	writeConfig(filepath.Join(home, ".config/fish/config.fish"), fishConf)
@@ -77,7 +77,7 @@ func setupDesktopAesthetic() {
 	os.MkdirAll(filepath.Join(home, ".config/gtk-3.0"), 0755)
 	os.MkdirAll(filepath.Join(home, ".config/gtk-4.0"), 0755)
 	os.MkdirAll(filepath.Join(home, ".config/qt6ct"), 0755)
-	
+
 	writeConfig(filepath.Join(home, ".config/gtk-3.0/settings.ini"), gtkConf)
 	writeConfig(filepath.Join(home, ".config/gtk-4.0/settings.ini"), gtkConf)
 	writeConfig(filepath.Join(home, ".config/qt6ct/qt6ct.conf"), qtConf)
@@ -91,7 +91,7 @@ func setupHyprlandAndWaybar() {
 		"cliphist", "brightnessctl", "playerctl", "polkit-kde-agent",
 		"thunar", "nwg-look", "rofi-power-menu", "cava", "pavucontrol", "waypaper", "btop",
 	)
-	
+
 	pacman.Remove("xdg-desktop-portal-kde")
 
 	home := os.Getenv("HOME")
@@ -108,7 +108,7 @@ func setupHyprlandAndWaybar() {
 	writeConfig(filepath.Join(home, ".config/hypr/hyprlock.conf"), hyprlockConf)
 	writeConfig(filepath.Join(home, ".config/hypr/hypridle.conf"), hypridleConf)
 	writeConfig(filepath.Join(home, ".config/hypr/cheatsheet.txt"), cheatsheetConf)
-	
+
 	showkeys := filepath.Join(home, ".config/hypr/show-keys.sh")
 	writeConfig(showkeys, showkeysConf)
 	exec.Command("chmod", "+x", showkeys).Run()

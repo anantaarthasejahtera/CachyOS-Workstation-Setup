@@ -29,7 +29,7 @@ Our setup defaults to providing three carefully curated models that target speci
 * **Parameters**: 7 Billion
 * **RAM Requirement**: 8 GB minimum
 * **Disk Space**: ~5 GB
-* **Use Case**: Hardwired directly into the `ai-tuner` script. This model is exceptionally good at reading raw bash outputs (like `top` or `vmstat`) and writing shell scripts, Python, or SQL. It is fast, lightweight, and focused purely on code.
+* **Use Case**: Hardwired directly into the `nexus doctor` AI-tuner. This model is exceptionally good at reading raw CLI outputs (like `top` or `vmstat`) and writing shell scripts, Python, or SQL. It is fast, lightweight, and focused purely on code.
 
 ---
 
@@ -44,7 +44,7 @@ You'll see options like:
 * `󰧑 AI Chat — Logic (deepseek)`
 Choosing any of these instantly drops you into a floating terminal session interacting with the model.
 
-### 2. The AI Auto-Tuner (`ai-tuner`)
+### 2. The AI Auto-Tuner (`nexus doctor`)
 Also accessible via Nexus, this tool runs background telemetry, feeds the raw data silently to `qwen2.5-coder:7b` via local cURL requests to the Ollama API port `11434`, and presents optimization advice.
 
 ### 3. Terminal Interface

@@ -22,9 +22,9 @@ features:
   - title: Living Ecosystem
     details: 9 integrated tools — Dynamic Theming, Time Machine Rollback, AI Auto-Tuner, Wallpaper Picker, Nexus Chat, App Store, and more.
   - title: Nexus Command Center
-    details: Super+X brings up a smart popup with 45+ actions, live system stats, GUI App Store, and AI-powered system management.
+    details: Super+X brings up a smart popup with 45+ actions, live system stats, and AI-powered system management. Driven by the new `nexus` Go binary.
   - title: Bilingual Support
-    details: The Guide CLI (130+ entries) and GUI Installer are fully translated in English and Bahasa Indonesia.
+    details: The Guide CLI and TUI Installer are fully translated in English and Bahasa Indonesia.
 ---
 
 ## Why CachyOS Workstation?

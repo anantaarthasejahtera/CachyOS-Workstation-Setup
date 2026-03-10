@@ -18,7 +18,7 @@ Unlike static dotfiles that lock you into one visual style, the Dynamic Theming 
 
 ## 🛡️ Time Machine (`config-rollback`)
 
-Based on our strictly enforced `safe_config()` Bash macro, **Time Machine** is a GUI implemented in Rofi.
+Based on our strict snapshotting logic in `internal/state`, **Time Machine** is a UI implemented in Rofi (or terminal via `nexus sync`).
 
 * Every time any of the 15 modules runs and edits a configuration file in `~/.config`, it first copies the existing file to `~/.config-backup/YYYYMMDD-HHMMSS/relative__path__file.ext`.
 * The **Time Machine** lists these timestamped snapshots visually.
@@ -42,13 +42,13 @@ Instead of writing complex symlinking scripts (like `stow`), `dotfiles-sync` tak
 
 The most advanced local observability tool.
 
-The `ai-tuner` is a bash utility that runs non-disruptive telemetry commands like `vmstat`, `free -h`, `df -h`, and `top -b -n 1`. It then constructs a strict system engineering prompt.
+The `ai-tuner` is a utility spawned by `nexus doctor` that runs non-disruptive telemetry commands like `vmstat`, `free -h`, `df -h`, and `top -b -n 1`. It then constructs a strict system engineering prompt.
 This prompt is fired via standard `curl` locally to `http://127.0.0.1:11434/api/generate` pointing directly to `qwen2.5-coder:7b`.
 The resulting output is parsed and presented via Rofi, giving the user intelligent, contextual recommendations for `sysctl` value changes, OOM threshold warnings, or caching inefficiencies.
 
 ---
 
-## 🏪 GUI App Store (`app-store`)
+## 🏪 Terminal App Store (`nexus apps`)
 
 Terminals are fast, but hunting down the correct package suffix for an obscure icon theme isn't.
 

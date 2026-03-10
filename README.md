@@ -30,14 +30,12 @@ A **modular installer** that transforms a fresh CachyOS installation into a full
 
 Features:
 
-- **GUI installer** — Catppuccin-themed zenity-based module selector with bilingual support (EN/ID) and progress bars
-- **Nexus v2** — Smart command center popup with 45+ actions and live system stats
-- **Guide v3** — 130+ searchable entries, executable, bilingual (EN/ID)
-- **Living Ecosystem (v4)** — 9 integrated tools: theming, rollback, cloud sync, AI tuning, app store, health check, wallpaper picker, AI chat, post-install wizard
-- **15 modules** — each independently runnable, fully idempotent
-- **Hardware-aware** — GPU auto-detect, dynamic hugepages, Secure Boot MOK, GPU-scaled configs
-- **Automated CI/CD** — Secure branch protection, Dependabot, and Automated GitHub Releases pipeline
-- **Post-update safety** — Pacman hook auto-validates system after kernel/WM/GPU updates
+- **TUI Installer** — Catppuccin-themed interactive CLI module selector (powered by Charmbracelet) with bilingual support (EN/ID)
+- **Nexus v2 (Go Native)** — A unified single binary replacing 16 legacy bash scripts.
+- **Living Ecosystem (v4)** — 9 integrated subsystems including theming, rollback, cloud sync, AI tuning, app store, and health check natively integrated.
+- **Hardware-aware** — GPU auto-detect, dynamic hugepages, Secure Boot MOK, GPU-scaled configs.
+- **Automated CI/CD** — Secure branch protection, Dependabot, and Automated GitHub Releases pipeline.
+- **Post-update safety** — Pacman hook auto-validates system after kernel/WM/GPU updates.
 
 ### 🎯 Who Is This For?
 
@@ -111,43 +109,33 @@ curl -fsSL https://raw.githubusercontent.com/anantaarthasejahtera/CachyOS-Workst
 git clone https://github.com/anantaarthasejahtera/CachyOS-Workstation-Setup.git
 cd CachyOS-Workstation-Setup
 
-# The GUI wizard will prompt for your Git identity
-# Or edit setup.sh / .env manually if you prefer
+# Build the Go Binary
+./build.sh
 
-# Run (interactive module selector)
-chmod +x setup.sh
-./setup.sh
+# Run the Interactive Installer
+./nexus install
 
-# Or install everything at once
-./setup.sh --all
+# Or install everything automatically
+./nexus install --all
 ```
 
-### GUI Module Selector
+### TUI Module Selector
 
-When you run `./setup.sh`, the zenity-based GUI installer guides you through module selection:
+When you run `./nexus install`, the TUI installer guides you through module selection:
 
 ```
-╔══════════════════════════════════════════════════════╗
-║  📦 Select Modules                                   ║
-╠══════════════════════════════════════════════════════╣
-║  [x] 01  Base & GPU Drivers         [~2 GB]          ║
-║  [x] 02  Kernel & Performance       [~0 MB]          ║
-║  [x] 03  Security & Maintenance     [~50 MB]         ║
-║  [x] 04  Dev Tools (Node,Py,Rust)   [~4 GB]          ║
-║  [x] 05  Mobile Dev (Flutter)       [~5 GB]          ║
-║  [x] 06  Shell & Dotfiles           [~100 MB]        ║
-║  [x] 07  Editors (Antigravity)      [~700 MB]        ║
-║  [x] 08  Desktop Theme (KDE)        [~300 MB]        ║
-║  [x] 09  Hyprland WM                [~200 MB]        ║
-║  [x] 10  Extra Apps                 [~500 MB]        ║
-║  [ ] 11  Gaming (Steam, PCSX2)      [~3 GB]          ║
-║  [ ] 12  Windows VM & Bottles       [~2 GB]          ║
-║  [x] 13  Waybar Status Bar          [~5 MB]          ║
-║  [x] 14  Nexus & Guide              [~1 MB]          ║
-║  [x] 15  Living Ecosystem Utils     [~1 MB]          ║
-║                                                      ║
-║  Space = toggle  ·  Enter = confirm                  ║
-╚══════════════════════════════════════════════════════╝
+╭────────────────────────────────────────────────────────────╮
+│ 📦 Select CachyOS Workstation Modules to Install           │
+├────────────────────────────────────────────────────────────┤
+│ [x] Base System (Base, Yay, GPU, Kernel, Security)         │
+│ [x] Development Tools (Docker, Go, Node, Python, Editors)  │
+│ [x] Desktop Aesthetic (Hyprland, Waybar, Catppuccin)       │
+│ [x] Applications & Gaming (Steam, PCsX2, Zen Browser)      │
+│ [ ] Mobile Dev (Android SDK, Flutter)                      │
+│ [ ] Virtualization (QEMU/KVM, Bottles)                     │
+│                                                            │
+│ Space = select  ·  Enter = confirm  ·  Esc = cancel        │
+╰────────────────────────────────────────────────────────────╯
 ```
 
 ---
@@ -163,34 +151,21 @@ CachyOS-Workstation-Setup/
 ├── Makefile                  # Dev commands (install, lint, init)
 ├── CHANGELOG.md              # Release history
 ├── ecosystem/                # Living Ecosystem (12 tools)
-│   ├── nexus.sh              # Nexus v2 Command Center (Super+X)
-│   ├── nexus-chat.sh         # AI chat session launcher
-│   ├── guide.sh              # Guide v3 — bilingual reference (EN/ID)
-│   ├── theme-switch.sh       # Dynamic Catppuccin flavor hot-swapper
-│   ├── config-rollback.sh    # Time Machine config restoration GUI
-│   ├── dotfiles-sync.sh      # Cloud Git sync for ~/.config
-│   ├── ai-tuner.sh           # Local AI system telemetry analysis
-│   ├── ai-power-fix.sh       # GPU power state fix for AI inference
-│   ├── app-store.sh          # Curated GUI App Store (Pacman/AUR)
-│   ├── health-check.sh       # Post-update system integrity validator
-│   └── post-install.sh       # First-boot post-install wizard
-├── modules/
-│   ├── 00-common.sh          # Shared functions & helpers
-│   ├── 01-base.sh            # GPU auto-detect, paru, makepkg
-│   ├── 02-kernel.sh          # sysctl, NVMe, THP, Zram
-│   ├── 03-security.sh        # UFW, SSH key, DNS, auto-cleanup
-│   ├── 04-dev.sh             # Docker, Node, Python, Rust, Go
-│   ├── 05-mobile.sh          # Flutter, Android SDK, Kotlin
-│   ├── 06-dotfiles.sh        # Kitty, Fish, Starship, fzf
-│   ├── 07-editors.sh         # Antigravity, Neovim, Ollama
-│   ├── 08-desktop.sh         # KDE Catppuccin, GRUB theme
-│   ├── 09-hyprland.sh        # WM config, keybinds, lock screen
-│   ├── 10-apps.sh            # Browser, tmux, Bluetooth, Native Apps
-│   ├── 11-gaming.sh          # Steam, PCSX2, PrismLauncher, MangoHud
-│   ├── 12-vm.sh              # QEMU/KVM, Bottles, LibreOffice
-│   ├── 13-waybar.sh          # Status bar config + CSS
-│   ├── 14-nexus-guide.sh     # Installs Nexus + Guide
-│   └── 15-ecosystem.sh       # Installs Living Ecosystem Utilities
+├── ecosystem/                # (Deprecated: Replaced by cmd/nexus)
+├── modules/                  # (Deprecated: Replaced by internal/modules)
+├── cmd/
+│   └── nexus/                # Root package for the CLI
+├── internal/
+│   ├── cmd/                  # CLI Commands (install, theme, apps, doctor)
+│   ├── modules/              # 100% Go-native installation modules
+│   │   ├── apps.go           # Browser, Terminals, Gaming, VM UI
+│   │   ├── base.go           # Hardware layout, pacman hooks
+│   │   ├── desktop.go        # Hyprland UI, Waybar & Catppuccin
+│   │   ├── dev.go            # LLM tools, Git, TS, Go, Python
+│   │   ├── extra.go          # Custom virtualization and Mobile SDKs
+│   │   └── system.go         # Security/UFW, Firewall, Snapper Configs
+│   ├── pacman/               # Go wrapper for Arch Linux Package Management
+│   └── state/                # Rollback mechanism and BTRFS JSON tracker
 ├── .github/                  # Community Health & CI Workflows
 │   ├── CODE_OF_CONDUCT.md
 │   ├── CONTRIBUTING.md
@@ -211,71 +186,39 @@ CachyOS-Workstation-Setup/
 ```mermaid
 flowchart TB
     subgraph Entry["Entry Points"]
-        CURL["curl \| bash<br/>install.sh"] --> SETUP
-        MANUAL["git clone + ./setup.sh"] --> SETUP
-        SETUP["setup.sh"] --> GUI["installer.sh<br/>GUI Module Selector (zenity)"]
+        SETUP["./nexus install"] --> TUI["TUI Installer (Go/Huh)"]
     end
 
-    subgraph Modules["15 Independent Modules"]
+    subgraph Go["Internal Go Packages"]
         direction LR
-        M00["00-common.sh<br/>Shared Helpers"] -.-> M01 & M06 & M09
-        M01["01-05<br/>Base · Kernel · Security<br/>Dev Tools · Mobile"]
-        M06["06-08<br/>Dotfiles · Editors<br/>Desktop"]
-        M09["09-13<br/>Hyprland · Apps<br/>Gaming · VM · Waybar"]
-        M14["14-15<br/>Nexus+Guide · Ecosystem"]
+        PAC["internal/pacman"] -.-> MOD["internal/modules"]
+        STATE["internal/state<br/>BTRFS Tracker"] -.-> MOD
     end
 
-    GUI --> Modules
+    TUI --> Go
 
-    subgraph Ecosystem["Living Ecosystem — /usr/local/bin/"]
-        direction LR
-        TS["🎨 theme-switch"]
-        CR["🛡️ config-rollback"]
-        DS["☁️ dotfiles-sync"]
-        AT["🧠 ai-tuner"]
-        AS["🏪 app-store"]
-        HC["🩺 health-check"]
-        WP["🖼️ waypaper"]
-        NC["💬 nexus-chat"]
-        PI["🧙 post-install"]
+    subgraph Runtime["Runtime Ecosystem (`nexus`)"]
+        NEXUS["nexus command<br/>Global Access"]
+        NEXUS --> COMMANDS["apps, chat, doctor, sync, theme"]
     end
 
-    M14 --> Ecosystem
-
-    subgraph Runtime["Runtime Layer"]
-        NEXUS["Nexus v2<br/>Super+X Command Center"] --> Ecosystem
-        GUIDE["Guide v3<br/>130+ bilingual entries"]
-        HOOK["Pacman Hook<br/>Auto health-check"]
-    end
-
-    M14 --> NEXUS & GUIDE
-    HC --> HOOK
+    Go --> Runtime
 
     style Entry fill:#1e1e2e,stroke:#89b4fa,color:#cdd6f4
-    style Modules fill:#1e1e2e,stroke:#a6e3a1,color:#cdd6f4
-    style Ecosystem fill:#1e1e2e,stroke:#cba6f7,color:#cdd6f4
-    style Runtime fill:#1e1e2e,stroke:#f9e2af,color:#cdd6f4
+    style Go fill:#1e1e2e,stroke:#a6e3a1,color:#cdd6f4
+    style Runtime fill:#1e1e2e,stroke:#cba6f7,color:#cdd6f4
 ```
 
-### Module Details
+### Module Porting Details
 
-| # | Module | Size | Key Tools |
-|---|--------|------|-----------|
-| 01 | Base & GPU | ~2 GB | GPU auto-detect (Intel/AMD/NVIDIA), Secure Boot MOK, paru, base-devel |
-| 02 | Kernel | ~0 MB | sysctl tuning, NVMe optimization, THP, GuC/HuC |
-| 03 | Security | ~50 MB | UFW, SSH key (ed25519), Cloudflare DNS, Zram, Timeshift |
-| 04 | Dev Tools | ~4 GB | Docker, Node/fnm/pnpm, Python/uv, Rust, Go, lazygit, CLI power tools |
-| 05 | Mobile | ~5 GB | Flutter, Android SDK (API 34), Kotlin, JDK 17, scrcpy |
-| 06 | Dotfiles | ~100 MB | Kitty, Fish shell, Starship prompt, fzf |
-| 07 | Editors | ~700 MB | [Antigravity](https://antigravity.google/blog) (Google's AI-powered VS Code fork), Neovim (lazy.nvim) |
-| 08 | Desktop | ~300 MB | KDE Catppuccin theme, GRUB theme, Inter + Nerd Fonts |
-| 09 | Hyprland | ~200 MB | Tiling WM, keybinds, Rofi, Hyprlock, Hypridle |
-| 10 | Apps | ~500 MB | Zen Browser, tmux, Spotify/Telegram/Discord (Native Arch/AUR packages) |
-| 11 | Gaming | ~3 GB | Steam (Proton), PCSX2 (GPU-aware config), PrismLauncher, Roblox, MangoHud |
-| 12 | VM | ~2 GB | QEMU/KVM via qemu-desktop (hugepages, CPU pinning), Bottles, LibreOffice |
-| 13 | Waybar | ~5 MB | Glassmorphism status bar with gradient CSS |
-| 14 | Nexus + Guide | ~1 MB | Smart command center + 130+ entry bilingual guide |
-| 15 | Ecosystem | ~1 MB | Theme Engine, Config Rollback, Dotfiles Sync, AI Tuner, App Store, Health Check, Waypaper, AI Chat, Post-Install |
+| Go Module | Translates Original Bash Scripts | Key Features |
+|---|--------|------|
+| `base.go` | `00-common.sh`, `01-base.sh` | GPU auto-detect (Intel/AMD/NVIDIA), Secure Boot MOK, Pacman Wrapper |
+| `system.go` | `02-kernel.sh`, `03-security.sh` | UFW, Cloudflare DNS, sysctl tuning, NVMe optimization, THP |
+| `dev.go` | `04-dev.sh`, `07-editors.sh` | Docker, Node/fnm, Python/uv, Rust, Go, Antigravity, Neovim (lazy.nvim) |
+| `desktop.go` | `06-dots`, `08-desk`, `09-hypr`, `13-waybar` | Tiling WM, Rofi, Waybar CSS, KDE Catppuccin, Fish, Starship, Kitty |
+| `apps.go` | `10-apps.sh`, `11-gaming.sh` | Zen Browser, Steam, PCsX2, MangoHud, Telegram, Spotify, KDE Connect |
+| `extra.go` | `05-mobile.sh`, `12-vm.sh` | QEMU/KVM (hugepages, pinning), Bottles, Flutter, Android SDK (API 34) |
 
 ---
 

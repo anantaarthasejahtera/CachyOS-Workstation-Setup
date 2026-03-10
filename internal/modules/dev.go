@@ -29,7 +29,7 @@ func setupDocker() {
 	fmt.Println("-> Installing Docker Ecosystem...")
 	pacman.Install("docker", "docker-compose", "docker-buildx", "lazydocker")
 	exec.Command("sudo", "systemctl", "enable", "--now", "docker.service").Run()
-	
+
 	user := os.Getenv("USER")
 	exec.Command("sudo", "usermod", "-aG", "docker", user).Run()
 }
@@ -40,18 +40,18 @@ func setupGit() {
 	pacman.Install("git-delta", "github-cli", "lazygit")
 
 	configs := map[string]string{
-		"init.defaultBranch": "main",
-		"core.pager": "delta",
+		"init.defaultBranch":     "main",
+		"core.pager":             "delta",
 		"interactive.diffFilter": "delta --color-only",
-		"delta.navigate": "true",
-		"delta.side-by-side": "true",
-		"delta.line-numbers": "true",
-		"delta.syntax-theme": "Catppuccin Mocha",
-		"merge.conflictstyle": "diff3",
-		"diff.colorMoved": "default",
-		"pull.rebase": "true",
-		"push.autoSetupRemote": "true",
-		"rerere.enabled": "true",
+		"delta.navigate":         "true",
+		"delta.side-by-side":     "true",
+		"delta.line-numbers":     "true",
+		"delta.syntax-theme":     "Catppuccin Mocha",
+		"merge.conflictstyle":    "diff3",
+		"diff.colorMoved":        "default",
+		"pull.rebase":            "true",
+		"push.autoSetupRemote":   "true",
+		"rerere.enabled":         "true",
 	}
 
 	for k, v := range configs {

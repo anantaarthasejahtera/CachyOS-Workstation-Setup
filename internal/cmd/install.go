@@ -31,7 +31,7 @@ var installCmd = &cobra.Command{
 func runNonInteractiveInstall() {
 	fmt.Println("Executing non-interactive full installation...")
 	state.CreateBTRFSSnapperSnapshot("Pre-Nexus Full Install")
-	
+
 	modules.InstallBaseSystem()
 	modules.InstallSystemAndSecurity()
 	modules.InstallDevAndEditors()
@@ -39,7 +39,7 @@ func runNonInteractiveInstall() {
 	modules.InstallAppsAndGaming()
 	modules.InstallMobile()
 	modules.InstallVM()
-	
+
 	fmt.Println("\n🎉 All massive porting modules installed successfully!")
 }
 
@@ -93,7 +93,7 @@ func runInteractiveTUI() {
 			modules.InstallVM()
 		}
 	}
-	
+
 	fmt.Println("\n🎉 Installation completed successfully!")
 }
 

@@ -11,10 +11,10 @@ curl -fsSL https://raw.githubusercontent.com/anantaarthasejahtera/CachyOS-Workst
 ```
 
 This will:
-1. Install base dependencies (like `git` and `zenity`).
+1. Install base dependencies (like `git` and `go`).
 2. Clone the repository into `~/.cache/cachy-workstation-setup`.
-3. Prompt you for your Git identity (Name & Email).
-4. Launch the **Bilingual GUI Installer** (zenity-based).
+3. Compile the `nexus` Go binary.
+4. Launch the **Bilingual TUI Installer** (`nexus install`).
 
 ### 🔧 Manual Install
 
@@ -25,12 +25,11 @@ If you prefer to inspect the repository beforehand:
 git clone https://github.com/anantaarthasejahtera/CachyOS-Workstation-Setup.git
 cd CachyOS-Workstation-Setup
 
-# (Optional) Edit your Git identity inside setup.sh
-nano setup.sh
+# Compile the Go binary 
+./build.sh
 
-# Run the interactive module selector
-chmod +x setup.sh
-./setup.sh
+# Run the interactive TUI module selector
+./nexus install
 ```
 
 ### 🛑 Uninstallation

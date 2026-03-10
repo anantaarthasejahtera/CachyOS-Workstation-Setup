@@ -48,7 +48,7 @@ func installGPUDrivers() {
 	if strings.Contains(gpu, "nvidia") {
 		fmt.Println("-> Installing NVIDIA drivers...")
 		pacman.Install("nvidia-dkms", "nvidia-utils", "lib32-nvidia-utils", "nvidia-settings", "vulkan-icd-loader", "lib32-vulkan-icd-loader", "mesa", "lib32-mesa", "libva-nvidia-driver")
-		
+
 		fmt.Println("-> Enabling DRM KMS for NVIDIA...")
 		exec.Command("sudo", "sed", "-i", `s/^MODULES=(/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm /`, "/etc/mkinitcpio.conf").Run()
 		exec.Command("sudo", "mkinitcpio", "-P").Run()

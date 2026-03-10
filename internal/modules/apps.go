@@ -24,10 +24,10 @@ func InstallAppsAndGaming() error {
 func setupApps() {
 	fmt.Println("-> Installing Core Apps (Browser, Tools)...")
 	pacman.Remove("auto-cpufreq") // Deprecated
-	
+
 	pacman.Install("zen-browser-bin")
 	pacman.Install("tmux", "direnv")
-	
+
 	// Bluetooth
 	pacman.Install("bluez", "bluez-utils", "blueman")
 	exec.Command("sudo", "systemctl", "enable", "--now", "bluetooth.service").Run()
@@ -35,22 +35,22 @@ func setupApps() {
 	// Comm & Productivity
 	pacman.Install("telegram-desktop", "discord", "spotify-launcher")
 	pacman.Install("libreoffice-fresh", "kdeconnect", "keepassxc", "obs-studio", "wf-recorder")
-	
+
 	if !pacman.IsInstalled("obsidian") && !pacman.IsInstalled("obsidian-bin") {
 		pacman.Install("obsidian-bin")
 	}
 
 	fmt.Println("-> Configuring Tmux and XDG Defaults...")
 	home := os.Getenv("HOME")
-	
+
 	// XDG Defaults
 	os.MkdirAll(filepath.Join(home, ".config"), 0755)
-	
+
 	browserDesktop := "zen-browser.desktop"
 	if !pacman.IsInstalled("zen-browser-bin") && !pacman.IsInstalled("zen-browser") {
 		browserDesktop = "firefox.desktop"
 	}
-	
+
 	mimeList := fmt.Sprintf(`[Default Applications]
 x-scheme-handler/http=%s
 x-scheme-handler/https=%s
@@ -63,7 +63,7 @@ x-scheme-handler/terminal=kitty.desktop
 text/plain=nvim.desktop
 application/x-shellscript=nvim.desktop
 `, browserDesktop, browserDesktop, browserDesktop, browserDesktop, browserDesktop, browserDesktop)
-	
+
 	os.WriteFile(filepath.Join(home, ".config/mimeapps.list"), []byte(mimeList), 0644)
 	exec.Command("xdg-settings", "set", "default-web-browser", browserDesktop).Run()
 
@@ -79,7 +79,7 @@ application/x-shellscript=nvim.desktop
 func setupGaming() {
 	fmt.Println("-> Installing Gaming Suite...")
 	pacman.Install("steam", "mangohud", "lib32-mangohud", "wine-staging", "winetricks", "prismlauncher")
-	
+
 	if !pacman.IsInstalled("pcsx2") && !pacman.IsInstalled("pcsx2-latest-bin") {
 		pacman.Install("pcsx2-latest-bin")
 	}
@@ -87,7 +87,7 @@ func setupGaming() {
 	home := os.Getenv("HOME")
 	os.MkdirAll(filepath.Join(home, ".config/MangoHud"), 0755)
 	os.WriteFile(filepath.Join(home, ".config/MangoHud/MangoHud.conf"), []byte(strings.TrimSpace(mangoConfig)+"\n"), 0644)
-	
+
 	fmt.Println("   Steam, Wine, Minecraft, and PS2 emulator installed.")
 }
 

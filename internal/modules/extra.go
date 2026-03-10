@@ -30,7 +30,7 @@ func InstallMobile() error {
 	}
 
 	exec.Command("yes", "|", filepath.Join(androidHome, "cmdline-tools/latest/bin/sdkmanager"), "--licenses").Run()
-	
+
 	pacman.Install("scrcpy", "android-udev")
 	exec.Command("sudo", "usermod", "-aG", "adbusers", os.Getenv("USER")).Run()
 
@@ -41,7 +41,7 @@ func InstallMobile() error {
 // InstallVM implements 12-vm.sh
 func InstallVM() error {
 	fmt.Println("🌟 [Module 12: VM] Installing Virtualization (QEMU/KVM) & Bottles...")
-	
+
 	pacman.Remove("qemu-full") // Deprecated
 	pacman.Install("qemu-desktop", "virt-manager", "libvirt", "edk2-ovmf", "dnsmasq", "iptables-nft", "swtpm", "spice-vdagent", "vde2", "bottles")
 
