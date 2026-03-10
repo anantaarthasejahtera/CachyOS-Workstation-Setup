@@ -1042,12 +1042,83 @@ Left-click: 100% Brightness",
 `
 
 const waybarStyle = `
-* { font-family: "Inter", "JetBrainsMono Nerd Font", sans-serif; font-size: 13px; }
-window#waybar { background: rgba(30,30,46,0.85); border-bottom: 2px solid rgba(203,166,247,0.4); color: #cdd6f4; }
-#workspaces button { color: #6c7086; }
-#workspaces button.active { background: linear-gradient(135deg, #cba6f7, #89b4fa); color: #1e1e2e; }
-#clock, #custom-media, #battery, #network, #pulseaudio { padding: 0 12px; background: rgba(49,50,68,0.6); }
-#clock { color: #cba6f7; }
+/* — Waybar — Catppuccin Mocha Glass — */
+/* Uses locally installed Inter & JetBrainsMono Nerd Font (no internet needed) */
+
+* {
+    font-family: "Inter", "JetBrainsMono Nerd Font", sans-serif;
+    font-size: 13px;
+    min-height: 0;
+}
+
+window#waybar {
+    background: rgba(30, 30, 46, 0.85);
+    border-bottom: 2px solid rgba(203, 166, 247, 0.4);
+    color: #cdd6f4;
+}
+
+#workspaces button {
+    padding: 0 8px;
+    color: #6c7086;
+    border-radius: 8px;
+    margin: 3px 2px;
+    transition: all 0.2s ease;
+}
+
+#workspaces button.active {
+    background: linear-gradient(135deg, #cba6f7, #89b4fa);
+    color: #1e1e2e;
+    font-weight: 600;
+    box-shadow: 0 0 12px rgba(203, 166, 247, 0.4);
+}
+
+#workspaces button:hover {
+    background: rgba(203, 166, 247, 0.2);
+    color: #cdd6f4;
+}
+
+#clock, #custom-media, #battery, #network, #pulseaudio, #backlight, #bluetooth, #tray, #custom-power, #custom-wallpaper {
+    padding: 0 12px;
+    margin: 4px 2px;
+    border-radius: 8px;
+    background: rgba(49, 50, 68, 0.6);
+    transition: all 0.2s ease;
+}
+
+#clock {
+    font-weight: 600;
+    color: #cba6f7;
+}
+
+#battery {
+    color: #a6e3a1;
+}
+
+#battery.charging { color: #f9e2af; }
+#battery.warning:not(.charging) { color: #fab387; }
+#battery.critical:not(.charging) { color: #f38ba8; }
+
+#network { color: #89dceb; }
+#pulseaudio { color: #f5c2e7; }
+#backlight { color: #f9e2af; }
+#bluetooth { color: #89b4fa; }
+
+#custom-power {
+    color: #f38ba8;
+    font-size: 15px;
+    padding: 0 10px;
+}
+
+#custom-power:hover {
+    background: rgba(243, 139, 168, 0.2);
+}
+
+tooltip {
+    background: rgba(30, 30, 46, 0.95);
+    border: 1px solid #cba6f7;
+    border-radius: 10px;
+    color: #cdd6f4;
+}
 `
 
 const waybarMediaConf = `#!/usr/bin/env bash
