@@ -6,19 +6,35 @@
 
 <hr>
 
-## [v1.6.0] - The Ecosystem Engine (2026-03-10)
+## [v1.6.0] - The Deep Codebase Audit (2026-03-10)
 
-This release brings the ecosystem into a fully declarative state, introducing massive architectural upgrades for package management, wallpaper configurations, and documentation pipelines.
-
-### ✨ New Features
-- **Declarative Package System**: Transitioned to a unified `run_modules()` architecture, dynamically installing and validating dependencies.
-- **System Defaults Automation**: Standardizes shell (fish), terminal (Alacritty), editor (nvim/cursor), and browser (Brave) implicitly across the OS.
-- **3-Tier Wallpaper Engine**: Now pulls from curated, high-star Catppuccin Mocha repositories. Ensures a robust fallback system (no more black screens on first boot).
-- **VitePress ESM Support**: Migrated `docs/package.json` to `"type": "module"` for native modern web standards.
+Comprehensive codebase remediation ensuring zero shell violations, zero duplicate packages, and zero reliance on intermediary dependency managers when native variants exist.
 
 ### 🔴 Critical Fixes
-- **ShellCheck CI Purity**: Resolved all outstanding ShellCheck warnings, guaranteeing pipeline integrity.
-- **Docs Base URL**: Corrected VitePress base URL routing for flawless GitHub Pages styling.
+- **Shell Policy (Fish Enforcement)**: Eradicated Zsh, Oh My Zsh, and `.zshrc` writing across all modules. Exclusively using Fish shell with `config.fish`, fast aliases (`eza`, `bat`), and maintaining the unified Starship prompt.
+- **Strict Anti-Flatpak Policy**: Eliminated all Flatpak usage from Mod 10 (Apps) and Mod 11 (Gaming). Using `telegram-desktop`, `discord` from official repos, and `spotify-launcher`, `obsidian-bin`, `pcsx2-latest-bin` from AUR.
+- **Dependency Duplication**: Removed redundant `pavucontrol`, `blueman`, `alacritty`, and `btop` installs across `09-hyprland.sh` and `13-waybar.sh`.
+
+### 🟡 Bug Fixes & Refactors
+- **Rofi Theme Ownership**: Centralized all Rofi configurations (`config.rasi`, `media.rasi`, etc.) exclusively into `13-waybar.sh` to prevent overlapping edits.
+- **Mobile Environment**: `05-mobile.sh` correctly exports Android PATH to `config.fish` instead of the legacy Zsh configuration.
+- **Documentation**: README, Setup Scripts, and Guide Interactive fully translated to recognize the new default Fish environment and Native Package standard.
+
+---
+
+## [v1.6.0] - The Deep Codebase Audit (2026-03-10)
+
+Comprehensive codebase remediation ensuring zero shell violations, zero duplicate packages, and zero reliance on intermediary dependency managers when native variants exist.
+
+### 🔴 Critical Fixes
+- **Shell Policy (Fish Enforcement)**: Eradicated Zsh, Oh My Zsh, and `.zshrc` writing across all modules. Exclusively using Fish shell with `config.fish`, fast aliases (`eza`, `bat`), and maintaining the unified Starship prompt.
+- **Strict Anti-Flatpak Policy**: Eliminated all Flatpak usage from Mod 10 (Apps) and Mod 11 (Gaming). Using `telegram-desktop`, `discord` from official repos, and `spotify-launcher`, `obsidian-bin`, `pcsx2-latest-bin` from AUR.
+- **Dependency Duplication**: Removed redundant `pavucontrol`, `blueman`, `alacritty`, and `btop` installs across `09-hyprland.sh` and `13-waybar.sh`.
+
+### 🟡 Bug Fixes & Refactors
+- **Rofi Theme Ownership**: Centralized all Rofi configurations (`config.rasi`, `media.rasi`, etc.) exclusively into `13-waybar.sh` to prevent overlapping edits.
+- **Mobile Environment**: `05-mobile.sh` correctly exports Android PATH to `config.fish` instead of the legacy Zsh configuration.
+- **Documentation**: README, Setup Scripts, and Guide Interactive fully translated to recognize the new default Fish environment and Native Package standard.
 
 ---
 

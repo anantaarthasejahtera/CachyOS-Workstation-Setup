@@ -59,10 +59,9 @@ install_pkg prismlauncher
 ok "PrismLauncher installed (open & login with Mojang/Microsoft account)"
 
 # --- PCSX2 (PS2 Emulator) ---
-log "Installing PCSX2 (PS2 emulator) via Flatpak..."
-# Arch removed PCSX2 from repos, flatpak is the official recommended way now
-flatpak install -y flathub net.pcsx2.PCSX2 || warn "Failed to install PCSX2 flatpak"
-# NOTE: Flatpak PCSX2 uses ~/.var/app/net.pcsx2.PCSX2/config/PCSX2/ — configure via the app GUI
+log "Installing PCSX2 (PS2 emulator) via AUR..."
+install_aur pcsx2-latest-bin 2>/dev/null || \
+    warn "PCSX2 AUR install failed — download AppImage from https://pcsx2.net/downloads"
 ok "PCSX2 installed (configure graphics settings via the app)"
 
 log "Gaming setup summary:"

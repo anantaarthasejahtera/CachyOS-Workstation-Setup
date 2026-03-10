@@ -213,8 +213,8 @@ log "  Windows ISO: bash $VM_POOL/download-windows-iso.sh"
 
 # --- Bottles (run Windows apps WITHOUT a VM) ---
 log "Installing Bottles (Windows app runner)..."
-flatpak install --user -y flathub com.usebottles.bottles 2>/dev/null || \
-    install_aur bottles 2>/dev/null || true
+install_aur bottles 2>/dev/null || \
+    warn "Bottles AUR install failed — install manually from https://usebottles.com"
 ok "Bottles installed (run MS Office 2016, small Windows apps)"
 
 # NOTE: LibreOffice, KDE Connect, Obsidian, KeePassXC, OBS moved to module 10

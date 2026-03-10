@@ -55,7 +55,7 @@ Terminals are fast, but hunting down the correct package suffix for an obscure i
 The App Store provides a heavily curated, 3-tier Rofi menu.
 1. The user selects a category (e.g., "Design Tools").
 2. The user sees a list (e.g., "Figma-Linux", "GIMP", "Krita").
-3. Once selected, a floating terminal executes the requisite `pacman`, `paru`, or `flatpak` command depending on where the ideal package actually lives.
+3. Once selected, a floating terminal executes the requisite `pacman` or `paru` command depending on where the ideal package actually lives.
 
 *(Note: Users can add their own software into the app store safely by editing `~/.config/app-store-custom.conf`).*
 

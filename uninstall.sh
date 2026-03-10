@@ -68,7 +68,7 @@ fi
     # 1. Ecosystem Tools
     if echo "$selections" | grep -qw "ecosystem"; then
         echo "# [1/$total] Removing Ecosystem Tools & Executables..."
-        ECO_TOOLS=("guide" "nexus" "theme-switch" "config-rollback" "dotfiles-sync" "ai-tuner" "app-store" "health-check" "post-install-wizard" "wallpaper-picker" "nexus-chat" "ai-power-fix")
+        ECO_TOOLS=("guide" "nexus" "theme-switch" "config-rollback" "dotfiles-sync" "ai-tuner" "app-store" "health-check" "post-install-wizard" "nexus-chat" "ai-power-fix")
         for tool in "${ECO_TOOLS[@]}"; do
             if [ -f "/usr/local/bin/$tool" ]; then
                 sudo rm -f "/usr/local/bin/$tool"

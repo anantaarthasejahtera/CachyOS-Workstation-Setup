@@ -97,11 +97,12 @@ if command -v ollama &>/dev/null; then
             mkdir -p "$HOME/.config/cachy-setup"
             echo "$default_model" > "$HOME/.config/cachy-setup/default-model"
             
-            # Add convenience alias to .zshrc if not present
-            if ! grep -q "alias ai=" "$HOME/.zshrc" 2>/dev/null; then
-                echo "" >> "$HOME/.zshrc"
-                echo "# Default AI model (set by post-install wizard)" >> "$HOME/.zshrc"
-                echo "alias ai='ollama run $default_model'" >> "$HOME/.zshrc"
+            # Add convenience alias to config.fish if not present
+            FISH_CONFIG="$HOME/.config/fish/config.fish"
+            if [ -f "$FISH_CONFIG" ] && ! grep -q "alias ai=" "$FISH_CONFIG" 2>/dev/null; then
+                echo "" >> "$FISH_CONFIG"
+                echo "# Default AI model (set by post-install wizard)" >> "$FISH_CONFIG"
+                echo "alias ai='ollama run $default_model'" >> "$FISH_CONFIG"
             fi
         fi
     fi

@@ -7,28 +7,9 @@ skip_if_current
 # =====================================================================
 header "Shell & Terminal Aesthetic"
 
-# --- Zsh + Oh My Zsh ---
-install_pkg zsh
-
-if [ ! -d "$HOME/.oh-my-zsh" ]; then
-    log "Installing Oh My Zsh..."
-    RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-fi
-
-# Plugins
-ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
-
-[ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ] && \
-    git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
-
-[ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ] && \
-    git clone https://github.com/zsh-users/zsh-syntax-highlighting "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
-
-[ ! -d "$ZSH_CUSTOM/plugins/zsh-completions" ] && \
-    git clone https://github.com/zsh-users/zsh-completions "$ZSH_CUSTOM/plugins/zsh-completions"
-
-[ ! -d "$ZSH_CUSTOM/plugins/fzf-tab" ] && \
-    git clone https://github.com/Aloxaf/fzf-tab "$ZSH_CUSTOM/plugins/fzf-tab"
+# --- Fish Shell ---
+log "Installing Fish shell..."
+install_pkg fish
 
 # --- Starship Prompt ---
 log "Installing Starship prompt..."
@@ -277,62 +258,73 @@ crust = "#11111b"
 STAREOF
 ok "Starship config written"
 
-# --- Zshrc ---
-log "Writing .zshrc..."
-safe_config "$HOME/.zshrc"
-cat > "$HOME/.zshrc" << 'ZSHEOF'
-# — CachyOS Zsh Config — Aesthetic + Productive —
-export ZSH="$HOME/.oh-my-zsh"
+# --- Fish config ---
+log "Writing Fish config..."
+mkdir -p "$HOME/.config/fish"
+safe_config "$HOME/.config/fish/config.fish"
+cat > "$HOME/.config/fish/config.fish" << 'FISHEOF'
+# — CachyOS Fish Config — Aesthetic + Productive —
 
-# Plugins
-plugins=(
-    git
-    docker
-    docker-compose
-    zsh-autosuggestions
-    zsh-syntax-highlighting
-    zsh-completions
-    fzf-tab
-    sudo
-    command-not-found
-    colored-man-pages
-)
-
-source $ZSH/oh-my-zsh.sh
+# Suppress Fish greeting
+set -g fish_greeting ""
 
 # — Starship Prompt —
-eval "$(starship init zsh)"
+if command -v starship &>/dev/null
+    starship init fish | source
+end
 
 # — Tool Initialization (only if installed) —
-command -v fnm &>/dev/null && eval "$(fnm env --use-on-cd)"
-command -v zoxide &>/dev/null && eval "$(zoxide init zsh)"
-command -v direnv &>/dev/null && eval "$(direnv hook zsh)"
+if command -v fnm &>/dev/null
+    fnm env --use-on-cd --shell fish | source
+end
+if command -v zoxide &>/dev/null
+    zoxide init fish | source
+end
+if command -v direnv &>/dev/null
+    direnv hook fish | source
+end
 
 # Cargo/Rust
-[ -f "$HOME/.cargo/env" ] && source "$HOME/.cargo/env"
+if test -f "$HOME/.cargo/env.fish"
+    source "$HOME/.cargo/env.fish"
+else if test -d "$HOME/.cargo/bin"
+    fish_add_path "$HOME/.cargo/bin"
+end
 
-# uv (Python)
-export PATH="$HOME/.local/bin:$PATH"
+# uv (Python) + local bin
+fish_add_path "$HOME/.local/bin"
 
 # Go
-export GOPATH="$HOME/go"
-export PATH="$GOPATH/bin:$PATH"
+set -gx GOPATH "$HOME/go"
+fish_add_path "$GOPATH/bin"
 
 # Antigravity
-export PATH="$HOME/.local/share/antigravity/bin:$PATH"
+fish_add_path "$HOME/.local/share/antigravity/bin"
 
 # Flutter & Android SDK
-export ANDROID_HOME="$HOME/Android/Sdk"
-export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
-export PATH="$HOME/.flutter-sdk/bin:$PATH"
-export JAVA_HOME="/usr/lib/jvm/java-17-openjdk"
-export CHROME_EXECUTABLE="$(which zen-browser 2>/dev/null || which firefox 2>/dev/null || echo '')"
+set -gx ANDROID_HOME "$HOME/Android/Sdk"
+fish_add_path "$ANDROID_HOME/cmdline-tools/latest/bin"
+fish_add_path "$ANDROID_HOME/platform-tools"
+fish_add_path "$ANDROID_HOME/emulator"
+fish_add_path "$HOME/.flutter-sdk/bin"
+set -gx JAVA_HOME "/usr/lib/jvm/java-17-openjdk"
+
+# Chrome executable for Flutter
+if command -v zen-browser &>/dev/null
+    set -gx CHROME_EXECUTABLE (command -v zen-browser)
+else if command -v firefox &>/dev/null
+    set -gx CHROME_EXECUTABLE (command -v firefox)
+end
 
 # ── System defaults (enforced by setup) ───────────────────
-export EDITOR="nvim"
-export VISUAL="nvim"
-export TERMINAL="kitty"
-export BROWSER="$(which zen-browser 2>/dev/null || which firefox 2>/dev/null || echo 'firefox')"
+set -gx EDITOR "nvim"
+set -gx VISUAL "nvim"
+set -gx TERMINAL "kitty"
+if command -v zen-browser &>/dev/null
+    set -gx BROWSER (command -v zen-browser)
+else
+    set -gx BROWSER "firefox"
+end
 
 # — Modern Aliases —
 alias ls='eza --icons --group-directories-first'
@@ -364,16 +356,15 @@ alias gpl='git pull'
 alias lg='lazygit'
 
 # System aliases
-alias update='echo "🔄 Checking for updates..."; sudo pacman -Sy && echo "" && echo "📦 Packages to update:" && pacman -Qu 2>/dev/null | head -20; echo ""; read -p "Proceed with full update? [y/N] " ans && [[ "$ans" =~ ^[Yy] ]] && sudo pacman -Su && flatpak update -y 2>/dev/null && rustup update 2>/dev/null && echo "✅ System updated" || echo "— Update cancelled"'
-alias cleanup='sudo pacman -Sc --noconfirm && pacman -Qdtq | xargs -r sudo pacman -Rns --noconfirm 2>/dev/null; echo "— Cleanup done"'
 alias ff='fastfetch'
-alias keys='cat ~/.config/hypr/cheatsheet.txt 2>/dev/null || echo "Hyprland cheatsheet not found"'
+alias keys='cat ~/.config/hypr/cheatsheet.txt 2>/dev/null; or echo "Hyprland cheatsheet not found"'
 alias ports='ss -tulnp'
-alias myip='curl -s ifconfig.me && echo ""'
+alias myip='curl -s ifconfig.me; and echo ""'
 alias weather='curl -s wttr.in/?format=3'
-alias record='wf-recorder -f ~/Videos/recording-$(date +%Y%m%d-%H%M%S).mp4'
-alias clip='wf-recorder -g "$(slurp)" -f ~/Videos/clip-$(date +%Y%m%d-%H%M%S).mp4'
-alias screenshot='grim ~/Pictures/Screenshots/$(date +%Y%m%d-%H%M%S).png'
+alias record='wf-recorder -f ~/Videos/recording-(date +%Y%m%d-%H%M%S).mp4'
+alias clip='wf-recorder -g (slurp) -f ~/Videos/clip-(date +%Y%m%d-%H%M%S).mp4'
+alias screenshot='grim ~/Pictures/Screenshots/(date +%Y%m%d-%H%M%S).png'
+alias cleanup='sudo pacman -Sc --noconfirm; and pacman -Qdtq | xargs -r sudo pacman -Rns --noconfirm 2>/dev/null; echo "— Cleanup done"'
 
 # Docker aliases
 alias dc='docker compose'
@@ -390,24 +381,26 @@ alias tl='tmux list-sessions'
 alias tk='tmux kill-session -t'
 
 # — FZF Config —
-export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
-export FZF_DEFAULT_OPTS=" \
+set -gx FZF_DEFAULT_COMMAND 'fd --type f --hidden --follow --exclude .git'
+set -gx FZF_DEFAULT_OPTS "\
   --color=bg+:#313244,bg:#1e1e2e,spinner:#f5e0dc,hl:#f38ba8 \
   --color=fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc \
   --color=marker:#f5e0dc,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8 \
   --border rounded --margin 1 --padding 1"
 
 # — Greeting (safe: won't break shell if fastfetch fails) —
-if command -v fastfetch &>/dev/null; then fastfetch 2>/dev/null; fi
-ZSHEOF
-ok ".zshrc written"
+if command -v fastfetch &>/dev/null
+    fastfetch 2>/dev/null
+end
+FISHEOF
+ok "Fish config.fish written"
 
-# --- Set zsh as default shell ---
-log "Setting zsh as default shell..."
-if [ "$SHELL" != "$(which zsh)" ]; then
-    # Ensure zsh is in /etc/shells before changing
-    grep -q "$(which zsh)" /etc/shells 2>/dev/null || which zsh | sudo tee -a /etc/shells
-    chsh -s "$(which zsh)"
+# --- Set Fish as default shell ---
+log "Setting Fish as default shell..."
+if [ "$SHELL" != "$(which fish)" ]; then
+    # Ensure fish is in /etc/shells before changing
+    grep -q "$(which fish)" /etc/shells 2>/dev/null || which fish | sudo tee -a /etc/shells
+    chsh -s "$(which fish)"
 fi
 
 # --- bat theme ---

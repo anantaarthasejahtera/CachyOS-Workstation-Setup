@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #  Aesthetic GUI App Store
-#  Curated Flatpak & AUR installer via Rofi
+#  Curated Pacman & AUR installer via Rofi
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 set -euo pipefail
@@ -14,7 +14,7 @@ set -euo pipefail
 
 declare -A BROWSERS=(
     ["Google Chrome"]="google-chrome|aur"
-    ["Brave Browser"]="com.brave.Browser|flatpak"
+    ["Brave Browser"]="brave-bin|aur"
     ["Firefox"]="firefox|pacman"
     ["Microsoft Edge"]="microsoft-edge-stable-bin|aur"
 )
@@ -28,19 +28,19 @@ declare -A DEV_TOOLS=(
 )
 
 declare -A GAMING=(
-    ["Heroic Games Launcher"]="com.heroicgameslauncher.hgl|flatpak"
+    ["Heroic Games Launcher"]="heroic-games-launcher-bin|aur"
     ["Lutris"]="lutris|pacman"
-    ["Discord"]="com.discordapp.Discord|flatpak"
+    ["Discord"]="discord|pacman"
     ["OBS Studio"]="obs-studio|pacman"
-    ["RetroArch"]="org.libretro.RetroArch|flatpak"
+    ["RetroArch"]="retroarch|pacman"
 )
 
 declare -A MEDIA=(
-    ["Spotify"]="com.spotify.Client|flatpak"
+    ["Spotify"]="spotify-launcher|aur"
     ["Figma (Linux)"]="figma-linux-bin|aur"
     ["GIMP"]="gimp|pacman"
     ["VLC Media Player"]="vlc|pacman"
-    ["Krita"]="org.kde.krita|flatpak"
+    ["Krita"]="krita|pacman"
 )
 
 declare -A UTILS=(
@@ -113,9 +113,6 @@ case "$manager" in
         ;;
     "aur")
         cmd="paru -S --noconfirm $pkg_name"
-        ;;
-    "flatpak")
-        cmd="flatpak install -y flathub $pkg_name"
         ;;
 esac
 

@@ -9,7 +9,7 @@ Activated instantly with **`Super+X`**, it replaces traditional application menu
 Unlike standard launchers (like `rofi -show drun` which we map to `Super+D`), the Nexus Command Center is broken down into specific operational categories:
 
 * **Header Stats**: Live readouts of Battery %, RAM consumption, and Free Disk Space.
-* **System Actions**: 1-click updates (`pacman` + `flatpak`), cache cleanups.
+* **System Actions**: 1-click updates (`pacman`), cache cleanups.
 * **Smart Recording**: Auto-detects if `wf-recorder` is running to replace the "Record" option with a red "Stop Recording" button.
 * **AI & DevOps**: Direct shortcuts to local Ollama inference models (`qwen3` and `deepseek`), Docker manager, and VM manager.
 * **Living Ecosystem**: Launch points for the App Store, Theme Switcher, Health Check, Dotfiles Sync, and Time Machine config rollback.
