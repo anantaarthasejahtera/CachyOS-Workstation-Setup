@@ -27,7 +27,7 @@ func setupTerminalAndShell() {
 	fmt.Println("-> Installing Terminal & Shell...")
 	pacman.Install("fish", "starship", "kitty")
 	pacman.Install("ttf-jetbrains-mono-nerd", "ttf-firacode-nerd", "ttf-nerd-fonts-symbols-common")
-	pacman.Install("ttf-inter")
+	pacman.Install("inter-font")
 
 	home := os.Getenv("HOME")
 	os.MkdirAll(filepath.Join(home, "projects"), 0755)
@@ -57,9 +57,9 @@ func setupDesktopAesthetic() {
 	fmt.Println("-> Installing Desktop Aesthetics (Catppuccin)...")
 	pacman.Install("papirus-icon-theme", "kvantum", "fastfetch", "cmatrix")
 	pacman.Install(
-		"catppuccin-kde-theme-mocha", "papirus-folders-catppuccin",
+		"catppuccin-kde-theme-mocha", "papirus-folders-catppuccin-git",
 		"catppuccin-cursors-mocha", "kvantum-theme-catppuccin-mocha",
-		"catppuccin-gtk-theme-mocha", "sddm-theme-catppuccin-mocha",
+		"catppuccin-gtk-theme-git", "sddm-theme-catppuccin-git",
 	)
 
 	// Wallpapers

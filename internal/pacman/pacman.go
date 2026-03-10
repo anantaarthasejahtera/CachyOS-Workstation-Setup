@@ -33,9 +33,20 @@ func Install(packages ...string) error {
 	return cmd.Run()
 }
 
-// Remove runs yay -Rns --noconfirm
+// Remove runs yay -Rns --noconfirm only for installed packages
 func Remove(packages ...string) error {
-	args := append([]string{"-Rns", "--noconfirm"}, packages...)
+	var toRemove []string
+	for _, pkg := range packages {
+		if IsInstalled(pkg) {
+			toRemove = append(toRemove, pkg)
+		}
+	}
+
+	if len(toRemove) == 0 {
+		return nil // Nothing to remove
+	}
+
+	args := append([]string{"-Rns", "--noconfirm"}, toRemove...)
 	cmd := exec.Command("yay", args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
