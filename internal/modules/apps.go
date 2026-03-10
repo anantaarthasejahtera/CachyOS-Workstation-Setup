@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/internal/pacman"
+	"github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/internal/state"
 )
 
 // InstallAppsAndGaming implements 10-apps.sh and 11-gaming.sh logic.
@@ -64,7 +65,7 @@ text/plain=nvim.desktop
 application/x-shellscript=nvim.desktop
 `, browserDesktop, browserDesktop, browserDesktop, browserDesktop, browserDesktop, browserDesktop)
 
-	os.WriteFile(filepath.Join(home, ".config/mimeapps.list"), []byte(mimeList), 0644)
+	state.SafeWriteConfig(filepath.Join(home, ".config/mimeapps.list"), []byte(mimeList), 0644)
 	exec.Command("xdg-settings", "set", "default-web-browser", browserDesktop).Run()
 
 	// Tmux
@@ -73,7 +74,7 @@ application/x-shellscript=nvim.desktop
 		exec.Command("git", "clone", "https://github.com/tmux-plugins/tpm", tpmDir).Run()
 	}
 	os.MkdirAll(filepath.Join(home, ".config/tmux"), 0755)
-	os.WriteFile(filepath.Join(home, ".config/tmux/tmux.conf"), []byte(strings.TrimSpace(tmuxConf)+"\n"), 0644)
+	state.SafeWriteConfig(filepath.Join(home, ".config/tmux/tmux.conf"), []byte(strings.TrimSpace(tmuxConf)+"\n"), 0644)
 }
 
 func setupGaming() {
@@ -86,7 +87,7 @@ func setupGaming() {
 
 	home := os.Getenv("HOME")
 	os.MkdirAll(filepath.Join(home, ".config/MangoHud"), 0755)
-	os.WriteFile(filepath.Join(home, ".config/MangoHud/MangoHud.conf"), []byte(strings.TrimSpace(mangoConfig)+"\n"), 0644)
+	state.SafeWriteConfig(filepath.Join(home, ".config/MangoHud/MangoHud.conf"), []byte(strings.TrimSpace(mangoConfig)+"\n"), 0644)
 
 	fmt.Println("   Steam, Wine, Minecraft, and PS2 emulator installed.")
 }

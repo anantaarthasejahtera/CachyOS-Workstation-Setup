@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/internal/pacman"
+	"github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/internal/state"
 )
 
 // InstallDevAndEditors implements 04-dev.sh and 07-editors.sh logic.
@@ -116,7 +117,7 @@ func setupEditors() {
     "window.titleBarStyle": "custom",
     "files.autoSave": "afterDelay"
 }`
-	os.WriteFile(filepath.Join(vscodeDir, "settings.json"), []byte(vscSettings), 0644)
+	state.SafeWriteConfig(filepath.Join(vscodeDir, "settings.json"), []byte(vscSettings), 0644)
 
 	// Neovim & Lazy.nvim Catppuccin Setup
 	fmt.Println("-> Configuring Neovim...")
@@ -151,7 +152,7 @@ require("lazy").setup({
     { "nvim-telescope/telescope.nvim", dependencies = { "nvim-lua/plenary.nvim" } },
     { "nvim-treesitter/nvim-treesitter", build = ":TSUpdate" },
 })`
-	os.WriteFile(filepath.Join(nvimDir, "init.lua"), []byte(nvimInit), 0644)
+	state.SafeWriteConfig(filepath.Join(nvimDir, "init.lua"), []byte(nvimInit), 0644)
 }
 
 func setupOllama() {

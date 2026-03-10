@@ -6,6 +6,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
+	"time"
 )
 
 type Config struct {
@@ -64,4 +66,31 @@ func CreateBTRFSSnapperSnapshot(description string) {
 	cmd := exec.Command("sudo", "snapper", "create", "-d", fmt.Sprintf("Nexus: %s", description))
 	// Run asynchronously or just don't handle error explicitly to avoid blocking
 	_ = cmd.Run()
+}
+
+// SafeWriteConfig implements the legacy safe_config bash macro.
+// It checks if a file exists, and if so, backs it up to ~/.config-backup/YYYYMMDD-HHMMSS/ before overwriting.
+func SafeWriteConfig(targetPath string, content []byte, perm os.FileMode) error {
+	home := os.Getenv("HOME")
+	if _, err := os.Stat(targetPath); err == nil {
+		// File exists, back it up.
+		now := time.Now().Format("20060102-150405")
+		backupDir := filepath.Join(home, ".config-backup", now)
+		os.MkdirAll(backupDir, 0755)
+
+		// Create a flattened relative path name like __home__USER__.config__hypr__hyprland.conf
+		flatName := strings.ReplaceAll(strings.TrimPrefix(targetPath, "/"), "/", "__")
+		backupPath := filepath.Join(backupDir, flatName)
+
+		// Read old content
+		oldData, err := os.ReadFile(targetPath)
+		if err == nil {
+			os.WriteFile(backupPath, oldData, perm)
+		}
+	}
+
+	// Make sure the target directory exists
+	os.MkdirAll(filepath.Dir(targetPath), 0755)
+
+	return os.WriteFile(targetPath, content, perm)
 }

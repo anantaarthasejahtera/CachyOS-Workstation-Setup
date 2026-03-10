@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/internal/pacman"
+	"github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/internal/state"
 )
 
 // InstallDesktopAndDotfiles implements 06-dotfiles, 08-desktop, 09-hyprland, 13-waybar.
@@ -130,7 +131,7 @@ func setupHyprlandAndWaybar() {
 }
 
 func writeConfig(path string, content string) {
-	os.WriteFile(path, []byte(strings.TrimSpace(content)+"\n"), 0644)
+	state.SafeWriteConfig(path, []byte(strings.TrimSpace(content)+"\n"), 0644)
 }
 
 // -------------------------------------------------------------------------
