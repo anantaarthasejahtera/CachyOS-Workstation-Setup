@@ -6,6 +6,22 @@
 
 <hr>
 
+## [v1.6.0] - The Ecosystem Engine (2026-03-10)
+
+This release brings the ecosystem into a fully declarative state, introducing massive architectural upgrades for package management, wallpaper configurations, and documentation pipelines.
+
+### ✨ New Features
+- **Declarative Package System**: Transitioned to a unified `run_modules()` architecture, dynamically installing and validating dependencies.
+- **System Defaults Automation**: Standardizes shell (fish), terminal (Alacritty), editor (nvim/cursor), and browser (Brave) implicitly across the OS.
+- **3-Tier Wallpaper Engine**: Now pulls from curated, high-star Catppuccin Mocha repositories. Ensures a robust fallback system (no more black screens on first boot).
+- **VitePress ESM Support**: Migrated `docs/package.json` to `"type": "module"` for native modern web standards.
+
+### 🔴 Critical Fixes
+- **ShellCheck CI Purity**: Resolved all outstanding ShellCheck warnings, guaranteeing pipeline integrity.
+- **Docs Base URL**: Corrected VitePress base URL routing for flawless GitHub Pages styling.
+
+---
+
 ## [v1.5.1] - The Final Polish (2026-03-08)
 
 Minor bugfixes and code quality enforcement following the v1.5.0 milestone.
