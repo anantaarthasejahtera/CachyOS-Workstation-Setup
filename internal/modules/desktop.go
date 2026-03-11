@@ -872,8 +872,7 @@ element-text { background-color: inherit; text-color: inherit; }
 `
 
 const rofiWifiConf = `#!/usr/bin/env bash
-# Managed by Nexus - Basic stub for UI
-nmcli device wifi list
+nexus wifi
 `
 
 const dunstConf = `
@@ -1137,8 +1136,7 @@ tooltip {
 `
 
 const waybarMediaConf = `#!/usr/bin/env bash
-# Managed by Nexus - Basic stub
-playerctl status
+rofi -show media -modi "media:nexus rofi-media" -theme ~/.config/rofi/media.rasi
 `
 
 const waypaperConf = `[Settings]
