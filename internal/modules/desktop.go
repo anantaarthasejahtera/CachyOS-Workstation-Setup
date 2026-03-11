@@ -404,11 +404,12 @@ const hyprlandConf = `
 monitor=,preferred,auto,1
 
 # Autostart
+# Ultra-Lightweight: Switched swww-daemon to hyprpaper (~15MB RAM vs 100MB+)
+exec-once = hyprpaper
 exec-once = waybar
 exec-once = dunst
-exec-once = swww-daemon
+# Ultra-Lightweight: Image clipboard hoarding is disabled to prevent huge memory leaks
 exec-once = wl-paste --type text --watch cliphist store
-exec-once = wl-paste --type image --watch cliphist store
 exec-once = /usr/lib/polkit-kde-authentication-agent-1
 exec-once = hypridle
 exec-once = post-install-wizard
@@ -489,9 +490,6 @@ render {
     direct_scanout = true
 }
 
-cursor {
-    no_hardware_cursors = true
-}
 
 # ═══════════════════════════════════════════════════════════════════════
 # Window Rules — Hyprland v0.54.1 (breaking change from v0.52 and below)
