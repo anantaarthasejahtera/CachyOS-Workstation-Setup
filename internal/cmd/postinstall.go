@@ -15,7 +15,7 @@ var (
 			Padding(1, 2).
 			Border(lipgloss.RoundedBorder()).
 			BorderForeground(lipgloss.Color("#cba6f7")). // Mocha Mauve/Accent
-			Foreground(lipgloss.Color("#cdd6f4"))      // Mocha Text
+			Foreground(lipgloss.Color("#cdd6f4"))        // Mocha Text
 
 	w_headingStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#cba6f7")).Bold(true)
 	w_infoStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("#89b4fa"))
@@ -29,7 +29,7 @@ var postInstallCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		header := w_headingStyle.Render("🚀 Nexus Post-Install Wizard") + "\n" +
 			lipgloss.NewStyle().Foreground(lipgloss.Color("#6c7086")).Render("Welcome to your CachyOS Workstation")
-		
+
 		fmt.Println(wizardStyle.Render(header))
 		fmt.Println()
 
@@ -62,9 +62,9 @@ var postInstallCmd = &cobra.Command{
 			BorderForeground(lipgloss.Color("#a6e3a1")).
 			Render(
 				w_successStyle.Render("🎉 All set! Welcome to your new Ecosystem.") + "\n" +
-				"Remember: Press " + w_headingStyle.Render("Super + X") + " to open the Nexus Command Center at any time.",
+					"Remember: Press " + w_headingStyle.Render("Super + X") + " to open the Nexus Command Center at any time.",
 			)
-			
+
 		fmt.Println("\n" + finishBox)
 
 		fmt.Println("\nPress Enter to exit...")

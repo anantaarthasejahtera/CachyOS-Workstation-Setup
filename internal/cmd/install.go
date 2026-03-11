@@ -43,7 +43,7 @@ func runNonInteractiveInstall() {
 	modules.InstallVM()
 
 	fmt.Println("\n🎉 All massive porting modules installed successfully!")
-	
+
 	// Automatically trigger post-install wizard for repo cloud syncing
 	runPostInstallWizard()
 }

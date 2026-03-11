@@ -6,8 +6,8 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/spf13/cobra"
 	"github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/internal/menu"
+	"github.com/spf13/cobra"
 )
 
 var networkCmd = &cobra.Command{
@@ -26,16 +26,16 @@ var networkCmd = &cobra.Command{
 
 		rofiCmd := exec.Command("rofi", "-dmenu", "-i", "-p", " Network", "-mesg", mesg, "-theme-str", themeConfig)
 		rofiCmd.Stdin = strings.NewReader(strings.Join(entries, "\n"))
-		
+
 		var out bytes.Buffer
 		rofiCmd.Stdout = &out
-		
+
 		if err := rofiCmd.Run(); err != nil {
 			return nil // User pressed ESC
 		}
 
 		chosen := strings.TrimSpace(out.String())
-		
+
 		switch {
 		case strings.Contains(chosen, "Wi-Fi Scanner"):
 			exec.Command(os.Args[0], "wifi").Start()

@@ -6,18 +6,18 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/spf13/cobra"
 	"github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/internal/menu"
+	"github.com/spf13/cobra"
 )
 
 var wifiCmd = &cobra.Command{
-	Use:   "wifi",
-	Short: "Native Rofi Wi-Fi Scanner",
+	Use:    "wifi",
+	Short:  "Native Rofi Wi-Fi Scanner",
 	Hidden: true, // Hide from standard CLI help
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// Ensure WiFi is soft unblocked
 		exec.Command("nmcli", "radio", "wifi", "on").Run()
-		
+
 		// Rescan
 		exec.Command("nmcli", "device", "wifi", "rescan").Run()
 
@@ -48,7 +48,7 @@ var wifiCmd = &cobra.Command{
 				if inUse == "*" {
 					icon = "󰤪 (Connected) "
 				}
-				
+
 				lock := ""
 				if sec != "" && sec != "--" {
 					lock = " "
@@ -62,7 +62,7 @@ var wifiCmd = &cobra.Command{
 
 		themeConfig := menu.GetRofiTheme()
 		mesg := "📡 Pick a Wi-Fi Network"
-		
+
 		rofiCmd := exec.Command("rofi", "-dmenu", "-i", "-p", " Wi-Fi", "-mesg", mesg, "-theme-str", themeConfig)
 		rofiCmd.Stdin = strings.NewReader(strings.Join(displayEntries, "\n"))
 		var outBuf bytes.Buffer
@@ -89,7 +89,7 @@ var wifiCmd = &cobra.Command{
 		if selectedIndex == -1 {
 			return nil
 		}
-		
+
 		targetSsid := rawSsids[selectedIndex]
 
 		// Ask for password
@@ -97,13 +97,13 @@ var wifiCmd = &cobra.Command{
 		passCmd := exec.Command("rofi", "-dmenu", "-password", "-p", " Pass", "-mesg", passMesg, "-theme-str", themeConfig)
 		var passBuf bytes.Buffer
 		passCmd.Stdout = &passBuf
-		
+
 		if err := passCmd.Run(); err != nil {
 			return nil // canceled
 		}
-		
+
 		password := strings.TrimSpace(passBuf.String())
-		
+
 		exec.Command("notify-send", "📡 Connecting...", fmt.Sprintf("Attempting to connect to %s", targetSsid)).Start()
 
 		connectCmd := exec.Command("nmcli", "device", "wifi", "connect", targetSsid, "password", password)

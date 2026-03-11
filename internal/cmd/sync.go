@@ -19,7 +19,7 @@ var (
 			Padding(1, 2).
 			Border(lipgloss.RoundedBorder()).
 			BorderForeground(lipgloss.Color("#cba6f7")). // Mocha Mauve/Accent
-			Foreground(lipgloss.Color("#cdd6f4"))      // Mocha Text
+			Foreground(lipgloss.Color("#cdd6f4"))        // Mocha Text
 
 	successStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#a6e3a1")).Bold(true) // Mocha Green
 	errorStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("#f38ba8")).Bold(true) // Mocha Red
@@ -38,7 +38,7 @@ var syncCmd = &cobra.Command{
 			Bold(true).
 			Foreground(lipgloss.Color("#cba6f7")).
 			Render("☁️  Dotfiles Cloud Sync")
-		
+
 		fmt.Println(syncStyle.Render(header))
 		fmt.Println()
 
@@ -75,7 +75,7 @@ var syncCmd = &cobra.Command{
 		remoteOut, _ := exec.Command("git", "-C", configDir, "remote", "-v").Output()
 		if len(remoteOut) == 0 {
 			var remoteUrl string
-			
+
 			form := huh.NewForm(
 				huh.NewGroup(
 					huh.NewInput().

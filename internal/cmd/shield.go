@@ -30,7 +30,7 @@ var shieldCmd = &cobra.Command{
 			fmt.Println("Adblock is currently: [DISABLED]")
 			fmt.Println("\n-> Backing up original /etc/hosts...")
 			exec.Command("sudo", "cp", "/etc/hosts", "/etc/hosts.bak").Run()
-			
+
 			fmt.Println("-> Fetching StevenBlack Unified Hosts (Adware + Malware lists)...")
 			err := exec.Command("sudo", "curl", "-#L", "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts", "-o", "/etc/hosts").Run()
 			if err != nil {

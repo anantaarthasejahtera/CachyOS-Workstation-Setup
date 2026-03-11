@@ -7,13 +7,13 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/spf13/cobra"
 	"github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/internal/menu"
+	"github.com/spf13/cobra"
 )
 
 var dnsCmd = &cobra.Command{
-	Use:   "dns",
-	Short: "Switch DNS Providers",
+	Use:    "dns",
+	Short:  "Switch DNS Providers",
 	Hidden: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		entries := []string{
@@ -27,10 +27,10 @@ var dnsCmd = &cobra.Command{
 
 		rofiCmd := exec.Command("rofi", "-dmenu", "-i", "-p", " DNS", "-mesg", mesg, "-theme-str", themeConfig)
 		rofiCmd.Stdin = strings.NewReader(strings.Join(entries, "\n"))
-		
+
 		var out bytes.Buffer
 		rofiCmd.Stdout = &out
-		
+
 		if err := rofiCmd.Run(); err != nil {
 			return nil
 		}
