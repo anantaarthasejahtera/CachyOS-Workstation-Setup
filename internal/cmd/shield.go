@@ -13,7 +13,7 @@ var shieldCmd = &cobra.Command{
 	Short: "Toggle OS-level Network Adblock & Malware Shield",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		fmt.Println("🛡️  Nexus OS-Level Shield Manager")
-		fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+		fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 
 		// Check if adblock is active (presence of backup file implies stevenblack is active)
 		isActive := false

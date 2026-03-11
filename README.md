@@ -232,6 +232,7 @@ The project has evolved into a "Living Ecosystem" with 9 integrated pillars, com
 
 ### 1. 🎨 Dynamic Theming Engine (`theme-switch`)
 Ditch hardcoded palettes. Seamlessly swap between Catppuccin flavors (Mocha, Macchiato, Frappe, Latte), Dracula, Tokyo Night, and Rosé Pine.
+- Features a **Live Preview Bubbletea Engine**: interactively preview Hyprland border colors in real-time via TUI before saving.
 - Automatically hot-reloads Hyprland window borders, Rofi UI, Waybar CSS, Kitty terminals, and Dunst notifications **instantly**.
 
 ### 2. 🛡️ Time Machine (`config-rollback`)
@@ -261,9 +262,9 @@ Post-update system integrity validator.
 - Also available via **Nexus** → System Health Check, or terminal: `health-check`.
 
 ### 7. 🖼️ Wallpaper Picker (`waypaper`)
-Visual wallpaper selection.
-- Browse and apply wallpapers via the Waypaper GUI.
-- Integrated with Hyprpaper for persistence across reboots.
+Visual wallpaper selection automatically configured out of the box.
+- The installer automatically fetches premium Catppuccin wallpapers from the Orangci GitHub repo directly into `~/Pictures/Wallpapers/orangci`.
+- Browse and apply wallpapers via the Waypaper GUI, deeply integrated with Nexus.
 
 ### 8. 💬 Nexus AI Chat (`nexus-chat`)
 Interactive local AI chat.
@@ -272,8 +273,9 @@ Interactive local AI chat.
 - Auto-starts Ollama service if needed, manages CPU power governor.
 
 ### 9. 🧙 Post-Install Wizard (`post-install`)
-First-boot onboarding.
-- Syncs dotfiles, sets wallpaper, verifies ecosystem tools are working.
+First-boot onboarding via terminal UI.
+- Built with Charmbracelet `huh` and `lipgloss` for a beautiful, responsive Catppuccin interface.
+- Syncs dotfiles directly via simple URL input, sets wallpaper, verifies ecosystem tools are working.
 - Runs automatically after first install, or invoke manually: `post-install`.
 
 ---
