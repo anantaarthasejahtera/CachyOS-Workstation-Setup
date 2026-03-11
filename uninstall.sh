@@ -25,9 +25,9 @@ zenity --question \
 
 This wizard will remove:
 
-  <b>1.</b> Ecosystem scripts from /usr/local/bin/
+  <b>1.</b> Ecosystem scripts from /usr/local/bin/ (V1 & V2)
   <b>2.</b> Nexus Command Center and Guide
-  <b>3.</b> Rofi custom themes and app store configs
+  <b>3.</b> GUI enhancements (Rofi themes, Waypaper, Oragnci Wallpapers)
   <b>4.</b> System Health Check Pacman Hooks
   <b>5.</b> Internal state tracking (~/.config/cachy-setup)
 
@@ -48,7 +48,7 @@ selections=$(zenity --list --checklist \
     --separator=" " --print-column=2 \
     TRUE "ecosystem"  "Ecosystem Tools"        "/usr/local/bin/ scripts" \
     TRUE "hooks"      "Pacman Hooks"           "99-cachy-health.hook" \
-    TRUE "rofi"       "Rofi UI Themes"         "Custom Rofi configs" \
+    TRUE "rofi"       "UI & Customizations"    "Rofi themes, Waypaper configs" \
     TRUE "state"      "State Tracking"         "\$HOME/.config/cachy-setup/" \
     TRUE "keybinds"   "Hyprland Keybinds"      "Nexus & Guide bindings" \
     2>/dev/null) || exit 0
@@ -73,6 +73,9 @@ fi
             if [ -f "/usr/local/bin/$tool" ]; then
                 sudo rm -f "/usr/local/bin/$tool"
             fi
+            if [ -f "$HOME/.local/bin/$tool" ]; then
+                rm -f "$HOME/.local/bin/$tool"
+            fi
         done
     fi
     done=$((done + 1))
@@ -86,11 +89,13 @@ fi
     done=$((done + 1))
     echo $(( done * 100 / total ))
 
-    # 3. Rofi UI
+    # 3. UI & Desktop Customizations
     if echo "$selections" | grep -qw "rofi"; then
-        echo "# [3/$total] Cleaning up Rofi UI Themes..."
+        echo "# [3/$total] Cleaning up UI Themes & Customizations..."
         rm -rf "$HOME/.config/rofi/cachy-setup" 2>/dev/null || true
         rm -f "$HOME/.config/app-store-custom.conf" 2>/dev/null || true
+        rm -rf "$HOME/.config/waypaper" 2>/dev/null || true
+        rm -rf "$HOME/Pictures/Wallpapers/orangci" 2>/dev/null || true
     fi
     done=$((done + 1))
     echo $(( done * 100 / total ))
