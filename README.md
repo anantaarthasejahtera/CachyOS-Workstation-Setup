@@ -109,15 +109,21 @@ curl -fsSL https://raw.githubusercontent.com/anantaarthasejahtera/CachyOS-Workst
 git clone https://github.com/anantaarthasejahtera/CachyOS-Workstation-Setup.git
 cd CachyOS-Workstation-Setup
 
-# Build the Go Binary
-./build.sh
-
-# Run the Interactive Installer
-./nexus install
-
-# Or install everything automatically
-./nexus install --all
+# Execute the local installation script (fetches binary automatically)
+bash install.sh
 ```
+
+### 🔨 Build from Source
+
+If you prefer to compile from source rather than utilizing the pre-built `nexus` binary:
+
+```bash
+cd CachyOS-Workstation-Setup
+./build.sh
+sudo cp ./nexus /usr/local/bin/nexus
+nexus install
+```
+
 
 ### TUI Module Selector
 
