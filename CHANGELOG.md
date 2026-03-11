@@ -6,6 +6,20 @@
 
 <hr>
 
+## [v2.0.0] - The Go-Native Architecture (2026-03-11)
+
+The most monumental update to the ecosystem. Completely rewrites the legacy 16 bash scripts into a single, high-performance Go binary (`nexus`). Introduces premium, aesthetic, and automated TUI/GUI workflows powered by Charmbracelet and Rofi.
+
+### ✨ Major Features
+- **Go-Native Binary**: Replaced all `ecosystem/` and `modules/` bash scripts with a single `/usr/local/bin/nexus` CLI tool.
+- **Rofi 2-Column Dashboard**: Transformed the Rofi interface into a wide, premium control center with customized typography and borders.
+- **Live Theme Switcher**: `nexus theme` now utilizes a Bubbletea TUI engine, allowing real-time preview of Hyprland border colors before applying.
+- **Network Cockpit**: Converted `nmcli` and bash stubs to natively trigger `nexus network` inside Rofi for beautiful Wi-Fi scanning.
+- **Waypaper Automation**: Automatically pulls Catppuccin wallpapers from the `orangci` repo and sets up the Waypaper configuration during desktop installation.
+- **Interactive Post-Install Wizard**: Enhanced the first-boot experience with Charmbracelet's `huh` and `lipgloss` to render beautiful, Catppuccin-themed forms for GitHub repo synchronization.
+
+---
+
 ## [v1.6.0] - The Deep Codebase Audit (2026-03-10)
 
 Comprehensive codebase remediation ensuring zero shell violations, zero duplicate packages, and zero reliance on intermediary dependency managers when native variants exist.

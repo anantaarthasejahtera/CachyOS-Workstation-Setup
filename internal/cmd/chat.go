@@ -1,0 +1,41 @@
+package cmd
+
+import (
+	"fmt"
+	"os"
+	"os/exec"
+
+	"github.com/spf13/cobra"
+)
+
+var chatCmd = &cobra.Command{
+	Use:   "chat",
+	Short: "AI-powered workstation assistant",
+	Long:  `Launch the Nexus AI chat to get help, diagnose issues, or run automations using local Ollama streams.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("=====================================================")
+		fmt.Println(" 🤖 Nexus AI Assistant (Powered by qwen2.5-coder:7b) ")
+		fmt.Println("=====================================================")
+		fmt.Println(" Type /bye to exit. Conversation history is retained.")
+		fmt.Println("")
+
+		// Connect directly to local Ollama REPL
+		ollamaCmd := exec.Command("ollama", "run", "qwen2.5-coder:7b")
+		ollamaCmd.Stdin = os.Stdin
+		ollamaCmd.Stdout = os.Stdout
+		ollamaCmd.Stderr = os.Stderr
+
+		err := ollamaCmd.Run()
+		if err != nil {
+			msg := "❌ Failed to connect to local AI. Ensure 'ollama' is running and the model is installed."
+			fmt.Println(msg)
+			exec.Command("rofi", "-e", msg).Start()
+		}
+
+		fmt.Println("\nNexus AI session ended.")
+	},
+}
+
+func init() {
+	rootCmd.AddCommand(chatCmd)
+}

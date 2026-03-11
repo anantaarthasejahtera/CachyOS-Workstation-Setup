@@ -7,7 +7,7 @@ No system is perfectly unbreakable, but the CachyOS Workstation provides the too
 Did you edit your `waybar/style.css` and now the bar won't load? Did you add an invalid hook to `hyprland.conf` and now you're staring at a black screen?
 
 **Solution: Use Time Machine**
-1. Press `SUPER + X` to open the Nexus.
+1. Press `SUPER + X` to open the Nexus, or run `nexus sync` from the terminal.
 2. Select the `Time Machine (Config Rollback)` option.
 3. The system will display all recent changes by date and time in a Rofi menu.
 4. Select the snapshot from *before* you broke the config.
@@ -46,7 +46,7 @@ If `qwen3:30b` is generating text very slowly:
 
 ## FAQ
 
-**Q: Can I use this script on Ubuntu or Fedora?**
+**Q: Can I use this Go binary on Ubuntu or Fedora?**
 A: No. This relies heavily on `pacman`, `paru`, the AUR, and CachyOS's custom kernel repos.
 
 **Q: Does the Dynamic Themer support my custom Kitty config?**

@@ -1,6 +1,6 @@
 # 🏗️ Architecture & Philosophy
 
-The CachyOS Workstation Setup isn't just a string of unorganized bash commands. It is engineered with software design patterns normally reserved for immutable operating systems and Configuration Management tools (like Ansible or Chef).
+The CachyOS Workstation Setup isn't just a string of unorganized bash commands. It is engineered with robust Go modules and design patterns normally reserved for immutable operating systems and Configuration Management tools (like Ansible or Chef).
 
 ## The Core Philosophy
 
@@ -8,14 +8,14 @@ The CachyOS Workstation Setup isn't just a string of unorganized bash commands. 
 2. **Modularity**: Users must have the right to veto any tool. Monolithic installation scripts assume too much about the developer.
 3. **Observability**: A rolling-release Linux distribution naturally introduces entropy. Mechanisms must exist to constantly audit the health of the system.
 
-## The `00-common.sh` Library
+## The `internal/modules` Go Library
 
-If you inspect `/modules/00-common.sh`, you will find the architectural DNA of the project.
+If you inspect `internal/modules/`, you will find the architectural DNA of the project.
 
-### The `safe_config` Macro
-Rather than blindly `cp`ing files into `~/.config`, our scripts use `safe_config`.
-```bash
-safe_config "$HOME/.config/waybar/style.css"
+### The `state.json` Macro
+Rather than blindly `cp`ing files into `~/.config`, our modules use the state tracker.
+```go
+state.CreateBTRFSSnapperSnapshot("Pre-Nexus Install")
 ```
 Behind the scenes, this creates a rigorous, timestamped snapshot of the target file (`~/.config-backup/YYYYMMDD-HHMMSS-06-dotfiles/waybar__style.css`) before any overwrite occurs. Each backup directory is tagged with the calling module name to prevent collisions when multiple modules run in quick succession.
 This is what enables the **Config Rollback (Time Machine)** UI via Rofi to map file dependencies globally across your setup.
@@ -26,7 +26,7 @@ This prevents the UI from trying to run large modular downloads over and over.
 
 ## The Pacman Hook Architecture
 
-One of our flagship enterprise features is bridging `/etc/pacman.d/hooks` with our user-space Bash scripts.
+One of our flagship enterprise features is bridging `/etc/pacman.d/hooks` with our user-space Go binaries.
 
 Arch Linux provides extreme bleeding-edge kernel updates. Sometimes, an NVIDIA DKMS module or a Hyprland `wlroots` update can cause black screens on reboot.
 By injecting `99-cachy-health.hook`, we intercept the completion of `pacman -Syu`. 

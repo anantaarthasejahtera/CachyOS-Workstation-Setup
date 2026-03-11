@@ -16,11 +16,11 @@ Unlike standard launchers (like `rofi -show drun` which we map to `Super+D`), th
 
 ## Customization
 
-The Nexus script is deployed to `/usr/local/bin/nexus` by Module 14 (`modules/14-nexus-guide.sh`). The source lives in `ecosystem/nexus.sh`.
+The Nexus binary is compiled natively and orchestrated entirely in Go. The source lives in `internal/cmd/*.go`.
 
-To add your own custom actions, edit `ecosystem/nexus.sh` in the cloned repository and re-run Module 14, or run:
+To add your own custom actions, edit the `internal/cmd` package in the cloned repository and recompile:
 
 ```bash
-# Re-deploy just the Nexus and Guide
-bash modules/14-nexus-guide.sh
+# Re-compile Nexus
+./build.sh
 ```

@@ -20,6 +20,18 @@ jobs:
       - name: Install Zip
         run: sudo apt-get install -y zip
 
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+          check-latest: true
+          
+      - name: Build Nexus Binary
+        run: |
+          echo "Building Nexus for Linux amd64..."
+          GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o nexus ./cmd/nexus/...
+          tar -czvf nexus-linux-amd64.tar.gz nexus
+
       - name: Package Source Code
         run: |
           echo "Packaging source code..."
@@ -53,7 +65,9 @@ jobs:
       - name: Generate Release
         uses: softprops/action-gh-release@v2
         with:
-          files: cachyos-workstation.zip
+          files: |
+            cachyos-workstation.zip
+            nexus-linux-amd64.tar.gz
           fail_on_unmatched_files: true
           body_path: release_body.txt
           generate_release_notes: true

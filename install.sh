@@ -222,15 +222,40 @@ fi
 
 # ── Launch Wizard ──
 echo -e "${MAGENTA}  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
-echo -e "${BOLD}  Launching Setup Wizard...${RESET}"
+echo -e "${BOLD}  Fetching Nexus Binary & Booting Wizard...${RESET}"
 echo -e "${MAGENTA}  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
 echo ""
-echo -e "  ${CYAN}Tip:${RESET} Follow the wizard popups — check modules, click ${BOLD}Next${RESET}"
-echo -e "  ${CYAN}Tip:${RESET} All changes are backed up automatically"
-echo ""
 
+cd "$INSTALL_DIR"
+
+# 1. Try to fetch the latest pre-built binary
+echo -e "${BLUE}  ⚙️  Fetching latest pre-built Nexus binary...${RESET}"
+LATEST_RELEASE_URL=$(curl -sL https://api.github.com/repos/anantaarthasejahtera/CachyOS-Workstation-Setup/releases/latest | grep "browser_download_url.*nexus-linux-amd64.tar.gz" | cut -d '"' -f 4 | head -n 1)
+
+if [ -n "$LATEST_RELEASE_URL" ]; then
+    echo -e "${GREEN}  ✓ Found pre-built binary. Downloading...${RESET}"
+    curl -#L "$LATEST_RELEASE_URL" -o nexus.tar.gz
+    tar -xzf nexus.tar.gz nexus
+    rm nexus.tar.gz
+else
+    # Fallback to local build if no releases found yet or offline
+    echo -e "${YELLOW}  ⚠ Pre-built binary not found. Falling back to local compilation...${RESET}"
+    if ! command -v go &>/dev/null; then
+        echo -e "${BLUE}  ⚙️  Installing Go compiler...${RESET}"
+        sudo pacman -S --noconfirm --needed go
+    fi
+    echo -e "${BLUE}  ⚙️  Compiling Nexus v2...${RESET}"
+    bash build.sh
+fi
+
+echo -e "${BLUE}  ⚙️  Installing Nexus globally...${RESET}"
+sudo cp ./nexus /usr/local/bin/nexus
+sudo chmod +x /usr/local/bin/nexus
+
+echo -e "${GREEN}  ✓ Nexus deployed successfully. Booting wizard...${RESET}"
 sleep 1
 
-chmod +x setup.sh installer.sh
-bash setup.sh
+# Launch the new Go-native installer
+nexus install
+
 
