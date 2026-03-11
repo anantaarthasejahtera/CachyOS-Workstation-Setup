@@ -412,8 +412,8 @@ func min(a, b int) int {
 func GetRofiTheme() string {
 	return fmt.Sprintf(`
 * {
-	font: "JetBrainsMono Nerd Font 11";
-	bg: %s;
+	font: "Inter 12";
+	bg: %sF2; /* Semi-transparent background */
 	bg-alt: %s;
 	bg-surface: %s;
 	fg: %s;
@@ -422,76 +422,98 @@ func GetRofiTheme() string {
 	green: %s;
 	blue: %s;
 }
+
 window {
-	width: 460px;
+	width: 900px;
 	border: 2px;
 	border-color: %s;
-	border-radius: 16px;
+	border-radius: 24px;
 	background-color: %s;
 	transparency: "real";
 	location: center;
+	padding: 10px;
 }
+
 mainbox {
 	background-color: transparent;
-	spacing: 0;
+	spacing: 15px;
 }
+
 inputbar {
 	background-color: %s;
-	border-radius: 12px;
-	padding: 10px 16px;
-	margin: 12px 12px 4px 12px;
+	border-radius: 14px;
+	padding: 12px 20px;
+	margin: 10px 20px 0px 20px;
 	children: [prompt, textbox-prompt-colon, entry];
 }
+
 prompt {
 	background-color: transparent;
 	text-color: %s;
-	font: "JetBrainsMono Nerd Font Bold 13";
+	font: "Inter Bold 14";
 }
+
 textbox-prompt-colon {
 	str: "";
 	background-color: transparent;
 }
+
 entry {
 	background-color: transparent;
 	text-color: %s;
-	placeholder: "Search actions...";
+	placeholder: "Search Nexus Commands...";
 	placeholder-color: #6c7086;
+	cursor: text;
 }
+
 message {
 	background-color: %s;
-	border-radius: 8px;
-	margin: 4px 12px;
-	padding: 6px 12px;
+	border-radius: 14px;
+	margin: 0px 20px;
+	padding: 12px 20px;
 }
+
 textbox {
 	background-color: transparent;
-	text-color: #6c7086;
-	font: "JetBrainsMono Nerd Font 9";
+	text-color: %s;
+	font: "Inter Medium 11";
 }
+
 listview {
-	columns: 1;
-	lines: 16;
+	columns: 2;
+	lines: 8;
 	scrollbar: false;
 	background-color: transparent;
-	padding: 4px 8px 8px 8px;
+	padding: 0px 20px 20px 20px;
+	spacing: 12px;
 	fixed-height: false;
 }
+
 element {
-	padding: 6px 16px;
-	border-radius: 10px;
-	background-color: transparent;
+	padding: 12px 20px;
+	border-radius: 12px;
+	background-color: %s;
 	text-color: %s;
 }
+
 element selected {
 	background-color: %s;
 	text-color: %s;
 }
+
 element-text {
 	background-color: transparent;
 	text-color: inherit;
 	vertical-align: 0.5;
+	font: "Inter Medium 12";
 }
-	`, BG, BG_ALT, BG_SURFACE, FG, ACCENT, RED, GREEN, BLUE, ACCENT, BG, BG_ALT, ACCENT, FG, BG_ALT, FG, BG_ALT, ACCENT)
+
+element-icon {
+	background-color: transparent;
+	size: 24px;
+	padding: 0px 10px 0px 0px;
+}
+	`, BG, BG_ALT, BG_SURFACE, FG, ACCENT, RED, GREEN, BLUE, ACCENT, BG, BG_ALT, ACCENT, FG, BG_ALT, ACCENT, BG_ALT, FG, ACCENT, BG)
 }
 
 func filterEmptyLines(input string) string {

@@ -3,10 +3,12 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"os/exec"
 
 	"github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/internal/modules"
 	"github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/internal/state"
 	"github.com/charmbracelet/huh"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
 )
 
@@ -41,6 +43,9 @@ func runNonInteractiveInstall() {
 	modules.InstallVM()
 
 	fmt.Println("\n🎉 All massive porting modules installed successfully!")
+	
+	// Automatically trigger post-install wizard for repo cloud syncing
+	runPostInstallWizard()
 }
 
 func runInteractiveTUI() {
@@ -95,6 +100,14 @@ func runInteractiveTUI() {
 	}
 
 	fmt.Println("\n🎉 Installation completed successfully!")
+
+	// Automatically trigger post-install wizard for repo cloud syncing
+	runPostInstallWizard()
+}
+
+func runPostInstallWizard() {
+	fmt.Println("\n" + lipgloss.NewStyle().Foreground(lipgloss.Color("#cba6f7")).Bold(true).Render("✨ Launching Final Post-Install Wizard..."))
+	exec.Command(os.Args[0], "postinstall").Run()
 }
 
 func init() {
