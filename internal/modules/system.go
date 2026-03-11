@@ -16,6 +16,7 @@ func InstallSystemAndSecurity() error {
 
 	setupKernelAndPerformance()
 	setupSecurity()
+	optimizeFstab()
 
 	fmt.Println("✅ [Module 02 & 03: System] Deep system tuning and security applied.")
 	return nil
@@ -162,4 +163,18 @@ func writeSystemFile(path, content string) {
 	os.WriteFile(tmpPath, []byte(content), 0644)
 	exec.Command("sudo", "mv", tmpPath, path).Run()
 	exec.Command("sudo", "chmod", "0644", path).Run()
+}
+
+func optimizeFstab() {
+	fmt.Println("-> Optimizing /etc/fstab for SSD Longevity (BTRFS/EXT4)...")
+	// Convert relatime to noatime
+	exec.Command("sudo", "sed", "-i", `s/relatime/noatime/g`, "/etc/fstab").Run()
+
+	// Append commit=120 and discard=async safely via awk
+	script := `
+awk '$3 ~ /^(ext4|btrfs)$/ {
+    if ($4 !~ /commit=/) $4 = $4 ",commit=120"
+    if ($4 !~ /discard=async/ && $3 == "btrfs") $4 = $4 ",discard=async"
+}1' /etc/fstab > /tmp/fstab.tmp && sudo mv /tmp/fstab.tmp /etc/fstab`
+	exec.Command("bash", "-c", script).Run()
 }

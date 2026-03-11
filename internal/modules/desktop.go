@@ -26,7 +26,9 @@ func InstallDesktopAndDotfiles() error {
 func setupTerminalAndShell() {
 	fmt.Println("-> Installing Terminal & Shell...")
 	pacman.Install("fish", "starship", "kitty")
-	pacman.Install("ttf-jetbrains-mono-nerd", "ttf-firacode-nerd", "ttf-nerd-fonts-symbols-common")
+	// CachyOS/Arch recently restructured nerd-fonts. ttf-nerd-fonts-symbols-common can pull 
+	// massive metapackages. We use specific minimal packages (~30MB) instead of 1.4GB metapackages.
+	pacman.Install("ttf-jetbrains-mono-nerd", "ttf-nerd-fonts-symbols")
 	pacman.Install("inter-font")
 
 	home := os.Getenv("HOME")
@@ -475,6 +477,16 @@ dwindle {
 misc {
     disable_hyprland_logo = true
     disable_splash_rendering = true
+    vrr = 1
+    vfr = true
+}
+
+render {
+    direct_scanout = true
+}
+
+cursor {
+    no_hardware_cursors = true
 }
 
 # ═══════════════════════════════════════════════════════════════════════

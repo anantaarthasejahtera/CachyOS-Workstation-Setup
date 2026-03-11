@@ -17,7 +17,7 @@ func InstallBaseSystem() error {
 	exec.Command("sudo", "pacman", "-Syu", "--noconfirm").Run()
 
 	fmt.Println("-> Installing base development tools...")
-	pacman.Install("base-devel", "git", "curl", "wget", "unzip", "zip", "cmake", "ninja", "meson", "pkgconf")
+	pacman.Install("base-devel", "git", "curl", "wget", "unzip", "zip", "cmake", "ninja", "meson", "pkgconf", "ccache")
 
 	installGPUDrivers()
 
@@ -70,10 +70,17 @@ func installGPUDrivers() {
 
 func optimizeMakepkg() {
 	nproc := runtime.NumCPU()
-	fmt.Printf("-> Optimizing makepkg.conf for %d threads...\n", nproc)
+	fmt.Printf("-> Optimizing makepkg.conf for %d threads, ccache, and Rust...\n", nproc)
 
 	makeflags := fmt.Sprintf("MAKEFLAGS=\"-j%d\"", nproc)
 	exec.Command("sudo", "sed", "-i", fmt.Sprintf(`s/^#MAKEFLAGS=.*/%s/`, makeflags), "/etc/makepkg.conf").Run()
 	exec.Command("sudo", "sed", "-i", `s/^COMPRESSXZ=.*/COMPRESSXZ=(xz -c -z - --threads=0)/`, "/etc/makepkg.conf").Run()
 	exec.Command("sudo", "sed", "-i", `s/^COMPRESSZST=.*/COMPRESSZST=(zstd -c -z -q - --threads=0)/`, "/etc/makepkg.conf").Run()
+
+	// Inject RUSTFLAGS for native optimization
+	rustflags := `RUSTFLAGS="-C opt-level=3 -C target-cpu=native"`
+	exec.Command("sudo", "sed", "-i", fmt.Sprintf(`s~^#RUSTFLAGS=.*~%s~`, rustflags), "/etc/makepkg.conf").Run()
+
+	// Enable ccache in BUILDENV
+	exec.Command("sudo", "sed", "-i", `s/!ccache/ccache/g`, "/etc/makepkg.conf").Run()
 }
