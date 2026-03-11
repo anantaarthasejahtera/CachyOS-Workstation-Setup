@@ -127,6 +127,9 @@ var syncCmd = &cobra.Command{
 			pushCmd.Stderr = os.Stderr
 			if err := pushCmd.Run(); err != nil {
 				fmt.Println(errorStyle.Render("❌ Failed to push to remote. Check SSH keys or network."))
+				fmt.Println(infoStyle.Render("\n💡 Troubleshooting Tips:"))
+				fmt.Println(infoStyle.Render("  1. Private Repos: Use an SSH URL (git@github.com:...) or login via 'gh auth login'."))
+				fmt.Println(infoStyle.Render("  2. Wrong URL entered? Fix it by typing: git -C ~/.config remote remove origin"))
 				exec.Command("notify-send", "-u", "critical", "Cloud Sync", "Push failed.").Start()
 			} else {
 				fmt.Println(successStyle.Render("✅ Sync Complete!"))
