@@ -59,9 +59,9 @@ func setupDesktopAesthetic() {
 	fmt.Println("-> Installing Desktop Aesthetics (Catppuccin)...")
 	pacman.Install("papirus-icon-theme", "kvantum", "fastfetch", "cmatrix")
 	pacman.Install(
-		"catppuccin-kde-theme-mocha", "papirus-folders-catppuccin-git",
-		"catppuccin-cursors-mocha", "kvantum-theme-catppuccin-mocha",
-		"catppuccin-gtk-theme-git", "sddm-theme-catppuccin-git",
+		"catppuccin-gtk-theme-mocha", "papirus-folders-catppuccin-git",
+		"catppuccin-cursors-mocha", "kvantum-theme-catppuccin-git",
+		"sddm-theme-catppuccin-git",
 	)
 
 	// Wallpapers
