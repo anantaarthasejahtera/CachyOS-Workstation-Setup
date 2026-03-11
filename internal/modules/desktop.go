@@ -987,9 +987,8 @@ Left-click: Open btop",
         "format-wifi": "󰤨  {signalStrength}%",
         "format-ethernet": "󰈀 Connected",
         "format-disconnected": "󰤭  Off",
-        "tooltip-format": "{ifname} via {gwaddr}
-Left-click: Wi-Fi Menu",
-        "on-click": "~/.config/rofi/scripts/rofi-wifi-menu.sh"
+        "tooltip-format": "{ifname} via {gwaddr}\nLeft-click: Network Cockpit",
+        "on-click": "nexus network"
     },
     "pulseaudio": {
         "format": "{icon}  {volume}%",

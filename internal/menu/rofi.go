@@ -409,7 +409,7 @@ func min(a, b int) int {
 	return b
 }
 
-func getRofiTheme() string {
+func GetRofiTheme() string {
 	return fmt.Sprintf(`
 * {
 	font: "JetBrainsMono Nerd Font 11";
@@ -510,7 +510,7 @@ func ShowMenu() error {
 	entriesList = filterEmptyLines(entriesList)
 
 	mesg := fmt.Sprintf("Super+X · %s · %s", getBattery(), getRAM())
-	themeConfig := getRofiTheme()
+	themeConfig := GetRofiTheme()
 
 	cmd := exec.Command("rofi", "-dmenu", "-i", "-p", " Nexus", "-mesg", mesg, "-theme-str", themeConfig)
 	cmd.Stdin = strings.NewReader(entriesList)
