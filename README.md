@@ -145,12 +145,10 @@ When you run `./nexus install`, the TUI installer guides you through module sele
 ```
 CachyOS-Workstation-Setup/
 ├── install.sh                # One-liner bootstrap (curl | bash)
-├── setup.sh                  # Main entry point (edit config here)
-├── installer.sh              # GUI installer (zenity-based)
 ├── uninstall.sh              # Safe ecosystem remover
 ├── Makefile                  # Dev commands (install, lint, init)
 ├── CHANGELOG.md              # Release history
-├── ecosystem/                # Living Ecosystem (12 tools)
+├── build.sh                  # Go binary compiler
 ├── ecosystem/                # (Deprecated: Replaced by cmd/nexus)
 ├── modules/                  # (Deprecated: Replaced by internal/modules)
 ├── cmd/

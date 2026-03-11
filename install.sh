@@ -222,15 +222,28 @@ fi
 
 # ── Launch Wizard ──
 echo -e "${MAGENTA}  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
-echo -e "${BOLD}  Launching Setup Wizard...${RESET}"
+echo -e "${BOLD}  Compiling & Launching Setup Wizard...${RESET}"
 echo -e "${MAGENTA}  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
 echo ""
-echo -e "  ${CYAN}Tip:${RESET} Follow the wizard popups — check modules, click ${BOLD}Next${RESET}"
-echo -e "  ${CYAN}Tip:${RESET} All changes are backed up automatically"
-echo ""
 
+# Ensure golang is installed
+if ! command -v go &>/dev/null; then
+    echo "Installing Go compiler..."
+    sudo pacman -S --noconfirm --needed go
+fi
+
+# Build the nexus binary
+echo -e "${BLUE}  ⚙️  Compiling Nexus v2...${RESET}"
+bash build.sh
+
+echo -e "${BLUE}  ⚙️  Installing Nexus globally...${RESET}"
+sudo cp ./nexus /usr/local/bin/nexus
+sudo chmod +x /usr/local/bin/nexus
+
+echo -e "${GREEN}  ✓ Nexus deployed successfully. Booting wizard...${RESET}"
 sleep 1
 
-chmod +x setup.sh installer.sh
-bash setup.sh
+# Launch the new Go-native installer
+nexus install
+
 
