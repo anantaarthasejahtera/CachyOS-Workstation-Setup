@@ -93,6 +93,7 @@ func setupHyprlandAndWaybar() {
 		"waybar", "rofi-wayland", "dunst", "grim", "slurp", "wl-clipboard",
 		"cliphist", "brightnessctl", "playerctl", "polkit-kde-agent",
 		"thunar", "nwg-look", "rofi-power-menu", "cava", "pavucontrol", "waypaper", "btop",
+		"wireguard-tools", // VPN Drag & Drop Support
 	)
 
 	pacman.Remove("xdg-desktop-portal-kde")

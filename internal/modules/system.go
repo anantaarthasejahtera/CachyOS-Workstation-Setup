@@ -16,6 +16,7 @@ func InstallSystemAndSecurity() error {
 
 	setupKernelAndPerformance()
 	setupSecurity()
+	setupAdblock()
 	optimizeFstab()
 
 	fmt.Println("✅ [Module 02 & 03: System] Deep system tuning and security applied.")
@@ -131,11 +132,11 @@ func setupSecurity() {
 		exec.Command("ssh-keygen", "-t", "ed25519", "-C", "nexus-auto-generated", "-f", sshKeyPath, "-N", "", "-q").Run()
 	}
 
-	// Cloudflare DNS
-	fmt.Println("-> Setting Cloudflare HTTP/3 DNS...")
+	// Quad9 DNS (Malware Blocking)
+	fmt.Println("-> Setting Quad9 HTTP/3 DNS (Malware Blocking + Privacy)...")
 	exec.Command("sudo", "mkdir", "-p", "/etc/systemd/resolved.conf.d").Run()
 	dnsConf := `[Resolve]
-DNS=1.1.1.1 1.0.0.1 2606:4700:4700::1111 2606:4700:4700::1001
+DNS=9.9.9.9 149.112.112.112 2620:fe::fe 2620:fe::9
 DNSOverTLS=yes
 Domains=~.
 `
@@ -177,4 +178,15 @@ awk '$3 ~ /^(ext4|btrfs)$/ {
     if ($4 !~ /discard=async/ && $3 == "btrfs") $4 = $4 ",discard=async"
 }1' /etc/fstab > /tmp/fstab.tmp && sudo mv /tmp/fstab.tmp /etc/fstab`
 	exec.Command("bash", "-c", script).Run()
+}
+
+func setupAdblock() {
+	fmt.Println("-> Injecting OS-Level Adblock & Malware Shield (/etc/hosts)...")
+	// Backup original if not backed up
+	if _, err := os.Stat("/etc/hosts.bak"); os.IsNotExist(err) {
+		exec.Command("sudo", "cp", "/etc/hosts", "/etc/hosts.bak").Run()
+	}
+	// Fetch StevenBlack unified hosts file (adware + malware blocking)
+	exec.Command("sudo", "curl", "-#L", "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts", "-o", "/etc/hosts").Run()
+	fmt.Println("   ✓ Adblock active. Zero CPU overhead.")
 }
