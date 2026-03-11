@@ -53,6 +53,9 @@ vm.swappiness = 10
 vm.vfs_cache_pressure = 50
 vm.dirty_ratio = 10
 vm.dirty_background_ratio = 5
+vm.max_map_count = 16777216
+vm.min_free_kbytes = 1048576
+vm.oom_kill_allocating_task = 1
 
 # Network Performance
 net.core.netdev_max_backlog = 16384
@@ -60,14 +63,29 @@ net.core.somaxconn = 8192
 net.ipv4.tcp_fastopen = 3
 net.ipv4.tcp_max_syn_backlog = 8192
 net.ipv4.tcp_tw_reuse = 1
+net.core.default_qdisc = fq_pie
+net.ipv4.tcp_congestion_control = bbr
 
-# Hardening
+# File Descriptors & Hardening
 kernel.nmi_watchdog = 0
 fs.inotify.max_user_watches = 524288
 fs.inotify.max_user_instances = 1024
+fs.file-max = 2097152
+
+# Developer & Gaming Mitigations
+kernel.split_lock_mitigate = 0
+kernel.perf_event_paranoid = 1
 `
 	writeSystemFile("/etc/sysctl.d/99-performance.conf", sysctlConfig)
 	exec.Command("sudo", "sysctl", "--system").Run()
+
+	// Process File Limits
+	fmt.Println("-> Applying process file limits for large monorepos...")
+	limitsConfig := `* soft nofile 1048576
+* hard nofile 2097152
+`
+	exec.Command("sudo", "mkdir", "-p", "/etc/security/limits.d").Run()
+	writeSystemFile("/etc/security/limits.d/99-nexus.conf", limitsConfig)
 
 	// I/O Scheduler
 	ioRules := `# NVMe: no scheduler
