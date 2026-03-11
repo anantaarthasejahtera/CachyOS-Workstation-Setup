@@ -67,14 +67,14 @@ func setupDesktopAesthetic() {
 	// Wallpapers
 	wallDir := filepath.Join(os.Getenv("HOME"), "Pictures/Wallpapers")
 	os.MkdirAll(wallDir, 0755)
-	fmt.Println("-> Generating Catppuccin Gradient Wallpaper...")
-	pacman.Install("imagemagick")
-	magickCmd := `magick -size 3840x2160 xc:'#1e1e2e' \
-    \( -size 3840x2160 gradient:'#302d41'-'#1e1e2e' \) -compose overlay -composite \
-    \( -size 200x200 xc:'#cba6f7' -blur 0x80 -resize 3840x2160\! \) -compose softlight -composite \
-    \( -size 200x200 xc:'#89b4fa' -gravity southeast -blur 0x60 -resize 3840x2160\! \) -compose softlight -composite \
-    ~/Pictures/Wallpapers/catppuccin-mocha-gradient.png`
-	exec.Command("bash", "-c", magickCmd).Run()
+
+	fmt.Println("-> Fetching Orangci Catppuccin Wallpapers...")
+	orangciDir := filepath.Join(wallDir, "orangci")
+	if _, err := os.Stat(orangciDir); os.IsNotExist(err) {
+		exec.Command("git", "clone", "--depth", "1", "https://github.com/orangci/walls-catppuccin-mocha.git", orangciDir).Run()
+	} else {
+		exec.Command("git", "-C", orangciDir, "pull").Run()
+	}
 
 	home := os.Getenv("HOME")
 	os.MkdirAll(filepath.Join(home, ".config/gtk-3.0"), 0755)
@@ -131,6 +131,9 @@ func setupHyprlandAndWaybar() {
 	waybarMedia := filepath.Join(home, ".config/waybar/scripts/media-hub.sh")
 	writeConfig(waybarMedia, waybarMediaConf)
 	exec.Command("chmod", "+x", waybarMedia).Run()
+
+	os.MkdirAll(filepath.Join(home, ".config/waypaper"), 0755)
+	writeConfig(filepath.Join(home, ".config/waypaper/config.ini"), waypaperConf)
 }
 
 func writeConfig(path string, content string) {
@@ -1136,4 +1139,24 @@ tooltip {
 const waybarMediaConf = `#!/usr/bin/env bash
 # Managed by Nexus - Basic stub
 playerctl status
+`
+
+const waypaperConf = `[Settings]
+language = en
+folder = ~/Pictures/Wallpapers/orangci
+monitors = All
+wallpaper = ~/Pictures/Wallpapers/orangci/01.png
+backend = hyprpaper
+fill = fill
+sort = name
+color = #ffffff
+subfolders = False
+show_hidden = False
+show_gifs_only = False
+post_command = 
+number_of_columns = 3
+swww_transition_type = any
+swww_transition_step = 90
+swww_transition_angle = 0
+swww_transition_duration = 2
 `
