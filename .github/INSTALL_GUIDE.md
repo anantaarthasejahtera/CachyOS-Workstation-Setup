@@ -84,8 +84,10 @@ curl -fsSL https://raw.githubusercontent.com/anantaarthasejahtera/CachyOS-Workst
 # Option B: Clone and customize (recommended)
 git clone https://github.com/anantaarthasejahtera/CachyOS-Workstation-Setup.git
 cd CachyOS-Workstation-Setup
-# The GUI wizard will prompt for your Git identity
-bash setup.sh   # Launch GUI module selector (zenity)
+# Compile the nexus binary and interactively run it
+bash build.sh
+sudo cp ./nexus /usr/local/bin/nexus
+nexus install   # Launch GUI module selector (Bubbletea)
 ```
 
 ### Important
@@ -123,7 +125,7 @@ Hyprland auto-detects monitors. If needed, edit `~/.config/hypr/hyprland.conf`.
 
 ### Wi-Fi not working after install?
 ```bash
-nmtui   # Terminal UI for network management
+nexus network   # TUI/Rofi for Wi-Fi management
 ```
 
 ### Something broke after `pacman -Syu`?

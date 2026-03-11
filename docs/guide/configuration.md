@@ -9,7 +9,7 @@ This means you can freely test customizations. If you break something, you can r
 
 ## Customizing The App Store
 
-Our GUI App Store (`app-store`) reads from a custom configuration file if it exists. 
+Our GUI App Store (`nexus apps`) reads from a custom configuration file if it exists. 
 By default, we provide a massive list of curated apps, but you can inject your own proprietary or obscure software seamlessly.
 
 1. Open `~/.config/app-store-custom.conf`.
@@ -44,7 +44,7 @@ exec-once = [workspace 5 silent] spotify-launcher
 
 ## Styling Waybar
 
-The Waybar configuration is built using advanced CSS Variables injected by the `theme-switch` ecosystem tool.
+The Waybar configuration is built using advanced CSS Variables injected by the `nexus theme` ecosystem tool.
 
 * **Layout**: Edit `~/.config/waybar/config`
 * **Styling**: Edit `~/.config/waybar/style.css`

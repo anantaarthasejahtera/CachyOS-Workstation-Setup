@@ -50,8 +50,10 @@ Native hypervisors and Android integrations.
 * Automatically downloads and sets up the Android SDK and Flutter.
 
 ## `nexus` Commands (Ecosystem Tools)
-* `nexus apps`: App Store
-* `nexus theme`: Theme Switcher
+* `nexus apps`: GUI App Store
+* `nexus theme`: Dynamic Theme Switcher
 * `nexus sync`: Cloud Sync & Time Machine
 * `nexus doctor`: System Health Check and AI Tuner
 * `nexus chat`: AI Chat Interface
+* `nexus rollback`: Config Rollback UI
+* `nexus network`: Wi-Fi Scanner and Active Shield

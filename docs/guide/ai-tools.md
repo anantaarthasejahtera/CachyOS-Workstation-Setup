@@ -44,7 +44,7 @@ You'll see options like:
 * `󰧑 AI Chat — Logic (deepseek)`
 Choosing any of these instantly drops you into a floating terminal session interacting with the model.
 
-### 2. The AI Auto-Tuner (`nexus doctor`)
+### 2. The AI Auto-Tuner (`nexus tuner`)
 Also accessible via Nexus, this tool runs background telemetry, feeds the raw data silently to `qwen2.5-coder:7b` via local cURL requests to the Ollama API port `11434`, and presents optimization advice.
 
 ### 3. Terminal Interface

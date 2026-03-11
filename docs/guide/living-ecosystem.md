@@ -2,13 +2,13 @@
 
 The true differentiator of the CachyOS Workstation Setup is its transition from a static "run once and forget" script into a perpetually aware **Living Ecosystem**. 
 
-Located primarily in `/usr/local/bin/`, the ecosystem consists of interconnected tools accessible directly from the Nexus (`Super+X`).
+Located primarily in `/usr/local/bin/nexus`, the ecosystem consists of interconnected tools accessible directly from the Nexus (`Super+X`) or via the command line interface (e.g., `nexus doctor`, `nexus sync`).
 
 ---
 
-## 🎨 Dynamic Theming Engine (`theme-switch`)
+## 🎨 Dynamic Theming Engine (`nexus theme`)
 
-Unlike static dotfiles that lock you into one visual style, the Dynamic Theming Engine allows for instantaneous holistic color adjustments without restarting your graphical session.
+Unlike static dotfiles that lock you into one visual style, the Dynamic Theming Engine (now powered by a Bubbletea Live Preview UI) allows for instantaneous holistic color adjustments without restarting your graphical session.
 
 * **Supported Themes**: Catppuccin (Mocha, Macchiato, Frappe, Latte), Dracula, Tokyo Night, Rosé Pine.
 * **Mechanism**: Using `sed`, it sweeps through your `waybar/style.css`, `kitty/kitty.conf`, `rofi/colors.rasi`, and `hypr/hyprland.conf` simultaneously, replacing generic color variables native to the ecosystem.
@@ -16,9 +16,9 @@ Unlike static dotfiles that lock you into one visual style, the Dynamic Theming 
 
 ---
 
-## 🛡️ Time Machine (`config-rollback`)
+## 🛡️ Time Machine (`nexus rollback`)
 
-Based on our strict snapshotting logic in `internal/state`, **Time Machine** is a UI implemented in Rofi (or terminal via `nexus sync`).
+Based on our strict snapshotting logic in `internal/state`, **Time Machine** is a UI implemented natively in Go to list and recover configurations.
 
 * Every time any of the 15 modules runs and edits a configuration file in `~/.config`, it first copies the existing file to `~/.config-backup/YYYYMMDD-HHMMSS/relative__path__file.ext`.
 * The **Time Machine** lists these timestamped snapshots visually.
@@ -26,7 +26,7 @@ Based on our strict snapshotting logic in `internal/state`, **Time Machine** is 
 
 ---
 
-## ☁️ Dotfiles Cloud Sync (`dotfiles-sync`)
+## ☁️ Dotfiles Cloud Sync (`nexus sync`)
 
 Provides effortless disaster recovery off-disk.
 
@@ -38,7 +38,7 @@ Instead of writing complex symlinking scripts (like `stow`), `dotfiles-sync` tak
 
 ---
 
-## 🧠 AI Auto-Tuner (`ai-tuner`)
+## 🧠 AI Auto-Tuner (`nexus tuner`)
 
 The most advanced local observability tool.
 
@@ -61,7 +61,7 @@ The App Store provides a heavily curated, 3-tier Rofi menu.
 
 ---
 
-## 🩺 System Health Check (`health-check`)
+## 🩺 System Health Check (`nexus doctor`)
 
 Bridges the gap between Arch Linux's rolling nature and stability.
 

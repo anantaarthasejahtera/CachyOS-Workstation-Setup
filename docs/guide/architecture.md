@@ -43,4 +43,4 @@ This design proactively shifts the developer from dealing with a "broken boot st
 Most dotfile repositories are "Dead Artefacts" — they capture a user's configuration exactly as it existed on one Tuesday afternoon in 2023.
 We reject this model entirely. 
 
-By injecting binaries directly into `/usr/local/bin/` (e.g. `theme-switch`, `config-rollback`, `ai-tuner`) and hooking them up to an overlay dashboard (Nexus), we provide dynamic manipulation *primitives*. You don't just consume the dotfiles; you use tools that change your system safely over time.
+By injecting the compiled Go binary natively into `/usr/local/bin/nexus` (giving you subcommands like `nexus theme`, `nexus rollback`, `nexus tuner`) and hooking them up to an overlay dashboard, we provide dynamic manipulation *primitives*. You don't just consume the dotfiles; you use tools that change your system safely over time.
