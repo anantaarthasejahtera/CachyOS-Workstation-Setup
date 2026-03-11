@@ -17,10 +17,10 @@ hero:
       link: https://github.com/anantaarthasejahtera/CachyOS-Workstation-Setup
 
 features:
-  - title: 15 Modular Scripts
-    details: Fully idempotent, hardware-aware, declarative modules. Install everything or cherry-pick. Auto-migrate deprecated packages on re-run.
+  - title: Pure Go Architecture
+    details: The entire CachyOS bootstrap installer has been completely rewritten in Go, resulting in blindingly fast setups without bash dependencies. Install everything or cherry-pick cleanly.
   - title: Living Ecosystem
-    details: 9 integrated tools — Dynamic Theming, Time Machine Rollback, AI Auto-Tuner, Wallpaper Picker, Nexus Chat, App Store, and more.
+    details: Fully compiled tools natively interacting with Linux. Dynamic Theming, Rollbacks, AI Auto-Tuner, Waypaper, Nexus Chat, App Store, and more.
   - title: Nexus Command Center
     details: Super+X brings up a smart popup with 45+ actions, live system stats, and AI-powered system management. Driven by the new `nexus` Go binary.
   - title: Bilingual Support

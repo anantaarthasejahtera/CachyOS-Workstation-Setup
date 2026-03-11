@@ -256,24 +256,26 @@ func buildMenu() string {
 func executeAction(chosen string) {
 	homeDir, _ := os.UserHomeDir()
 	timestamp := time.Now().Format("20060102-150405")
+	selfExe := os.Args[0]
 
 	if strings.Contains(chosen, "GUI App Store") {
-		exec.Command("app-store").Start()
+		exec.Command("kitty", "-e", selfExe, "apps").Start()
 	} else if strings.Contains(chosen, "AI Auto-Tuner") {
-		exec.Command("ai-tuner").Start()
+		exec.Command("kitty", "-e", selfExe, "tuner").Start()
 	} else if strings.Contains(chosen, "Health Check") {
-		exec.Command("kitty", "-e", "bash", "-c", "health-check; echo \"\"; echo \"Press Enter to close...\"; read").Start()
+		exec.Command("kitty", "-e", "bash", "-c", fmt.Sprintf("%s doctor; echo \"\"; echo \"Press Enter to close...\"; read", selfExe)).Start()
 	} else if strings.Contains(chosen, "System Dashboard") {
 		dashboardCmd := `echo -e "\033[1;35m━━━ 📊 System Dashboard ━━━\033[0m"; echo ""; fastfetch 2>/dev/null || echo "(fastfetch not installed)"; echo ""; echo -e "\033[1;36m━━━ Disk Usage ━━━\033[0m"; duf 2>/dev/null || df -h; echo ""; echo -e "\033[1;36m━━━ Top 10 Processes (by CPU) ━━━\033[0m"; ps aux --sort=-%cpu | head -11; echo ""; echo -e "\033[1;36m━━━ Memory ━━━\033[0m"; free -h`
 		exec.Command("kitty", "--hold", "-e", "bash", "-c", dashboardCmd).Start()
 	} else if strings.Contains(chosen, "Dotfiles Cloud Sync") {
-		exec.Command("dotfiles-sync").Start()
+		exec.Command("kitty", "-e", selfExe, "sync").Start()
 	} else if strings.Contains(chosen, "Time Machine") {
-		exec.Command("config-rollback").Start()
+		exec.Command(selfExe, "rollback").Start()
 	} else if strings.Contains(chosen, "Dynamic Theme Switcher") {
-		exec.Command("theme-switch").Start()
+		exec.Command("kitty", "-e", selfExe, "theme").Start()
 	} else if strings.Contains(chosen, "Change Wallpaper") {
 		exec.Command("waypaper").Start()
+
 	} else if strings.Contains(chosen, "System Update") {
 		previewText := "Pending updates"
 		out, err := exec.Command("pacman", "-Qu").Output()
@@ -336,7 +338,7 @@ func executeAction(chosen string) {
 		exec.Command("bash", "-c", fmt.Sprintf("wf-recorder -g \"$(slurp)\" -f %s &", path)).Start()
 		exec.Command("notify-send", "🎥 Recording region", "Super+X → Stop to end").Start()
 	} else if strings.Contains(chosen, "Nexus AI Chat") {
-		exec.Command("nexus-chat").Start()
+		exec.Command("kitty", "-e", selfExe, "chat").Start()
 	} else if strings.Contains(chosen, "Antigravity") {
 		exec.Command("antigravity").Start()
 	} else if strings.Contains(chosen, "Neovim") {
@@ -512,7 +514,7 @@ func ShowMenu() error {
 
 	cmd := exec.Command("rofi", "-dmenu", "-i", "-p", " Nexus", "-mesg", mesg, "-theme-str", themeConfig)
 	cmd.Stdin = strings.NewReader(entriesList)
-	
+
 	var out bytes.Buffer
 	cmd.Stdout = &out
 

@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"os/exec"
 
 	"github.com/spf13/cobra"
 )
@@ -9,12 +11,28 @@ import (
 var chatCmd = &cobra.Command{
 	Use:   "chat",
 	Short: "AI-powered workstation assistant",
-	Long:  `Launch the Nexus AI chat to get help, diagnose issues, or run automations using native Go HTTP streams.`,
+	Long:  `Launch the Nexus AI chat to get help, diagnose issues, or run automations using local Ollama streams.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("🤖 Nexus AI Chat Initializing...")
-		fmt.Println("   Connected to AI provider. State history is loaded via SQLite memory.")
-		// Wait for user input loop (placeholder)
-		fmt.Println("   > How can I assist you with your CachyOS setup today?")
+		fmt.Println("=====================================================")
+		fmt.Println(" 🤖 Nexus AI Assistant (Powered by qwen2.5-coder:7b) ")
+		fmt.Println("=====================================================")
+		fmt.Println(" Type /bye to exit. Conversation history is retained.")
+		fmt.Println("")
+
+		// Connect directly to local Ollama REPL
+		ollamaCmd := exec.Command("ollama", "run", "qwen2.5-coder:7b")
+		ollamaCmd.Stdin = os.Stdin
+		ollamaCmd.Stdout = os.Stdout
+		ollamaCmd.Stderr = os.Stderr
+
+		err := ollamaCmd.Run()
+		if err != nil {
+			msg := "❌ Failed to connect to local AI. Ensure 'ollama' is running and the model is installed."
+			fmt.Println(msg)
+			exec.Command("rofi", "-e", msg).Start()
+		}
+
+		fmt.Println("\nNexus AI session ended.")
 	},
 }
 
