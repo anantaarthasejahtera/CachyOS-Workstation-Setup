@@ -32,18 +32,35 @@ func init() {
 	rootCmd.AddCommand(mediaCmd)
 }
 
-func getCommandOutput(name string, arg ...string) string {
-	out, err := exec.Command(name, arg...).Output()
-	if err != nil {
-		return ""
+func runCommand(name string, arg ...string) (string, error) {
+	cmd := exec.Command(name, arg...)
+	
+	// Waybar execution environment often strips standard PATH
+	env := os.Environ()
+	hasPath := false
+	for _, e := range env {
+		if strings.HasPrefix(e, "PATH=") {
+			hasPath = true
+		}
 	}
-	return strings.TrimSpace(string(out))
+	if !hasPath {
+		env = append(env, "PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin")
+	}
+	cmd.Env = env
+
+	out, err := cmd.Output()
+	return strings.TrimSpace(string(out)), err
+}
+
+func getCommandOutput(name string, arg ...string) string {
+	out, _ := runCommand(name, arg...)
+	return out
 }
 
 func showMediaMenu() error {
 	status := getCommandOutput("playerctl", "status")
 	if status == "" {
-		exec.Command("notify-send", "Media Hub", "No media player is currently running.").Run()
+		runCommand("notify-send", "Media Hub", "No media player is currently running.")
 		return nil
 	}
 
@@ -110,34 +127,27 @@ func showMediaMenu() error {
 		playPauseOpt = "󰏤 Pause"
 	}
 
-	options := fmt.Sprintf("%s\n%s\n%s\n%s\n", prevOpt, playPauseOpt, nextOpt, visOpt)
+	// Rofi script mode protocol
+
+	// 1. Message with large title and medium artist
 	mesg := fmt.Sprintf("<span weight='bold' size='large'>%s</span> - <span size='medium'>%s</span>", escapeMarkup(title), escapeMarkup(artist))
+	fmt.Printf("\x00message\x1f%s\n", mesg)
+
+	// 2. Prompt title
+	fmt.Printf("\x00prompt\x1fMedia\n")
+
+	// 3. Keep selection if re-running
+	fmt.Printf("\x00keep-selection\x1ftrue\n")
+
+	// 4. Inject dynamic theme string for cover art
 	themeStr := fmt.Sprintf("cover-art { background-image: url(\"%s\", width); }", coverPath)
+	fmt.Printf("\x00theme\x1f%s\n", themeStr)
 
-	home, _ := os.UserHomeDir()
-	themePath := filepath.Join(home, ".config", "rofi", "media.rasi")
-
-	cmd := exec.Command("rofi", "-dmenu",
-		"-p", "Media",
-		"-mesg", mesg,
-		"-hover-select",
-		"-me-select-entry", "",
-		"-me-accept-entry", "MousePrimary",
-		"-theme", themePath,
-		"-theme-str", themeStr,
-	)
-
-	cmd.Stdin = strings.NewReader(options)
-	out, err := cmd.Output()
-	if err != nil {
-		// Used exited Rofi
-		return nil
-	}
-
-	choice := strings.TrimSpace(string(out))
-	if choice != "" {
-		return handleMediaAction(choice)
-	}
+	// Print the options themselves
+	fmt.Println(prevOpt)
+	fmt.Println(playPauseOpt)
+	fmt.Println(nextOpt)
+	fmt.Println(visOpt)
 
 	return nil
 }
@@ -145,18 +155,20 @@ func showMediaMenu() error {
 func handleMediaAction(action string) error {
 	switch action {
 	case "󰒮 Prev":
-		exec.Command("playerctl", "previous").Run()
+		runCommand("playerctl", "previous")
 		waitForMetadataUpdate()
 	case "󰏤 Pause", "󰐊 Play":
-		exec.Command("playerctl", "play-pause").Run()
+		runCommand("playerctl", "play-pause")
 	case "󰒭 Next":
-		exec.Command("playerctl", "next").Run()
+		runCommand("playerctl", "next")
 		waitForMetadataUpdate()
 	case "󱍙 Visualizer":
 		if _, err := exec.LookPath("cava"); err == nil {
-			exec.Command("kitty", "--class", "cava-floating", "-e", "cava").Start()
+			cmd := exec.Command("kitty", "--class", "cava-floating", "-e", "cava")
+			cmd.Env = append(os.Environ(), "PATH=/usr/local/bin:/usr/bin:/bin")
+			cmd.Start()
 		} else {
-			exec.Command("notify-send", "Visualizer", "Cava is not installed. Please install it via 'sudo pacman -S cava'.").Run()
+			runCommand("notify-send", "Visualizer", "Cava is not installed. Please install it via 'sudo pacman -S cava'.")
 		}
 		// Visualizer exits Rofi, so we don't return an empty string to re-render
 		return nil
