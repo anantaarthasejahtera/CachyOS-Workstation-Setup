@@ -29,7 +29,49 @@ func InstallDevAndEditors() error {
 func setupDocker() {
 	fmt.Println("-> Installing Docker Ecosystem...")
 	pacman.Install("docker", "docker-compose", "docker-buildx", "lazydocker")
-	exec.Command("sudo", "systemctl", "enable", "--now", "docker.service").Run()
+	
+	// Ultra-Lightweight Adjustment: We do NOT enable docker.service by default.
+	// Users can start it via 'systemctl start docker' or utilize docker.socket activation
+	// to ensure 0 MB memory overhead when Docker is not in use.
+	fmt.Println("   Note: Docker daemon is installed but disabled by default to save RAM.")
+
+	fmt.Println("   Installing Docker Auto-Suspend (15m idle timeout)...")
+	setupDockerIdleTimeout := `
+	cat << 'EOF' | sudo tee /usr/local/bin/docker-idle-suspend.sh > /dev/null
+#!/usr/bin/env bash
+if systemctl is-active --quiet docker; then
+    if [ -z "$(docker ps -q)" ]; then
+        systemctl stop docker
+    fi
+fi
+EOF
+	sudo chmod +x /usr/local/bin/docker-idle-suspend.sh
+
+	cat << 'EOF' | sudo tee /etc/systemd/system/docker-idle.service > /dev/null
+[Unit]
+Description=Suspend Docker when idle
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/docker-idle-suspend.sh
+EOF
+
+	cat << 'EOF' | sudo tee /etc/systemd/system/docker-idle.timer > /dev/null
+[Unit]
+Description=Run Docker idle suspend every 15m
+
+[Timer]
+OnBootSec=15m
+OnUnitActiveSec=15m
+
+[Install]
+WantedBy=timers.target
+EOF
+
+	sudo systemctl daemon-reload
+	sudo systemctl enable --now docker-idle.timer
+	`
+	exec.Command("bash", "-c", setupDockerIdleTimeout).Run()
 
 	user := os.Getenv("USER")
 	exec.Command("sudo", "usermod", "-aG", "docker", user).Run()
@@ -115,7 +157,12 @@ func setupEditors() {
     "editor.minimap.enabled": false,
     "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font'",
     "window.titleBarStyle": "custom",
-    "files.autoSave": "afterDelay"
+    "files.autoSave": "afterDelay",
+    "git.autorefresh": false,
+    "telemetry.enableTelemetry": false,
+    "workbench.enableExperiments": false,
+    "extensions.ignoreRecommendations": true,
+    "update.mode": "none"
 }`
 	state.SafeWriteConfig(filepath.Join(vscodeDir, "settings.json"), []byte(vscSettings), 0644)
 
@@ -161,5 +208,9 @@ func setupOllama() {
 	if !pacman.IsInstalled("ollama") {
 		exec.Command("bash", "-c", `curl -fsSL https://ollama.com/install.sh | sh`).Run()
 	}
-	exec.Command("sudo", "systemctl", "enable", "--now", "ollama.service").Run()
+	
+	// Ultra-Lightweight Adjustment: Do NOT enable ollama.service by default.
+	// It consumes significant idle RAM. It will be started on-demand via Nexus Chat.
+	fmt.Println("   Note: Ollama daemon installed but disabled by default to save RAM.")
+	exec.Command("sudo", "systemctl", "disable", "ollama.service").Run()
 }

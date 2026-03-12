@@ -31,6 +31,9 @@ Telemetry:
 
 		fmt.Println("Thinking (querying local qwen2.5-coder:7b)...")
 
+		// Wake up AI daemon
+		exec.Command("sudo", "systemctl", "start", "ollama.service").Run()
+
 		// Query Ollama local API via executable
 		ollamaCmd := exec.Command("ollama", "run", "qwen2.5-coder:7b")
 		ollamaCmd.Stdin = strings.NewReader(prompt)
@@ -40,8 +43,12 @@ Telemetry:
 		ollamaCmd.Stderr = &out
 
 		err := ollamaCmd.Run()
+		
+		// Immediately put daemon back to sleep
+		exec.Command("sudo", "systemctl", "stop", "ollama.service").Run()
+
 		if err != nil {
-			msg := "❌ Failed to query Ollama. Make sure the service is running (`systemctl start ollama`) and the model is pulled (`ollama pull qwen2.5-coder:7b`)."
+			msg := "❌ Failed to query Ollama. Make sure the model is pulled (`ollama pull qwen2.5-coder:7b`)."
 			fmt.Println(msg)
 			exec.Command("rofi", "-e", msg).Start()
 			return

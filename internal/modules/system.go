@@ -51,8 +51,10 @@ func setupKernelAndPerformance() {
 	// Sysctl tuning
 	fmt.Println("-> Applying kernel sysctl tuning...")
 	sysctlConfig := `# Memory Management
-vm.swappiness = 10
-vm.vfs_cache_pressure = 50
+# Ultra-Lightweight Tuning for ZRAM
+vm.swappiness = 60
+vm.vfs_cache_pressure = 100
+vm.page-cluster = 0
 vm.dirty_ratio = 10
 vm.dirty_background_ratio = 5
 vm.max_map_count = 16777216

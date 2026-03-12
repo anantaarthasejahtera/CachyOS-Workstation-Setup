@@ -45,8 +45,12 @@ func InstallVM() error {
 	pacman.Remove("qemu-full") // Deprecated
 	pacman.Install("qemu-desktop", "virt-manager", "libvirt", "edk2-ovmf", "dnsmasq", "iptables-nft", "swtpm", "spice-vdagent", "vde2", "bottles")
 
-	exec.Command("sudo", "systemctl", "enable", "--now", "libvirtd.service").Run()
-	exec.Command("sudo", "systemctl", "enable", "--now", "virtlogd.service").Run()
+	// Ultra-Lightweight Adjustment: Rely on socket activation.
+	// virt-manager will automatically wake libvirtd.socket when launched.
+	// This prevents ~100MB RAM overhead from running a virtualization daemon 24/7.
+	fmt.Println("   Note: libvirtd daemon relies on socket activation to save RAM.")
+	exec.Command("sudo", "systemctl", "disable", "libvirtd.service").Run()
+	exec.Command("sudo", "systemctl", "disable", "virtlogd.service").Run()
 
 	user := os.Getenv("USER")
 	exec.Command("sudo", "usermod", "-aG", "libvirt", user).Run()

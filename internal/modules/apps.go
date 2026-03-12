@@ -23,15 +23,30 @@ func InstallAppsAndGaming() error {
 }
 
 func setupApps() {
+	home := os.Getenv("HOME")
 	fmt.Println("-> Installing Core Apps (Browser, Tools)...")
 	pacman.Remove("auto-cpufreq") // Deprecated
 
 	pacman.Install("zen-browser-bin")
 	pacman.Install("tmux", "direnv")
 
-	// Bluetooth
+	// Bluetooth - Ultra-Lightweight: Disable by default. 
+	// Users can start it via 'systemctl start bluetooth' or Waybar menu when needed.
 	pacman.Install("bluez", "bluez-utils", "blueman")
-	exec.Command("sudo", "systemctl", "enable", "--now", "bluetooth.service").Run()
+	exec.Command("sudo", "systemctl", "disable", "bluetooth.service").Run()
+
+	// Discord - Ultra-Lightweight Tuning
+	discordDir := filepath.Join(home, ".config/discord")
+	os.MkdirAll(discordDir, 0755)
+	discordSettings := `{
+    "IS_MAXIMIZED": false,
+    "IS_MINIMIZED": false,
+    "WINDOW_BOUNDS": { "x": 0, "y": 0, "width": 1280, "height": 720 },
+    "SKIP_HOST_UPDATE": true,
+    "OPEN_ON_STARTUP": false,
+    "MINIMIZE_TO_TRAY": true
+}`
+	state.SafeWriteConfig(filepath.Join(discordDir, "settings.json"), []byte(discordSettings), 0644)
 
 	// Comm & Productivity
 	pacman.Install("telegram-desktop", "discord", "spotify-launcher")
@@ -40,9 +55,6 @@ func setupApps() {
 	if !pacman.IsInstalled("obsidian") && !pacman.IsInstalled("obsidian-bin") {
 		pacman.Install("obsidian-bin")
 	}
-
-	fmt.Println("-> Configuring Tmux and XDG Defaults...")
-	home := os.Getenv("HOME")
 
 	// XDG Defaults
 	os.MkdirAll(filepath.Join(home, ".config"), 0755)
