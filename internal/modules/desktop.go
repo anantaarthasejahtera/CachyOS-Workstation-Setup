@@ -1134,7 +1134,7 @@ tooltip {
 `
 
 const waybarMediaConf = `#!/usr/bin/env bash
-rofi -show media -modi "media:nexus rofi-media" -theme ~/.config/rofi/media.rasi
+/usr/local/bin/nexus rofi-media
 `
 
 const waypaperConf = `[Settings]
