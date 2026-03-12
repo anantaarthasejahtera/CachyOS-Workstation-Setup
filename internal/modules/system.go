@@ -158,6 +158,18 @@ __pycache__/
 	ignorePath := filepath.Join(os.Getenv("HOME"), ".gitignore_global")
 	os.WriteFile(ignorePath, []byte(gitIgnore), 0644)
 	exec.Command("git", "config", "--global", "core.excludesFile", ignorePath).Run()
+
+	// --- Ultra-Lightweight System Daemon Purge ---
+	fmt.Println("-> Purging non-essential background daemons (avahi, cups, ModemManager)...")
+	// Avahi: Local network auto-discovery (Airplay, Printers) - Constantly broadcasts mDNS
+	exec.Command("sudo", "systemctl", "disable", "--now", "avahi-daemon.service", "avahi-daemon.socket").Run()
+	// NetworkManager Wait: Blocks boot sequence heavily 
+	exec.Command("sudo", "systemctl", "disable", "NetworkManager-wait-online.service").Run()
+	// ModemManager: Huawei USB 4G stick support - Useless on wifi workstations
+	exec.Command("sudo", "systemctl", "mask", "ModemManager.service").Run()
+	// CUPS: Local physical printing service
+	exec.Command("sudo", "systemctl", "disable", "--now", "cups.service", "cups.socket").Run()
+	exec.Command("sudo", "systemctl", "mask", "cups.service").Run() // Prevent auto-starting when opening print dialogs
 }
 
 // Helper to wrap sudo file writes safely

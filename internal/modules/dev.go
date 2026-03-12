@@ -158,11 +158,30 @@ func setupEditors() {
     "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font'",
     "window.titleBarStyle": "custom",
     "files.autoSave": "afterDelay",
+    
+    // --- Phase V: Aggressive RAM & CPU Minimization ---
     "git.autorefresh": false,
     "telemetry.enableTelemetry": false,
     "workbench.enableExperiments": false,
     "extensions.ignoreRecommendations": true,
-    "update.mode": "none"
+    "update.mode": "none",
+    "search.followSymlinks": false,
+    "files.exclude": {
+        "**/node_modules": true,
+        "**/__pycache__": true,
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "**/.venv": true,
+        "**/*.pyc": true
+    },
+    // Prevent language servers from parsing heavy ignored folders
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/bower_components": true,
+        "**/*.code-search": true,
+        "**/dist": true,
+        "**/build": true
+    }
 }`
 	state.SafeWriteConfig(filepath.Join(vscodeDir, "settings.json"), []byte(vscSettings), 0644)
 

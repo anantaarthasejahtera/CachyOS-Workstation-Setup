@@ -12,7 +12,7 @@ import (
 var tunerCmd = &cobra.Command{
 	Use:   "tuner",
 	Short: "AI Auto-Tuner & Sysctl Optimization",
-	Long:  `Gathers real-time telemetry and pipes it to local qwen2.5-coder:7b via Ollama for system optimization advice.`,
+	Long:  `Gathers real-time telemetry and pipes it to local qwen3.5:4b via Ollama for system optimization advice.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("🧠 Nexus AI Auto-Tuner")
 		fmt.Println("Gathering system telemetry...")
@@ -29,13 +29,13 @@ var tunerCmd = &cobra.Command{
 Telemetry:
 %s`, telemetry)
 
-		fmt.Println("Thinking (querying local qwen2.5-coder:7b)...")
+		fmt.Println("Thinking (querying local qwen3.5:4b)...")
 
 		// Wake up AI daemon
 		exec.Command("sudo", "systemctl", "start", "ollama.service").Run()
 
 		// Query Ollama local API via executable
-		ollamaCmd := exec.Command("ollama", "run", "qwen2.5-coder:7b")
+		ollamaCmd := exec.Command("ollama", "run", "qwen3.5:4b")
 		ollamaCmd.Stdin = strings.NewReader(prompt)
 
 		var out bytes.Buffer
@@ -48,7 +48,7 @@ Telemetry:
 		exec.Command("sudo", "systemctl", "stop", "ollama.service").Run()
 
 		if err != nil {
-			msg := "❌ Failed to query Ollama. Make sure the model is pulled (`ollama pull qwen2.5-coder:7b`)."
+			msg := "❌ Failed to query Ollama. Make sure the model is pulled (`ollama pull qwen3.5:4b`)."
 			fmt.Println(msg)
 			exec.Command("rofi", "-e", msg).Start()
 			return

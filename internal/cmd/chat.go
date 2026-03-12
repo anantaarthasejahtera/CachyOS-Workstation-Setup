@@ -14,7 +14,7 @@ var chatCmd = &cobra.Command{
 	Long:  `Launch the Nexus AI chat to get help, diagnose issues, or run automations using local Ollama streams.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("=====================================================")
-		fmt.Println(" 🤖 Nexus AI Assistant (Powered by qwen2.5-coder:7b) ")
+		fmt.Println(" 🤖 Nexus AI Assistant (Powered by qwen3.5:4b) ")
 		fmt.Println("=====================================================")
 		fmt.Println(" Type /bye to exit. Conversation history is retained.")
 		fmt.Println("")
@@ -24,7 +24,7 @@ var chatCmd = &cobra.Command{
 		exec.Command("sudo", "systemctl", "start", "ollama.service").Run()
 
 		// Connect directly to local Ollama REPL
-		ollamaCmd := exec.Command("ollama", "run", "qwen2.5-coder:7b")
+		ollamaCmd := exec.Command("ollama", "run", "qwen3.5:4b")
 		ollamaCmd.Stdin = os.Stdin
 		ollamaCmd.Stdout = os.Stdout
 		ollamaCmd.Stderr = os.Stderr

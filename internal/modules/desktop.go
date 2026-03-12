@@ -339,6 +339,11 @@ set -gx BROWSER "zen-browser"
 alias ls='eza --icons --group-directories-first'
 alias ll='eza -la --icons --group-directories-first --git'
 alias cat='bat --style=auto'
+
+# --- Phase V: Aggressive RAM Minimization for Browsers & Electron ---
+# Force Zen Browser to aggressively free RAM (Targeting 512MB limits)
+alias zen-browser='env MOZ_MIN_MEMORY_MB=512 zen-browser'
+alias code='env NODE_OPTIONS="--max-old-space-size=1024" code'
 alias grep='rg'
 alias find='fd'
 alias top='btm'

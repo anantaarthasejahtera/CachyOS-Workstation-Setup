@@ -52,6 +52,7 @@ var postInstallCmd = &cobra.Command{
 		// 3. Sync Dotfiles
 		fmt.Println("\n" + w_infoStyle.Render("▶ [3/3] Setting up Cloud Sync"))
 		syncCmd := exec.Command(os.Args[0], "sync")
+		syncCmd.Stdin = os.Stdin // VERY IMPORTANT: Required for interactive TUI elements (huh forms, gh auth login) to capture keystrokes
 		syncCmd.Stdout = os.Stdout
 		syncCmd.Stderr = os.Stderr
 		syncCmd.Run()
