@@ -855,18 +855,96 @@ textbox {
 `
 
 const rofiMediaConf = `
-configuration { show-icons: false; }
-* { bg: #1e1e2edd; bg-alt: #313244cc; fg: #cdd6f4; accent: #cba6f7; sel: #cba6f744; font: "Inter 12"; background-color: transparent; }
-window { width: 600px; background-color: @bg; border: 2px solid @accent; padding: 24px; }
-mainbox { orientation: horizontal; children: [ left-box, listview ]; }
-left-box { orientation: vertical; width: 250px; children: [ cover-art, message ]; }
-cover-art { width: 250px; height: 150px; }
-message { background-color: @bg-alt; padding: 16px; border: 1px solid @accent; }
-textbox { text-color: @fg; }
-listview { lines: 5; }
-element { padding: 14px; text-color: @fg; }
-element selected { background-color: @accent; text-color: @bg; }
-element-text { background-color: inherit; text-color: inherit; }
+configuration {
+    show-icons: false;
+}
+
+* {
+    /* Catppuccin Mocha Glass */
+    bg:       #1e1e2edd;     /* Base transparent */
+    bg-alt:   #313244cc;     /* Surface0 transparent */
+    fg:       #cdd6f4;       /* Text */
+    accent:   #cba6f7;       /* Mauve */
+    sel:      #cba6f744;     /* Mauve transparent for selection */
+
+    font:     "Inter Medium 12";
+    background-color: transparent;
+}
+
+window {
+    width: 600px;
+    transparency: "real";
+    background-color: @bg;
+    border: 2px solid;
+    border-color: @accent;
+    border-radius: 16px;
+    padding: 24px;
+}
+
+mainbox {
+    orientation: horizontal;
+    children: [ left-box, listview ];
+    spacing: 24px;
+}
+
+left-box {
+    orientation: vertical;
+    width: 250px;
+    expand: false;
+    children: [ cover-art, message ];
+    spacing: 16px;
+}
+
+cover-art {
+    width: 250px;
+    height: 150px;
+    border-radius: 12px;
+}
+
+message {
+    background-color: @bg-alt;
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid;
+    border-color: rgba(203, 166, 247, 0.3); /* Subtle accent border */
+}
+
+textbox {
+    text-color: @fg;
+    horizontal-align: 0.5;
+    vertical-align: 0.5;
+    font: "Inter 11";
+}
+
+listview {
+    lines: 5;
+    columns: 1;
+    spacing: 8px;
+    dynamic: true;
+    layout: vertical;
+    fixed-height: false;
+}
+
+element {
+    padding: 14px 18px;
+    border-radius: 10px;
+    background-color: transparent;
+    text-color: @fg;
+    cursor: pointer;
+}
+
+element-text {
+    background-color: inherit;
+    text-color: inherit;
+    horizontal-align: 0.0;
+    vertical-align: 0.5;
+    cursor: pointer;
+}
+
+element selected {
+    background-color: @accent;
+    text-color: @bg;
+}
 `
 
 const rofiWifiConf = `#!/usr/bin/env bash
@@ -1134,7 +1212,7 @@ tooltip {
 `
 
 const waybarMediaConf = `#!/usr/bin/env bash
-/usr/local/bin/nexus rofi-media
+rofi -show media -modi "media:nexus rofi-media" -theme ~/.config/rofi/media.rasi
 `
 
 const waypaperConf = `[Settings]
