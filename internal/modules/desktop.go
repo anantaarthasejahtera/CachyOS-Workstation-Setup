@@ -930,7 +930,6 @@ element {
     border-radius: 10px;
     background-color: transparent;
     text-color: @fg;
-    cursor: pointer;
 }
 
 element-text {
@@ -938,7 +937,6 @@ element-text {
     text-color: inherit;
     horizontal-align: 0.0;
     vertical-align: 0.5;
-    cursor: pointer;
 }
 
 element selected {
