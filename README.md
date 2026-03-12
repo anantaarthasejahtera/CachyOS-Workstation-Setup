@@ -78,12 +78,12 @@ Features:
 | Tier | CPU | RAM | Storage | Use Case |
 |------|-----|-----|---------|----------|
 | **Minimum** | Any x86_64 | 4 GB | 20 GB free | Base system + shell + editors (no AI) |
-| **Recommended** | 4+ cores | 16 GB | 50 GB free | Full install + 7B AI models + Docker + Android SDK |
-| **AI Powerhouse** | 8+ cores | 32 GB | 80 GB free | Qwen3:30b MoE + DeepSeek-R1 + multiple models simultaneously |
+| **Recommended** | 4+ cores | 16 GB | 50 GB free | Full install + 4B AI models + Docker + Android SDK |
+| **AI Powerhouse** | 8+ cores | 32 GB | 80 GB free | Qwen3.5:4B + DeepSeek-R1 + multiple models simultaneously |
 
-> **Storage breakdown** (if all modules installed): Base ~2GB, Dev ~4GB, Mobile ~5GB, Gaming ~3GB, VM ~2GB, AI models ~20GB+, other modules ~2GB.
+> **Storage breakdown** (if all modules installed): Base ~2GB, Dev ~4GB, Mobile ~5GB, Gaming ~3GB, VM ~2GB, AI models ~5GB+, other modules ~2GB.
 >
-> **AI note**: The 7B models (qwen2.5-coder, deepseek-r1) run fine on 16GB RAM. The 30B Qwen3 model uses **Mixture of Experts (MoE)** — only ~3B parameters activate per inference, so it runs on 16GB but is more comfortable with 32GB.
+> **AI note**: The Qwen 3.5 models (qwen3.5:4b, qwen3.5:2b, deepseek-r1:1.5b) run phenomenally on 16GB RAM. They use a **Hybrid MoE** architecture making them blazing fast while barely utilizing 1.2 to 2.7GB of active RAM.
 
 ---
 
@@ -248,7 +248,7 @@ Your customizations, instantly portable.
 ### 4. 🧠 AI Auto-Tuner (`ai-tuner`)
 Local AI system telemetry auditing.
 - Takes dynamic snapshots of `top`, `free -h`, and `vmstat`.
-- Pipes telemetry via the standard Ollama API directly into `qwen2.5-coder:7b` to get actionable system optimization advice displayed neatly in a Rofi UI.
+- Pipes telemetry via the standard Ollama API directly into `qwen3.5:4b` to get actionable system optimization advice displayed neatly in a Rofi UI.
 
 ### 5. 🏪 Aesthetic GUI App Store (`app-store`)
 Visual package management elevated.
@@ -268,7 +268,7 @@ Visual wallpaper selection automatically configured out of the box.
 
 ### 8. 💬 Nexus AI Chat (`nexus-chat`)
 Interactive local AI chat.
-- Select from installed Ollama models (qwen3, deepseek-r1, qwen2.5-coder) via Rofi.
+- Select from installed Ollama models (qwen3.5, deepseek-r1) via Rofi.
 - Choose mode: Normal Chat, Debate Mode, or Terminal Access.
 - Auto-starts Ollama service if needed, manages CPU power governor.
 
@@ -401,20 +401,19 @@ All models run **100% locally** via [Ollama](https://ollama.com) — no cloud, n
 
 | Model | Type | Purpose | RAM Required | Disk | Command |
 |-------|------|---------|-------------|------|---------|
-| `qwen3:30b-a3b` | **MoE** (3B active / 30B total) | Reasoning, debate, strategy, philosophy | 16GB min, 32GB ideal | ~18GB | `ollama run qwen3:30b-a3b` |
-| `deepseek-r1:7b` | Dense 7B | Chain-of-thought math & logic reasoning | 8GB min | ~5GB | `ollama run deepseek-r1:7b` |
-| `qwen2.5-coder:7b` | Dense 7B | Code generation, refactoring, debugging | 8GB min | ~5GB | `ollama run qwen2.5-coder:7b` |
+| `qwen3.5:4b` | **Hybrid MoE** | Reasoning, coding, general assistant default | 4GB min, 8GB ideal | ~2.7GB | `ollama run qwen3.5:4b` |
+| `qwen3.5:2b` | **Hybrid MoE** | Ultra-fast inference, short scripts, commands | 4GB min | ~1.5GB | `ollama run qwen3.5:2b` |
+| `deepseek-r1:1.5b` | Dense Nano | Distilled math & logic reasoning overhead-free | 4GB min | ~1.2GB | `ollama run deepseek-r1:1.5b` |
 
 <details>
-<summary>💡 What is MoE (Mixture of Experts)?</summary>
+<summary>💡 Ultra-Lightweight AI Philosophy</summary>
 
-Qwen3:30b uses a **Mixture of Experts** architecture — the model has 30 billion total parameters, but only ~3 billion activate per inference. This means:
-- **Speed**: Generates at near-7B speed despite being a 30B model
-- **Quality**: Produces 30B-quality outputs (comparable to GPT-4o in reasoning tasks)
-- **RAM**: Only loads the active expert parameters, so it fits in 16GB RAM
-- **Trade-off**: Needs ~18GB disk space for the full model weights
+Nexus leverages the newly released **Qwen 3.5** family and miniaturized **DeepSeek R1** variants to run flagship-tier reasoning and code generation on laptops without sacrificing system RAM. 
+- **Speed**: Generates at blinding speeds with minimal overhead
+- **RAM**: Barely utilizes 1GB to 3GB of active RAM, leaving your IDEs and Browsers untouched.
+- **Disk**: Minimal footprints compared to legacy 30B or older 7B models.
 
-This is why we chose it over a regular 30B dense model — you get flagship-tier reasoning on consumer hardware.
+This is why we transitioned away from bloated multi-gigabyte models — you get flawless logic execution while keeping your workstation entirely fluid.
 </details>
 
 All accessible via **Nexus** → AI section, or terminal `ollama run <model>`.
