@@ -18,6 +18,7 @@ func InstallDesktopAndDotfiles() error {
 	setupTerminalAndShell()
 	setupDesktopAesthetic()
 	setupHyprlandAndWaybar()
+	setupThunarConfig()
 
 	fmt.Println("✅ [Module 06-13: Desktop] UI and Dotfiles configurations complete.")
 	return nil
@@ -89,7 +90,7 @@ func setupDesktopAesthetic() {
 func setupHyprlandAndWaybar() {
 	fmt.Println("-> Installing Hyprland & Waybar ecosystem...")
 	pacman.Install(
-		"hyprland", "hyprpaper", "hyprlock", "hypridle", "xdg-desktop-portal-hyprland",
+		"hyprland", "swww", "hyprlock", "hypridle", "xdg-desktop-portal-hyprland",
 		"waybar", "rofi-wayland", "dunst", "grim", "slurp", "wl-clipboard",
 		"cliphist", "brightnessctl", "playerctl", "polkit-kde-agent",
 		"thunar", "nwg-look", "rofi-power-menu", "cava", "pavucontrol", "waypaper", "btop",
@@ -108,7 +109,6 @@ func setupHyprlandAndWaybar() {
 	os.MkdirAll(filepath.Join(home, ".config/cava"), 0755)
 
 	writeConfig(filepath.Join(home, ".config/hypr/hyprland.conf"), hyprlandConf)
-	writeConfig(filepath.Join(home, ".config/hypr/hyprpaper.conf"), hyprpaperConf)
 	writeConfig(filepath.Join(home, ".config/hypr/hyprlock.conf"), hyprlockConf)
 	writeConfig(filepath.Join(home, ".config/hypr/hypridle.conf"), hypridleConf)
 	writeConfig(filepath.Join(home, ".config/hypr/cheatsheet.txt"), cheatsheetConf)
@@ -134,6 +134,13 @@ func setupHyprlandAndWaybar() {
 
 	os.MkdirAll(filepath.Join(home, ".config/waypaper"), 0755)
 	writeConfig(filepath.Join(home, ".config/waypaper/config.ini"), waypaperConf)
+}
+
+func setupThunarConfig() {
+	fmt.Println("-> Configuring Thunar (Terminal Integration)...")
+	home := os.Getenv("HOME")
+	os.MkdirAll(filepath.Join(home, ".config/Thunar"), 0755)
+	writeConfig(filepath.Join(home, ".config/Thunar/uca.xml"), thunarUcaConf)
 }
 
 func writeConfig(path string, content string) {
@@ -409,8 +416,8 @@ const hyprlandConf = `
 monitor=,preferred,auto,1
 
 # Autostart
-# Ultra-Lightweight: Switched swww-daemon to hyprpaper (~15MB RAM vs 100MB+)
-exec-once = hyprpaper
+# Ultra-Lightweight: Switched to swww for smooth transitions
+exec-once = swww-daemon
 exec-once = waybar
 exec-once = dunst
 # Ultra-Lightweight: Image clipboard hoarding is disabled to prevent huge memory leaks
@@ -641,10 +648,6 @@ bindel = , XF86MonBrightnessUp, exec, brightnessctl set 5%+
 bindel = , XF86MonBrightnessDown, exec, brightnessctl set 5%-
 `
 
-const hyprpaperConf = `
-splash = false
-ipc = on
-`
 
 const hyprlockConf = `
 # — Hyprlock — Catppuccin Mocha Lock Screen —
@@ -1223,7 +1226,7 @@ language = en
 folder = ~/Pictures/Wallpapers/orangci
 monitors = All
 wallpaper = ~/Pictures/Wallpapers/orangci/01.png
-backend = hyprpaper
+backend = swww
 fill = fill
 sort = name
 color = #ffffff
@@ -1236,4 +1239,20 @@ swww_transition_type = any
 swww_transition_step = 90
 swww_transition_angle = 0
 swww_transition_duration = 2
+`
+
+const thunarUcaConf = `<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+<action>
+	<icon>utilities-terminal</icon>
+	<name>Open Terminal Here</name>
+	<submenu></submenu>
+	<unique-id>1710240000-1</unique-id>
+	<command>kitty %f</command>
+	<description>Open Kitty in current directory</description>
+	<range></range>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+</actions>
 `

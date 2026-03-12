@@ -50,7 +50,7 @@ func setupApps() {
 
 	// Comm & Productivity
 	pacman.Install("telegram-desktop", "discord", "spotify-launcher")
-	pacman.Install("libreoffice-fresh", "kdeconnect", "keepassxc", "obs-studio", "wf-recorder")
+	pacman.Install("libreoffice-fresh", "kdeconnect", "keepassxc", "obs-studio", "wf-recorder", "mpv")
 
 	if !pacman.IsInstalled("obsidian") && !pacman.IsInstalled("obsidian-bin") {
 		pacman.Install("obsidian-bin")
@@ -93,7 +93,11 @@ func setupGaming() {
 	fmt.Println("-> Installing Gaming Suite...")
 	pacman.Install("steam", "mangohud", "lib32-mangohud", "wine-staging", "winetricks", "prismlauncher")
 
-	if !pacman.IsInstalled("pcsx2") && !pacman.IsInstalled("pcsx2-latest-bin") {
+	if !pacman.IsInstalled("ryujinx-bin") && !pacman.IsInstalled("ryujinx") {
+		pacman.Install("ryujinx-bin")
+	}
+
+	if !pacman.IsInstalled("pcsx2-latest-bin") {
 		pacman.Install("pcsx2-latest-bin")
 	}
 

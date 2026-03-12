@@ -134,9 +134,10 @@ func setupCLITools() {
 
 func setupEditors() {
 	// Antigravity (AI Editor) - Try AUR first, then fallback to Cursor
-	fmt.Println("-> Installing Antigravity Editor...")
+	fmt.Println("-> Installing Antigravity Editor & Modern Tools (Ghostty, Zed)...")
+	pacman.Install("ghostty-git", "zed-bin")
 	if !pacman.IsInstalled("antigravity-bin") {
-		pacman.Install("cursor-bin") // CachyOS uses cursor-bin as fallback if antigravity-bin is missing
+		pacman.Install("cursor-bin")
 	}
 
 	// VS Code Catppuccin Settings

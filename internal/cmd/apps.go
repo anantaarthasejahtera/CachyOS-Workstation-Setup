@@ -40,47 +40,48 @@ var appsCmd = &cobra.Command{
 			return
 		}
 
-		// Step 2: Choose App
 		var appOptions []huh.Option[string]
 		switch category {
 		case "browser":
 			appOptions = []huh.Option[string]{
-				huh.NewOption("🦊 LibreWolf (Privacy Browser)", "librewolf-bin"),
-				huh.NewOption("🛡️ Brave Browser", "brave-bin"),
-				huh.NewOption("🌍 Google Chrome", "google-chrome"),
-				huh.NewOption("Tor Browser", "torbrowser-launcher"),
+				huh.NewOption("🌀 Zen Browser (Sleek & Fast)", "zen-browser-bin"),
+				huh.NewOption("🛡️ Brave Browser (Ad-block Native)", "brave-bin"),
+				huh.NewOption("🦊 LibreWolf (Privacy Focused)", "librewolf-bin"),
+				huh.NewOption("🌐 Google Chrome", "google-chrome"),
 			}
 		case "dev":
 			appOptions = []huh.Option[string]{
-				huh.NewOption("💻 Visual Studio Code", "visual-studio-code-bin"),
-				huh.NewOption("🐘 Docker Desktop", "docker-desktop"),
-				huh.NewOption("☕ IntelliJ IDEA Community", "intellij-idea-community-edition"),
+				huh.NewOption("🚀 Ghostty (GPU Accelerated Terminal)", "ghostty-git"),
+				huh.NewOption("⚡ Zed Editor (Fastest Editor)", "zed-bin"),
 				huh.NewOption("🤖 Cursor AI Editor", "cursor-bin"),
-				huh.NewOption("Postman (API Client)", "postman-bin"),
+				huh.NewOption("💻 Visual Studio Code", "visual-studio-code-bin"),
+				huh.NewOption("🐚 Lazygit (Pro Terminal Git)", "lazygit"),
+				huh.NewOption("📡 Insomnia (Best API Client)", "insomnia-bin"),
+				huh.NewOption("🐘 Docker Desktop", "docker-desktop"),
 			}
 		case "gaming":
 			appOptions = []huh.Option[string]{
-				huh.NewOption("🎮 Discord", "discord"),
-				huh.NewOption("🕹️ Yuzu (Switch Emulator)", "yuzu-early-access"),
+				huh.NewOption("🎮 Steam", "steam"),
+				huh.NewOption("🕹️ Ryujinx (Switch Emulator)", "ryujinx-bin"),
 				huh.NewOption("🦆 DuckStation (PS1 Emulator)", "duckstation-git"),
 				huh.NewOption("🦸 Heroic Games Launcher", "heroic-games-launcher-bin"),
-				huh.NewOption("Lutris (Game Manager)", "lutris"),
+				huh.NewOption("👾 Discord", "discord"),
 			}
 		case "media":
 			appOptions = []huh.Option[string]{
+				huh.NewOption("📼 MPV (Pro-tier Video Player)", "mpv"),
+				huh.NewOption("💎 Obsidian (Knowledge Management)", "obsidian-bin"),
+				huh.NewOption("🎵 Spotify (via spotify-launcher)", "spotify-launcher"),
 				huh.NewOption("🖌️ Krita (Digital Painting)", "krita"),
 				huh.NewOption("✂️ Kdenlive (Video Editor)", "kdenlive"),
-				huh.NewOption("📼 VLC Media Player", "vlc"),
-				huh.NewOption("🎵 Spotify", "spotify"),
-				huh.NewOption("GIMP (Image Manipulation)", "gimp"),
 			}
 		case "utils":
 			appOptions = []huh.Option[string]{
+				huh.NewOption("🔥 Fastfetch (Modern Fetch)", "fastfetch"),
+				huh.NewOption("📈 Btop (Best System Monitor)", "btop"),
+				huh.NewOption("📂 Zoxide (Smarter cd)", "zoxide"),
 				huh.NewOption("🔒 1Password", "1password"),
-				huh.NewOption("☁️ Nextcloud Client", "nextcloud-client"),
-				huh.NewOption("🔥 Flameshot (Screenshot)", "flameshot"),
-				huh.NewOption("🔍 BleachBit", "bleachbit"),
-				huh.NewOption("Remmina (Remote Desktop)", "remmina"),
+				huh.NewOption("⚡ Flameshot (Screenshots)", "flameshot"),
 			}
 		}
 
