@@ -27,7 +27,7 @@ Once saved, relaunch the App Store via `Super+X`, and your custom category and a
 
 ## Modifying Hyprland
 
-Your primary tiling logic is housed in `~/.config/hypr/hyprland.conf`, installed via Module 09.
+Your primary tiling logic is housed in `~/.config/hypr/hyprland.conf`, installed via the Desktop module.
 
 ### Changing Monitor Scaling
 By default, Hyprland scales high-DPI monitors automatically. To override this and force a specific resolution (e.g., 4K at 144Hz):
@@ -53,7 +53,7 @@ The Waybar configuration is built using advanced CSS Variables injected by the `
 
 ## Shell Aliases (Fish)
 
-Your `config.fish` (installed via Module 06) is heavily optimized for speed. Custom aliases can be appended to the bottom using `abbr` or `alias`:
+Your `config.fish` (installed via the Desktop module) is heavily optimized for speed. Custom aliases can be appended to the bottom using `abbr` or `alias`:
 
 ```bash
 abbr update "sudo pacman -Syu"

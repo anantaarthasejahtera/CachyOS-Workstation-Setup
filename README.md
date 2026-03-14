@@ -30,7 +30,7 @@ A **modular installer** that transforms a fresh CachyOS installation into a full
 
 Features:
 
-- **TUI Installer** — Catppuccin-themed interactive CLI module selector (powered by Charmbracelet) with bilingual support (EN/ID)
+- **100% Native Go TUI** — Catppuccin-themed interactive CLI selection powered by Pterm. No `yad`, `zenity`, or GTK dependencies required. Runs everywhere.
 - **Nexus v2 (Go Native)** — A unified single binary replacing 16 legacy bash scripts.
 - **Living Ecosystem (v4)** — 9 integrated subsystems including theming, rollback, cloud sync, AI tuning, app store, and health check natively integrated.
 - **Hardware-aware** — GPU auto-detect, dynamic hugepages, Secure Boot MOK, GPU-scaled configs.
@@ -125,23 +125,21 @@ nexus install
 ```
 
 
-### TUI Module Selector
+### Pterm CLI TUI Installer
 
-When you run `./nexus install`, the TUI installer guides you through module selection:
+When you run `./nexus install`, the Native Go TUI guides you through module selection:
 
 ```
-╭────────────────────────────────────────────────────────────╮
-│ 📦 Select CachyOS Workstation Modules to Install           │
-├────────────────────────────────────────────────────────────┤
-│ [x] Base System (Base, Yay, GPU, Kernel, Security)         │
-│ [x] Development Tools (Docker, Go, Node, Python, Editors)  │
-│ [x] Desktop Aesthetic (Hyprland, Waybar, Catppuccin)       │
-│ [x] Applications & Gaming (Steam, PCsX2, Zen Browser)      │
-│ [ ] Mobile Dev (Android SDK, Flutter)                      │
-│ [ ] Virtualization (QEMU/KVM, Bottles)                     │
-│                                                            │
-│ Space = select  ·  Enter = confirm  ·  Esc = cancel        │
-╰────────────────────────────────────────────────────────────╯
+🌟 [Module Setup]
+Select CachyOS Workstation Modules to Install:
+  [✓] 🛡️ Base System (Base, Yay, GPU, Kernel, Security)
+  [✓] 👨‍💻 Development Tools (Docker, Go, Node, Python, Editors)
+  [✓] 🎨 Desktop Aesthetic (Hyprland, Waybar, Catppuccin)
+  [✓] 🛒 Applications & Gaming (Steam, PCSX2, Zen Browser)
+  [ ] 📱 Mobile Dev (Android SDK, Flutter)
+  [ ] 🖥️ Virtualization (QEMU/KVM, Bottles)
+
+Press Space to select, Enter to confirm.
 ```
 
 ---
@@ -150,17 +148,14 @@ When you run `./nexus install`, the TUI installer guides you through module sele
 
 ```
 CachyOS-Workstation-Setup/
+├── main.go                   # Clean root Go entrypoint
 ├── install.sh                # One-liner bootstrap (curl | bash)
 ├── uninstall.sh              # Safe ecosystem remover
 ├── Makefile                  # Dev commands (install, lint, init)
 ├── CHANGELOG.md              # Release history
 ├── build.sh                  # Go binary compiler
-├── ecosystem/                # (Deprecated: Replaced by cmd/nexus)
-├── modules/                  # (Deprecated: Replaced by internal/modules)
-├── cmd/
-│   └── nexus/                # Root package for the CLI
 ├── internal/
-│   ├── cmd/                  # CLI Commands (install, theme, apps, doctor)
+│   ├── cmd/                  # CLI Commands (install, theme, sync, doctor, postinstall)
 │   ├── modules/              # 100% Go-native installation modules
 │   │   ├── apps.go           # Browser, Terminals, Gaming, VM UI
 │   │   ├── base.go           # Hardware layout, pacman hooks
@@ -169,20 +164,10 @@ CachyOS-Workstation-Setup/
 │   │   ├── extra.go          # Custom virtualization and Mobile SDKs
 │   │   └── system.go         # Security/UFW, Firewall, Snapper Configs
 │   ├── pacman/               # Go wrapper for Arch Linux Package Management
-│   └── state/                # Rollback mechanism and BTRFS JSON tracker
+│   └── state/                # Rollback mechanism and JSON tracker
 ├── .github/                  # Community Health & CI Workflows
-│   ├── CODE_OF_CONDUCT.md
-│   ├── CONTRIBUTING.md
-│   ├── INSTALL_GUIDE.md
-│   ├── SECURITY.md
-│   └── SUPPORT.md
-├── .githooks/                # Local development Git hooks
-│   └── pre-commit            # Pre-commit checks (ShellCheck, syntax)
-├── assets/                   # Bundled wallpapers and static assets
-│   └── wallpapers/           # Catppuccin-themed wallpapers
 ├── docs/                     # Official VitePress documentation source
-├── .gitignore
-└── .gitattributes            # Enforce LF line endings for .sh files
+└── .gitignore
 ```
 
 ### Architecture
@@ -196,14 +181,14 @@ flowchart TB
     subgraph Go["Internal Go Packages"]
         direction LR
         PAC["internal/pacman"] -.-> MOD["internal/modules"]
-        STATE["internal/state<br/>BTRFS Tracker"] -.-> MOD
+        STATE["internal/state<br/>JSON Tracker"] -.-> MOD
     end
 
     TUI --> Go
 
     subgraph Runtime["Runtime Ecosystem (`nexus`)"]
         NEXUS["nexus command<br/>Global Access"]
-        NEXUS --> COMMANDS["apps, chat, doctor, sync, theme"]
+        NEXUS --> COMMANDS["install, doctor, sync, postinstall"]
     end
 
     Go --> Runtime
@@ -272,11 +257,12 @@ Interactive local AI chat.
 - Choose mode: Normal Chat, Debate Mode, or Terminal Access.
 - Auto-starts Ollama service if needed, manages CPU power governor.
 
-### 9. 🧙 Post-Install Wizard (`post-install`)
-First-boot onboarding via terminal UI.
-- Built with Charmbracelet `huh` and `lipgloss` for a beautiful, responsive Catppuccin interface.
-- Syncs dotfiles directly via simple URL input, sets wallpaper, verifies ecosystem tools are working.
-- Runs automatically after first install, or invoke manually: `post-install`.
+### 9. 🧙 Mature Post-Install Wizard (`nexus postinstall`)
+First-boot onboarding via terminal UI featuring rigorous Arch Linux system hygiene.
+- Solves the **"Plasma Trap"** by injecting SDDM Session configs (`Session=hyprland`) and applying the Catppuccin Mocha SDDM Theme automatically.
+- Deep cleans redundant `makedepends` automatically via `sudo pacman -Rns $(pacman -Qtdq)`.
+- Re-generates global system caches (`fc-cache -fv`, `bat cache`) and XDG directories to guarantee zero broken fonts or folders on first boot.
+- Runs automatically after first install, or invoke manually: `./nexus postinstall`.
 
 ---
 

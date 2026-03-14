@@ -1,31 +1,30 @@
 package modules
 
 import (
-	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 
 	"github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/internal/pacman"
 	"github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/internal/state"
+	"github.com/pterm/pterm"
 )
 
 // InstallDesktopAndDotfiles implements 06-dotfiles, 08-desktop, 09-hyprland, 13-waybar.
 func InstallDesktopAndDotfiles() error {
-	fmt.Println("🌟 [Module 06-13: Desktop] Setting up Hyprland, Waybar & Dotfiles...")
+	pterm.Info.Println("🌟 [Module 06-13: Desktop] Setting up Hyprland, Waybar & Dotfiles...")
 
 	setupTerminalAndShell()
 	setupDesktopAesthetic()
 	setupHyprlandAndWaybar()
 	setupThunarConfig()
 
-	fmt.Println("✅ [Module 06-13: Desktop] UI and Dotfiles configurations complete.")
+	pterm.Info.Println("✅ [Module 06-13: Desktop] UI and Dotfiles configurations complete.")
 	return nil
 }
 
 func setupTerminalAndShell() {
-	fmt.Println("-> Installing Terminal & Shell...")
+	pterm.Info.Println("-> Installing Terminal & Shell...")
 	pacman.Install("fish", "starship", "kitty")
 	// CachyOS/Arch recently restructured nerd-fonts. ttf-nerd-fonts-symbols-common can pull
 	// massive metapackages. We use specific minimal packages (~30MB) instead of 1.4GB metapackages.
@@ -53,11 +52,11 @@ func setupTerminalAndShell() {
 	writeConfig(filepath.Join(home, ".config/fastfetch/config.jsonc"), fastfetchConf)
 
 	// Set Fish as default
-	exec.Command("sudo", "chsh", "-s", "/usr/bin/fish", os.Getenv("USER")).Run()
+	pacman.Command("sudo", "chsh", "-s", "/usr/bin/fish", os.Getenv("USER")).Run()
 }
 
 func setupDesktopAesthetic() {
-	fmt.Println("-> Installing Desktop Aesthetics (Catppuccin)...")
+	pterm.Info.Println("-> Installing Desktop Aesthetics (Catppuccin)...")
 	pacman.Install("papirus-icon-theme", "kvantum", "fastfetch", "cmatrix")
 	pacman.Install(
 		"catppuccin-gtk-theme-mocha", "papirus-folders-catppuccin-git",
@@ -69,12 +68,12 @@ func setupDesktopAesthetic() {
 	wallDir := filepath.Join(os.Getenv("HOME"), "Pictures/Wallpapers")
 	os.MkdirAll(wallDir, 0755)
 
-	fmt.Println("-> Fetching Orangci Catppuccin Wallpapers...")
+	pterm.Info.Println("-> Fetching Orangci Catppuccin Wallpapers...")
 	orangciDir := filepath.Join(wallDir, "orangci")
 	if _, err := os.Stat(orangciDir); os.IsNotExist(err) {
-		exec.Command("git", "clone", "--depth", "1", "https://github.com/orangci/walls-catppuccin-mocha.git", orangciDir).Run()
+		pacman.Command("git", "clone", "--depth", "1", "https://github.com/orangci/walls-catppuccin-mocha.git", orangciDir).Run()
 	} else {
-		exec.Command("git", "-C", orangciDir, "pull").Run()
+		pacman.Command("git", "-C", orangciDir, "pull").Run()
 	}
 
 	home := os.Getenv("HOME")
@@ -88,7 +87,7 @@ func setupDesktopAesthetic() {
 }
 
 func setupHyprlandAndWaybar() {
-	fmt.Println("-> Installing Hyprland & Waybar ecosystem...")
+	pterm.Info.Println("-> Installing Hyprland & Waybar ecosystem...")
 	pacman.Install(
 		"hyprland", "swww", "hyprlock", "hypridle", "xdg-desktop-portal-hyprland",
 		"waybar", "rofi-wayland", "dunst", "grim", "slurp", "wl-clipboard",
@@ -115,13 +114,13 @@ func setupHyprlandAndWaybar() {
 
 	showkeys := filepath.Join(home, ".config/hypr/show-keys.sh")
 	writeConfig(showkeys, showkeysConf)
-	exec.Command("chmod", "+x", showkeys).Run()
+	pacman.Command("chmod", "+x", showkeys).Run()
 
 	writeConfig(filepath.Join(home, ".config/rofi/config.rasi"), rofiConf)
 	writeConfig(filepath.Join(home, ".config/rofi/media.rasi"), rofiMediaConf)
 	rofiWifi := filepath.Join(home, ".config/rofi/scripts/rofi-wifi-menu.sh")
 	writeConfig(rofiWifi, rofiWifiConf)
-	exec.Command("chmod", "+x", rofiWifi).Run()
+	pacman.Command("chmod", "+x", rofiWifi).Run()
 
 	writeConfig(filepath.Join(home, ".config/dunst/dunstrc"), dunstConf)
 	writeConfig(filepath.Join(home, ".config/cava/config"), cavaConf)
@@ -130,14 +129,14 @@ func setupHyprlandAndWaybar() {
 	writeConfig(filepath.Join(home, ".config/waybar/style.css"), waybarStyle)
 	waybarMedia := filepath.Join(home, ".config/waybar/scripts/media-hub.sh")
 	writeConfig(waybarMedia, waybarMediaConf)
-	exec.Command("chmod", "+x", waybarMedia).Run()
+	pacman.Command("chmod", "+x", waybarMedia).Run()
 
 	os.MkdirAll(filepath.Join(home, ".config/waypaper"), 0755)
 	writeConfig(filepath.Join(home, ".config/waypaper/config.ini"), waypaperConf)
 }
 
 func setupThunarConfig() {
-	fmt.Println("-> Configuring Thunar (Terminal Integration)...")
+	pterm.Info.Println("-> Configuring Thunar (Terminal Integration)...")
 	home := os.Getenv("HOME")
 	os.MkdirAll(filepath.Join(home, ".config/Thunar"), 0755)
 	writeConfig(filepath.Join(home, ".config/Thunar/uca.xml"), thunarUcaConf)

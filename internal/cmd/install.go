@@ -1,14 +1,14 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/internal/modules"
+	"github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/internal/pacman"
 	"github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/internal/state"
-	"github.com/charmbracelet/huh"
-	"github.com/charmbracelet/lipgloss"
+	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 )
 
@@ -17,10 +17,9 @@ var installAll bool
 var installCmd = &cobra.Command{
 	Use:   "install",
 	Short: "Run the interactive workstation installer",
-	Long:  `Run the full installation of CachyOS Workstation Setup. Triggers the TUI menu unless --all is specified.`,
+	Long:  `Run the full installation of CachyOS Workstation Setup. Triggers the GUI menu unless --all is specified.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("🚀 Nexus Installer v2.0 (Powered by pure Go)")
-
+		// Removed CLI banner for a full GUI experience.
 		if installAll {
 			runNonInteractiveInstall()
 			return
@@ -31,82 +30,102 @@ var installCmd = &cobra.Command{
 }
 
 func runNonInteractiveInstall() {
-	fmt.Println("Executing non-interactive full installation...")
+	modules_list := []struct {
+		id   string
+		name string
+		fn   func() error
+	}{
+		{"base", "Base System", modules.InstallBaseSystem},
+		{"security", "System Security", modules.InstallSystemAndSecurity},
+		{"dev", "Development & Editors", modules.InstallDevAndEditors},
+		{"desktop", "Desktop & Dotfiles", modules.InstallDesktopAndDotfiles},
+		{"apps", "Apps & Gaming", modules.InstallAppsAndGaming},
+		{"mobile", "Mobile Development", modules.InstallMobile},
+		{"vm", "Virtualization", modules.InstallVM},
+	}
+
+	w, err := NewWizard("Full Nexus Installation", len(modules_list))
+	if err != nil {
+		pterm.Error.Println("Error starting wizard:", err.Error())
+		return
+	}
+	defer w.Close()
+	pacman.SetLogger(w)
+
+	w.Write([]byte("\n🚀 Starting Full Non-Interactive Installation...\n"))
 	state.CreateBTRFSSnapperSnapshot("Pre-Nexus Full Install")
 
-	modules.InstallBaseSystem()
-	modules.InstallSystemAndSecurity()
-	modules.InstallDevAndEditors()
-	modules.InstallDesktopAndDotfiles()
-	modules.InstallAppsAndGaming()
-	modules.InstallMobile()
-	modules.InstallVM()
+	for _, m := range modules_list {
+		w.UpdateProgress("Installing " + m.name + "...")
+		m.fn()
+	}
 
-	fmt.Println("\n🎉 All massive porting modules installed successfully!")
-
-	// Automatically trigger post-install wizard for repo cloud syncing
+	w.Write([]byte("\n🎉 Installation successful!\n"))
+	w.Close() // Close wizard before postinstall so it doesn't leave lingering windows
 	runPostInstallWizard()
 }
 
 func runInteractiveTUI() {
-	var selectedModules []string
-
-	form := huh.NewForm(
-		huh.NewGroup(
-			huh.NewMultiSelect[string]().
-				Title("Select CachyOS Workstation Modules to Install").
-				Options(
-					huh.NewOption("Base System (Base, Yay, GPU, Kernel, Security)", "base").Selected(true),
-					huh.NewOption("Development Tools (Docker, Go, Node, Python, Editors)", "dev").Selected(true),
-					huh.NewOption("Desktop Aesthetic (Hyprland, Waybar, Catppuccin)", "desktop").Selected(true),
-					huh.NewOption("Applications & Gaming (Steam, PCsX2, Zen Browser)", "apps").Selected(true),
-					huh.NewOption("Mobile Dev (Android SDK, Flutter)", "mobile"),
-					huh.NewOption("Virtualization (QEMU/KVM, Bottles)", "vm"),
-				).
-				Value(&selectedModules),
-		),
-	).WithTheme(huh.ThemeCatppuccin())
-
-	err := form.Run()
-	if err != nil {
-		fmt.Println("Installation aborted.")
-		os.Exit(1)
+	// Step 1: Select Modules natively using Pterm interactive multiselect
+	options := []string{
+		"📦 Base System (Yay, GPU, Kernel, Security)",
+		"👨‍💻 Development Tools (Docker, Go, Node, Python, Editors)",
+		"🎨 Desktop Aesthetic (Hyprland, Waybar, Catppuccin)",
+		"🛒 Applications & Gaming (Steam, PCSX2, Zen Browser)",
+		"📱 Mobile Dev (Android SDK, Flutter)",
+		"🖥️ Virtualization (QEMU/KVM, Bottles)",
 	}
 
-	if len(selectedModules) == 0 {
-		fmt.Println("No modules selected. Exiting.")
+	selectedOptions, _ := pterm.DefaultInteractiveMultiselect.
+		WithOptions(options).
+		WithDefaultOptions(options[:4]). // Default select the first 4 (base, dev, desktop, apps)
+		WithFilter(false).
+		Show("Select CachyOS Workstation Modules to Install")
+
+	if len(selectedOptions) == 0 {
+		pterm.Warning.Println("No modules selected. Installation aborted.")
 		return
 	}
 
-	fmt.Printf("\nExecuting installation for: %v\n", selectedModules)
-	state.CreateBTRFSSnapperSnapshot("Pre-Nexus TUI Install")
+	// Step 2: Run Wizard
+	w, err := NewWizard("Nexus Installation Wizard", len(selectedOptions))
+	if err != nil {
+		pterm.Error.Println("Error starting wizard:", err.Error())
+		return
+	}
+	defer w.Close()
+	pacman.SetLogger(w)
 
-	for _, m := range selectedModules {
-		fmt.Printf("\n-> Executing Selection: %s...\n", m)
-		if m == "base" {
+	state.CreateBTRFSSnapperSnapshot("Pre-Nexus Wizard Install")
+
+	for _, m := range selectedOptions {
+		if strings.Contains(m, "Base System") {
+			w.UpdateProgress("Configuring Base System...")
 			modules.InstallBaseSystem()
 			modules.InstallSystemAndSecurity()
-		} else if m == "dev" {
+		} else if strings.Contains(m, "Development Tools") {
+			w.UpdateProgress("Setting up Dev Tools...")
 			modules.InstallDevAndEditors()
-		} else if m == "desktop" {
+		} else if strings.Contains(m, "Desktop Aesthetic") {
+			w.UpdateProgress("Applying Desktop Aesthetics...")
 			modules.InstallDesktopAndDotfiles()
-		} else if m == "apps" {
+		} else if strings.Contains(m, "Applications & Gaming") {
+			w.UpdateProgress("Installing Apps & Gaming...")
 			modules.InstallAppsAndGaming()
-		} else if m == "mobile" {
+		} else if strings.Contains(m, "Mobile Dev") {
+			w.UpdateProgress("Setting up Mobile Dev environment...")
 			modules.InstallMobile()
-		} else if m == "vm" {
+		} else if strings.Contains(m, "Virtualization") {
+			w.UpdateProgress("Configuring Virtualization...")
 			modules.InstallVM()
 		}
 	}
 
-	fmt.Println("\n🎉 Installation completed successfully!")
-
-	// Automatically trigger post-install wizard for repo cloud syncing
+	w.Close() // Close before opening postinstall dialog
 	runPostInstallWizard()
 }
 
 func runPostInstallWizard() {
-	fmt.Println("\n" + lipgloss.NewStyle().Foreground(lipgloss.Color("#cba6f7")).Bold(true).Render("✨ Launching Final Post-Install Wizard..."))
 	exec.Command(os.Args[0], "postinstall").Run()
 }
 

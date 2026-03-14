@@ -6,6 +6,29 @@
 
 <hr>
 
+## [v2.1.0] - The Zero-Dependency UI & Mature Post-Install (2026-03-15)
+
+The installer has been ascended into a standalone, zero-dependency Go application. All legacy GTK gui wrappers (YAD/Zenity) have been eradicated, replaced by a highly aesthetic native terminal interface. Furthermore, the post-install routine has reached "Very Mature" status with rigorous system hygiene implementation.
+
+### ✨ Major Features
+- **Pterm Native Go TUI**: The installer is now a pure CLI application powered by `pterm`. All multi-select menus, spinners, progress bars, and boolean prompts render natively in the terminal. **No YAD or Zenity required.**
+- **SDDM Catppuccin Mastery & Session Injection**: Solves the "Plasma Trap". Post-install seamlessly installs the Catppuccin Mocha SDDM theme and writes `/etc/sddm.conf.d/default-session.conf` to force Hyprland automatically on next boot.
+- **Native Sudo Caching**: Sudo privileges are handled inside a seamless terminal prompt (`CheckAndPromptSudo()`) at the very beginning of the process, preventing UI hangs during massive operations.
+
+### 🧹 The Very Mature Post-Install System
+The post-install script (`internal/cmd/postinstall.go`) now performs rigorous Arch Linux system finalization:
+- **XDG User Dirs**: Automatically synchronizes default folders (Downloads, Pictures, etc.).
+- **Global Fish Shell**: `chsh` is strictly enforced to Fish for both `$USER` and `root`.
+- **Cache Integrity**: Automatically runs `fc-cache -fv` and `bat cache --build` to prevent graphical rendering bugs on first boot.
+- **Orphan Pacman Cleanup**: Massively trims SSD bloat by natively executing `sudo pacman -Rns $(pacman -Qtdq) --noconfirm` to erase unneeded `makedepends`.
+- **Graceful Reboot**: TUI now triggers a graceful `sudo reboot` prompt upon complete execution.
+
+### ♻️ Architecture Reforms
+- **Main.go Rehousing**: The core CLI entrypoint has been moved to the project's root `main.go`, allowing for a simple `go build -o nexus ./main.go`.
+- **TUI Log Streaming**: Verbose internal package commands (e.g., yay logs) are silently piped in the background while the beautiful TUI spinner runs in the foreground.
+
+---
+
 ## [v2.0.0] - The Go-Native Architecture (2026-03-11)
 
 The most monumental update to the ecosystem. Completely rewrites the legacy 16 bash scripts into a single, high-performance Go binary (`nexus`). Introduces premium, aesthetic, and automated TUI/GUI workflows powered by Charmbracelet and Rofi.
@@ -17,22 +40,6 @@ The most monumental update to the ecosystem. Completely rewrites the legacy 16 b
 - **Network Cockpit**: Converted `nmcli` and bash stubs to natively trigger `nexus network` inside Rofi for beautiful Wi-Fi scanning.
 - **Waypaper Automation**: Automatically pulls Catppuccin wallpapers from the `orangci` repo and sets up the Waypaper configuration during desktop installation.
 - **Interactive Post-Install Wizard**: Enhanced the first-boot experience with Charmbracelet's `huh` and `lipgloss` to render beautiful, Catppuccin-themed forms for GitHub repo synchronization.
-
----
-
-## [v1.6.0] - The Deep Codebase Audit (2026-03-10)
-
-Comprehensive codebase remediation ensuring zero shell violations, zero duplicate packages, and zero reliance on intermediary dependency managers when native variants exist.
-
-### 🔴 Critical Fixes
-- **Shell Policy (Fish Enforcement)**: Eradicated Zsh, Oh My Zsh, and `.zshrc` writing across all modules. Exclusively using Fish shell with `config.fish`, fast aliases (`eza`, `bat`), and maintaining the unified Starship prompt.
-- **Strict Anti-Flatpak Policy**: Eliminated all Flatpak usage from Mod 10 (Apps) and Mod 11 (Gaming). Using `telegram-desktop`, `discord` from official repos, and `spotify-launcher`, `obsidian-bin`, `pcsx2-latest-bin` from AUR.
-- **Dependency Duplication**: Removed redundant `pavucontrol`, `blueman`, `alacritty`, and `btop` installs across `09-hyprland.sh` and `13-waybar.sh`.
-
-### 🟡 Bug Fixes & Refactors
-- **Rofi Theme Ownership**: Centralized all Rofi configurations (`config.rasi`, `media.rasi`, etc.) exclusively into `13-waybar.sh` to prevent overlapping edits.
-- **Mobile Environment**: `05-mobile.sh` correctly exports Android PATH to `config.fish` instead of the legacy Zsh configuration.
-- **Documentation**: README, Setup Scripts, and Guide Interactive fully translated to recognize the new default Fish environment and Native Package standard.
 
 ---
 
@@ -49,6 +56,22 @@ Refinements to the Wayland ecosystem, introducing a native wallpaper manager and
 - **Rofi Media Hub**: Fixed previous/next functionality and ensured thumbnail images update correctly upon song changes.
 - **Rofi Visuals**: Polished the graphical interface for Rofi widgets to match the transparent Catppuccin Hyprland aesthetics without background artifacts.
 - **Git & History**: Cleaned up the repository history using strict `--no-ff` merge policies and removed duplicated codebase audit changelogs.
+
+---
+
+## [v1.6.0] - The Deep Codebase Audit (2026-03-10)
+
+Comprehensive codebase remediation ensuring zero shell violations, zero duplicate packages, and zero reliance on intermediary dependency managers when native variants exist.
+
+### 🔴 Critical Fixes
+- **Shell Policy (Fish Enforcement)**: Eradicated Zsh, Oh My Zsh, and `.zshrc` writing across all modules. Exclusively using Fish shell with `config.fish`, fast aliases (`eza`, `bat`), and maintaining the unified Starship prompt.
+- **Strict Anti-Flatpak Policy**: Eliminated all Flatpak usage from Mod 10 (Apps) and Mod 11 (Gaming). Using `telegram-desktop`, `discord` from official repos, and `spotify-launcher`, `obsidian-bin`, `pcsx2-latest-bin` from AUR.
+- **Dependency Duplication**: Removed redundant `pavucontrol`, `blueman`, `alacritty`, and `btop` installs across `09-hyprland.sh` and `13-waybar.sh`.
+
+### 🟡 Bug Fixes & Refactors
+- **Rofi Theme Ownership**: Centralized all Rofi configurations (`config.rasi`, `media.rasi`, etc.) exclusively into `13-waybar.sh` to prevent overlapping edits.
+- **Mobile Environment**: `05-mobile.sh` correctly exports Android PATH to `config.fish` instead of the legacy Zsh configuration.
+- **Documentation**: README, Setup Scripts, and Guide Interactive fully translated to recognize the new default Fish environment and Native Package standard.
 
 ---
 

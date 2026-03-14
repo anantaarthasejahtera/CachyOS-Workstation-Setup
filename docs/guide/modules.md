@@ -1,6 +1,6 @@
 # 🧩 The Core Installation Modules
 
-Our setup has been deeply refactored from 15 bash scripts into **6 highly cohesive, independent Go modules**. Every module is fully idempotent (can be re-run endlessly without breaking things) and automatically backs up configurations via BTRFS/Snapper before making any changes.
+Our setup has been deeply refactored from legacy bash scripts into **highly cohesive, independent Go packages**. Every module is run natively via the `nexus` binary and automatically backs up configurations via JSON/BTRFS tracking before making any changes.
 
 Here is the comprehensive breakdown of what each Go package does under the hood.
 
@@ -50,10 +50,9 @@ Native hypervisors and Android integrations.
 * Automatically downloads and sets up the Android SDK and Flutter.
 
 ## `nexus` Commands (Ecosystem Tools)
+* `nexus install`: Launch the Native Pterm TUI Wizard
 * `nexus apps`: GUI App Store
 * `nexus theme`: Dynamic Theme Switcher
 * `nexus sync`: Cloud Sync & Time Machine
 * `nexus doctor`: System Health Check and AI Tuner
-* `nexus chat`: AI Chat Interface
-* `nexus rollback`: Config Rollback UI
-* `nexus network`: Wi-Fi Scanner and Active Shield
+* `nexus postinstall`: Mature System Finalization & Cleanup
