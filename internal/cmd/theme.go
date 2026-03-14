@@ -131,6 +131,46 @@ func applyPermanentConfig(t themeInfo) {
 		os.WriteFile(hyprConfig, []byte(configStr), 0644)
 	}
 
+	// Update Rofi (config.rasi & media.rasi)
+	rofiPaths := []string{
+		filepath.Join(homeDir, ".config", "rofi", "config.rasi"),
+		filepath.Join(homeDir, ".config", "rofi", "media.rasi"),
+	}
+	for _, p := range rofiPaths {
+		if content, err := os.ReadFile(p); err == nil {
+			reAccent := regexp.MustCompile(`accent:\s*#[a-zA-Z0-9]+;`)
+			newRofi := reAccent.ReplaceAllString(string(content), fmt.Sprintf("accent:   #%s;", t.col1))
+			os.WriteFile(p, []byte(newRofi), 0644)
+		}
+	}
+
+	// Update Kitty
+	kittyConfig := filepath.Join(homeDir, ".config", "kitty", "kitty.conf")
+	if content, err := os.ReadFile(kittyConfig); err == nil {
+		reTabBg := regexp.MustCompile(`active_tab_background\s*#[a-zA-Z0-9]+`)
+		newKitty := reTabBg.ReplaceAllString(string(content), fmt.Sprintf("active_tab_background #%s", t.col1))
+		os.WriteFile(kittyConfig, []byte(newKitty), 0644)
+	}
+
+	// Update Waybar
+	waybarConfig := filepath.Join(homeDir, ".config", "waybar", "style.css")
+	if content, err := os.ReadFile(waybarConfig); err == nil {
+		wb := string(content)
+		// Gradient active workspace
+		reGradient := regexp.MustCompile(`linear-gradient\(135deg,\s*#[a-zA-Z0-9]+,\s*#[a-zA-Z0-9]+\)`)
+		wb = reGradient.ReplaceAllString(wb, fmt.Sprintf("linear-gradient(135deg, #%s, #%s)", t.col1, t.col2))
+		
+		// Clock Font Color (specifically targeting the #clock block)
+		reClock := regexp.MustCompile(`#clock \{\s*font-weight:\s*600;\s*color:\s*#[a-zA-Z0-9]+;`)
+		wb = reClock.ReplaceAllString(wb, fmt.Sprintf("#clock {\n    font-weight: 600;\n    color: #%s;", t.col1))
+
+		// Tooltip Border 
+		reBorder := regexp.MustCompile(`border:\s*1px\s*solid\s*#[a-zA-Z0-9]+;`)
+		wb = reBorder.ReplaceAllString(wb, fmt.Sprintf("border: 1px solid #%s;", t.col1))
+
+		os.WriteFile(waybarConfig, []byte(wb), 0644)
+	}
+
 	// Persist
 	exec.Command("hyprctl", "reload").Run()
 	// Restart Waybar logic for live CSS changes (placeholder for now/waybar reload)
@@ -155,7 +195,7 @@ var themeCmd = &cobra.Command{
 			if found != nil {
 				applyLivePreview(*found)
 				applyPermanentConfig(*found)
-				fmt.Printf("✨ Applied team %s directly.\n", found.name)
+				fmt.Printf("\n✨ Applied ecosystem theme: %s\n\n", found.name)
 			} else {
 				fmt.Println("❌ Unknown theme.")
 			}

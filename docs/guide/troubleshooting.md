@@ -39,9 +39,9 @@ If you try to run `docker ps` and receive a permission error:
 
 ## 🧠 Ollama / AI Tuner Too Slow
 
-If `qwen3:30b` is generating text very slowly:
+If `qwen3.5:4b` is generating text very slowly:
 1. Your VRAM (GPU Memory) might be saturated. The MoE model needs a minimum of 16GB RAM, but prefers 24GB+ to load entirely into VRAM.
-2. **Solution**: Purge background tasks, or switch to the much lighter `deepseek-r1:7b` model via Nexus.
+2. **Solution**: Purge background tasks, or switch to the much lighter `deepseek-r1:1.5b` model via Nexus.
 
 ## FAQ
 

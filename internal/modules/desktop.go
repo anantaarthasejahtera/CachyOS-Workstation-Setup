@@ -1,30 +1,30 @@
 package modules
 
 import (
-	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 
 	"github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/internal/pacman"
 	"github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/internal/state"
+	"github.com/pterm/pterm"
 )
 
 // InstallDesktopAndDotfiles implements 06-dotfiles, 08-desktop, 09-hyprland, 13-waybar.
 func InstallDesktopAndDotfiles() error {
-	fmt.Println("🌟 [Module 06-13: Desktop] Setting up Hyprland, Waybar & Dotfiles...")
+	pterm.Info.Println("🌟 [Module 06-13: Desktop] Setting up Hyprland, Waybar & Dotfiles...")
 
 	setupTerminalAndShell()
 	setupDesktopAesthetic()
 	setupHyprlandAndWaybar()
+	setupThunarConfig()
 
-	fmt.Println("✅ [Module 06-13: Desktop] UI and Dotfiles configurations complete.")
+	pterm.Info.Println("✅ [Module 06-13: Desktop] UI and Dotfiles configurations complete.")
 	return nil
 }
 
 func setupTerminalAndShell() {
-	fmt.Println("-> Installing Terminal & Shell...")
+	pterm.Info.Println("-> Installing Terminal & Shell...")
 	pacman.Install("fish", "starship", "kitty")
 	// CachyOS/Arch recently restructured nerd-fonts. ttf-nerd-fonts-symbols-common can pull
 	// massive metapackages. We use specific minimal packages (~30MB) instead of 1.4GB metapackages.
@@ -52,11 +52,11 @@ func setupTerminalAndShell() {
 	writeConfig(filepath.Join(home, ".config/fastfetch/config.jsonc"), fastfetchConf)
 
 	// Set Fish as default
-	exec.Command("sudo", "chsh", "-s", "/usr/bin/fish", os.Getenv("USER")).Run()
+	pacman.Command("sudo", "chsh", "-s", "/usr/bin/fish", os.Getenv("USER")).Run()
 }
 
 func setupDesktopAesthetic() {
-	fmt.Println("-> Installing Desktop Aesthetics (Catppuccin)...")
+	pterm.Info.Println("-> Installing Desktop Aesthetics (Catppuccin)...")
 	pacman.Install("papirus-icon-theme", "kvantum", "fastfetch", "cmatrix")
 	pacman.Install(
 		"catppuccin-gtk-theme-mocha", "papirus-folders-catppuccin-git",
@@ -68,12 +68,12 @@ func setupDesktopAesthetic() {
 	wallDir := filepath.Join(os.Getenv("HOME"), "Pictures/Wallpapers")
 	os.MkdirAll(wallDir, 0755)
 
-	fmt.Println("-> Fetching Orangci Catppuccin Wallpapers...")
+	pterm.Info.Println("-> Fetching Orangci Catppuccin Wallpapers...")
 	orangciDir := filepath.Join(wallDir, "orangci")
 	if _, err := os.Stat(orangciDir); os.IsNotExist(err) {
-		exec.Command("git", "clone", "--depth", "1", "https://github.com/orangci/walls-catppuccin-mocha.git", orangciDir).Run()
+		pacman.Command("git", "clone", "--depth", "1", "https://github.com/orangci/walls-catppuccin-mocha.git", orangciDir).Run()
 	} else {
-		exec.Command("git", "-C", orangciDir, "pull").Run()
+		pacman.Command("git", "-C", orangciDir, "pull").Run()
 	}
 
 	home := os.Getenv("HOME")
@@ -87,9 +87,9 @@ func setupDesktopAesthetic() {
 }
 
 func setupHyprlandAndWaybar() {
-	fmt.Println("-> Installing Hyprland & Waybar ecosystem...")
+	pterm.Info.Println("-> Installing Hyprland & Waybar ecosystem...")
 	pacman.Install(
-		"hyprland", "hyprpaper", "hyprlock", "hypridle", "xdg-desktop-portal-hyprland",
+		"hyprland", "swww", "hyprlock", "hypridle", "xdg-desktop-portal-hyprland",
 		"waybar", "rofi-wayland", "dunst", "grim", "slurp", "wl-clipboard",
 		"cliphist", "brightnessctl", "playerctl", "polkit-kde-agent",
 		"thunar", "nwg-look", "rofi-power-menu", "cava", "pavucontrol", "waypaper", "btop",
@@ -108,20 +108,19 @@ func setupHyprlandAndWaybar() {
 	os.MkdirAll(filepath.Join(home, ".config/cava"), 0755)
 
 	writeConfig(filepath.Join(home, ".config/hypr/hyprland.conf"), hyprlandConf)
-	writeConfig(filepath.Join(home, ".config/hypr/hyprpaper.conf"), hyprpaperConf)
 	writeConfig(filepath.Join(home, ".config/hypr/hyprlock.conf"), hyprlockConf)
 	writeConfig(filepath.Join(home, ".config/hypr/hypridle.conf"), hypridleConf)
 	writeConfig(filepath.Join(home, ".config/hypr/cheatsheet.txt"), cheatsheetConf)
 
 	showkeys := filepath.Join(home, ".config/hypr/show-keys.sh")
 	writeConfig(showkeys, showkeysConf)
-	exec.Command("chmod", "+x", showkeys).Run()
+	pacman.Command("chmod", "+x", showkeys).Run()
 
 	writeConfig(filepath.Join(home, ".config/rofi/config.rasi"), rofiConf)
 	writeConfig(filepath.Join(home, ".config/rofi/media.rasi"), rofiMediaConf)
 	rofiWifi := filepath.Join(home, ".config/rofi/scripts/rofi-wifi-menu.sh")
 	writeConfig(rofiWifi, rofiWifiConf)
-	exec.Command("chmod", "+x", rofiWifi).Run()
+	pacman.Command("chmod", "+x", rofiWifi).Run()
 
 	writeConfig(filepath.Join(home, ".config/dunst/dunstrc"), dunstConf)
 	writeConfig(filepath.Join(home, ".config/cava/config"), cavaConf)
@@ -130,10 +129,17 @@ func setupHyprlandAndWaybar() {
 	writeConfig(filepath.Join(home, ".config/waybar/style.css"), waybarStyle)
 	waybarMedia := filepath.Join(home, ".config/waybar/scripts/media-hub.sh")
 	writeConfig(waybarMedia, waybarMediaConf)
-	exec.Command("chmod", "+x", waybarMedia).Run()
+	pacman.Command("chmod", "+x", waybarMedia).Run()
 
 	os.MkdirAll(filepath.Join(home, ".config/waypaper"), 0755)
 	writeConfig(filepath.Join(home, ".config/waypaper/config.ini"), waypaperConf)
+}
+
+func setupThunarConfig() {
+	pterm.Info.Println("-> Configuring Thunar (Terminal Integration)...")
+	home := os.Getenv("HOME")
+	os.MkdirAll(filepath.Join(home, ".config/Thunar"), 0755)
+	writeConfig(filepath.Join(home, ".config/Thunar/uca.xml"), thunarUcaConf)
 }
 
 func writeConfig(path string, content string) {
@@ -339,6 +345,11 @@ set -gx BROWSER "zen-browser"
 alias ls='eza --icons --group-directories-first'
 alias ll='eza -la --icons --group-directories-first --git'
 alias cat='bat --style=auto'
+
+# --- Phase V: Aggressive RAM Minimization for Browsers & Electron ---
+# Force Zen Browser to aggressively free RAM (Targeting 512MB limits)
+alias zen-browser='env MOZ_MIN_MEMORY_MB=512 zen-browser'
+alias code='env NODE_OPTIONS="--max-old-space-size=1024" code'
 alias grep='rg'
 alias find='fd'
 alias top='btm'
@@ -404,8 +415,8 @@ const hyprlandConf = `
 monitor=,preferred,auto,1
 
 # Autostart
-# Ultra-Lightweight: Switched swww-daemon to hyprpaper (~15MB RAM vs 100MB+)
-exec-once = hyprpaper
+# Ultra-Lightweight: Switched to swww for smooth transitions
+exec-once = swww-daemon
 exec-once = waybar
 exec-once = dunst
 # Ultra-Lightweight: Image clipboard hoarding is disabled to prevent huge memory leaks
@@ -636,10 +647,6 @@ bindel = , XF86MonBrightnessUp, exec, brightnessctl set 5%+
 bindel = , XF86MonBrightnessDown, exec, brightnessctl set 5%-
 `
 
-const hyprpaperConf = `
-splash = false
-ipc = on
-`
 
 const hyprlockConf = `
 # — Hyprlock — Catppuccin Mocha Lock Screen —
@@ -855,18 +862,94 @@ textbox {
 `
 
 const rofiMediaConf = `
-configuration { show-icons: false; }
-* { bg: #1e1e2edd; bg-alt: #313244cc; fg: #cdd6f4; accent: #cba6f7; sel: #cba6f744; font: "Inter 12"; background-color: transparent; }
-window { width: 600px; background-color: @bg; border: 2px solid @accent; padding: 24px; }
-mainbox { orientation: horizontal; children: [ left-box, listview ]; }
-left-box { orientation: vertical; width: 250px; children: [ cover-art, message ]; }
-cover-art { width: 250px; height: 150px; }
-message { background-color: @bg-alt; padding: 16px; border: 1px solid @accent; }
-textbox { text-color: @fg; }
-listview { lines: 5; }
-element { padding: 14px; text-color: @fg; }
-element selected { background-color: @accent; text-color: @bg; }
-element-text { background-color: inherit; text-color: inherit; }
+configuration {
+    show-icons: false;
+}
+
+* {
+    /* Catppuccin Mocha Glass */
+    bg:       #1e1e2edd;     /* Base transparent */
+    bg-alt:   #313244cc;     /* Surface0 transparent */
+    fg:       #cdd6f4;       /* Text */
+    accent:   #cba6f7;       /* Mauve */
+    sel:      #cba6f744;     /* Mauve transparent for selection */
+
+    font:     "Inter Medium 12";
+    background-color: transparent;
+}
+
+window {
+    width: 600px;
+    transparency: "real";
+    background-color: @bg;
+    border: 2px solid;
+    border-color: @accent;
+    border-radius: 16px;
+    padding: 24px;
+}
+
+mainbox {
+    orientation: horizontal;
+    children: [ left-box, listview ];
+    spacing: 24px;
+}
+
+left-box {
+    orientation: vertical;
+    width: 250px;
+    expand: false;
+    children: [ cover-art, message ];
+    spacing: 16px;
+}
+
+cover-art {
+    width: 250px;
+    height: 150px;
+    border-radius: 12px;
+}
+
+message {
+    background-color: @bg-alt;
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid;
+    border-color: rgba(203, 166, 247, 0.3); /* Subtle accent border */
+}
+
+textbox {
+    text-color: @fg;
+    horizontal-align: 0.5;
+    vertical-align: 0.5;
+    font: "Inter 11";
+}
+
+listview {
+    lines: 5;
+    columns: 1;
+    spacing: 8px;
+    dynamic: true;
+    layout: vertical;
+    fixed-height: false;
+}
+
+element {
+    padding: 14px 18px;
+    border-radius: 10px;
+    background-color: transparent;
+    text-color: @fg;
+}
+
+element-text {
+    background-color: inherit;
+    text-color: inherit;
+    horizontal-align: 0.0;
+    vertical-align: 0.5;
+}
+
+element selected {
+    background-color: @accent;
+    text-color: @bg;
+}
 `
 
 const rofiWifiConf = `#!/usr/bin/env bash
@@ -1134,7 +1217,7 @@ tooltip {
 `
 
 const waybarMediaConf = `#!/usr/bin/env bash
-rofi -show media -modi "media:nexus rofi-media" -theme ~/.config/rofi/media.rasi
+rofi -show media -modi "media:/usr/local/bin/nexus rofi-media" -theme ~/.config/rofi/media.rasi
 `
 
 const waypaperConf = `[Settings]
@@ -1142,7 +1225,7 @@ language = en
 folder = ~/Pictures/Wallpapers/orangci
 monitors = All
 wallpaper = ~/Pictures/Wallpapers/orangci/01.png
-backend = hyprpaper
+backend = swww
 fill = fill
 sort = name
 color = #ffffff
@@ -1155,4 +1238,20 @@ swww_transition_type = any
 swww_transition_step = 90
 swww_transition_angle = 0
 swww_transition_duration = 2
+`
+
+const thunarUcaConf = `<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+<action>
+	<icon>utilities-terminal</icon>
+	<name>Open Terminal Here</name>
+	<submenu></submenu>
+	<unique-id>1710240000-1</unique-id>
+	<command>kitty %f</command>
+	<description>Open Kitty in current directory</description>
+	<range></range>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+</actions>
 `

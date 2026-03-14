@@ -30,7 +30,7 @@ A **modular installer** that transforms a fresh CachyOS installation into a full
 
 Features:
 
-- **TUI Installer** — Catppuccin-themed interactive CLI module selector (powered by Charmbracelet) with bilingual support (EN/ID)
+- **100% Native Go TUI** — Catppuccin-themed interactive CLI selection powered by Pterm. No `yad`, `zenity`, or GTK dependencies required. Runs everywhere.
 - **Nexus v2 (Go Native)** — A unified single binary replacing 16 legacy bash scripts.
 - **Living Ecosystem (v4)** — 9 integrated subsystems including theming, rollback, cloud sync, AI tuning, app store, and health check natively integrated.
 - **Hardware-aware** — GPU auto-detect, dynamic hugepages, Secure Boot MOK, GPU-scaled configs.
@@ -78,12 +78,12 @@ Features:
 | Tier | CPU | RAM | Storage | Use Case |
 |------|-----|-----|---------|----------|
 | **Minimum** | Any x86_64 | 4 GB | 20 GB free | Base system + shell + editors (no AI) |
-| **Recommended** | 4+ cores | 16 GB | 50 GB free | Full install + 7B AI models + Docker + Android SDK |
-| **AI Powerhouse** | 8+ cores | 32 GB | 80 GB free | Qwen3:30b MoE + DeepSeek-R1 + multiple models simultaneously |
+| **Recommended** | 4+ cores | 16 GB | 50 GB free | Full install + 4B AI models + Docker + Android SDK |
+| **AI Powerhouse** | 8+ cores | 32 GB | 80 GB free | Qwen3.5:4B + DeepSeek-R1 + multiple models simultaneously |
 
-> **Storage breakdown** (if all modules installed): Base ~2GB, Dev ~4GB, Mobile ~5GB, Gaming ~3GB, VM ~2GB, AI models ~20GB+, other modules ~2GB.
+> **Storage breakdown** (if all modules installed): Base ~2GB, Dev ~4GB, Mobile ~5GB, Gaming ~3GB, VM ~2GB, AI models ~5GB+, other modules ~2GB.
 >
-> **AI note**: The 7B models (qwen2.5-coder, deepseek-r1) run fine on 16GB RAM. The 30B Qwen3 model uses **Mixture of Experts (MoE)** — only ~3B parameters activate per inference, so it runs on 16GB but is more comfortable with 32GB.
+> **AI note**: The Qwen 3.5 models (qwen3.5:4b, qwen3.5:2b, deepseek-r1:1.5b) run phenomenally on 16GB RAM. They use a **Hybrid MoE** architecture making them blazing fast while barely utilizing 1.2 to 2.7GB of active RAM.
 
 ---
 
@@ -125,23 +125,21 @@ nexus install
 ```
 
 
-### TUI Module Selector
+### Pterm CLI TUI Installer
 
-When you run `./nexus install`, the TUI installer guides you through module selection:
+When you run `./nexus install`, the Native Go TUI guides you through module selection:
 
 ```
-╭────────────────────────────────────────────────────────────╮
-│ 📦 Select CachyOS Workstation Modules to Install           │
-├────────────────────────────────────────────────────────────┤
-│ [x] Base System (Base, Yay, GPU, Kernel, Security)         │
-│ [x] Development Tools (Docker, Go, Node, Python, Editors)  │
-│ [x] Desktop Aesthetic (Hyprland, Waybar, Catppuccin)       │
-│ [x] Applications & Gaming (Steam, PCsX2, Zen Browser)      │
-│ [ ] Mobile Dev (Android SDK, Flutter)                      │
-│ [ ] Virtualization (QEMU/KVM, Bottles)                     │
-│                                                            │
-│ Space = select  ·  Enter = confirm  ·  Esc = cancel        │
-╰────────────────────────────────────────────────────────────╯
+🌟 [Module Setup]
+Select CachyOS Workstation Modules to Install:
+  [✓] 🛡️ Base System (Base, Yay, GPU, Kernel, Security)
+  [✓] 👨‍💻 Development Tools (Docker, Go, Node, Python, Editors)
+  [✓] 🎨 Desktop Aesthetic (Hyprland, Waybar, Catppuccin)
+  [✓] 🛒 Applications & Gaming (Steam, PCSX2, Zen Browser)
+  [ ] 📱 Mobile Dev (Android SDK, Flutter)
+  [ ] 🖥️ Virtualization (QEMU/KVM, Bottles)
+
+Press Space to select, Enter to confirm.
 ```
 
 ---
@@ -150,17 +148,14 @@ When you run `./nexus install`, the TUI installer guides you through module sele
 
 ```
 CachyOS-Workstation-Setup/
+├── main.go                   # Clean root Go entrypoint
 ├── install.sh                # One-liner bootstrap (curl | bash)
 ├── uninstall.sh              # Safe ecosystem remover
 ├── Makefile                  # Dev commands (install, lint, init)
 ├── CHANGELOG.md              # Release history
 ├── build.sh                  # Go binary compiler
-├── ecosystem/                # (Deprecated: Replaced by cmd/nexus)
-├── modules/                  # (Deprecated: Replaced by internal/modules)
-├── cmd/
-│   └── nexus/                # Root package for the CLI
 ├── internal/
-│   ├── cmd/                  # CLI Commands (install, theme, apps, doctor)
+│   ├── cmd/                  # CLI Commands (install, theme, sync, doctor, postinstall)
 │   ├── modules/              # 100% Go-native installation modules
 │   │   ├── apps.go           # Browser, Terminals, Gaming, VM UI
 │   │   ├── base.go           # Hardware layout, pacman hooks
@@ -169,20 +164,10 @@ CachyOS-Workstation-Setup/
 │   │   ├── extra.go          # Custom virtualization and Mobile SDKs
 │   │   └── system.go         # Security/UFW, Firewall, Snapper Configs
 │   ├── pacman/               # Go wrapper for Arch Linux Package Management
-│   └── state/                # Rollback mechanism and BTRFS JSON tracker
+│   └── state/                # Rollback mechanism and JSON tracker
 ├── .github/                  # Community Health & CI Workflows
-│   ├── CODE_OF_CONDUCT.md
-│   ├── CONTRIBUTING.md
-│   ├── INSTALL_GUIDE.md
-│   ├── SECURITY.md
-│   └── SUPPORT.md
-├── .githooks/                # Local development Git hooks
-│   └── pre-commit            # Pre-commit checks (ShellCheck, syntax)
-├── assets/                   # Bundled wallpapers and static assets
-│   └── wallpapers/           # Catppuccin-themed wallpapers
 ├── docs/                     # Official VitePress documentation source
-├── .gitignore
-└── .gitattributes            # Enforce LF line endings for .sh files
+└── .gitignore
 ```
 
 ### Architecture
@@ -196,14 +181,14 @@ flowchart TB
     subgraph Go["Internal Go Packages"]
         direction LR
         PAC["internal/pacman"] -.-> MOD["internal/modules"]
-        STATE["internal/state<br/>BTRFS Tracker"] -.-> MOD
+        STATE["internal/state<br/>JSON Tracker"] -.-> MOD
     end
 
     TUI --> Go
 
     subgraph Runtime["Runtime Ecosystem (`nexus`)"]
         NEXUS["nexus command<br/>Global Access"]
-        NEXUS --> COMMANDS["apps, chat, doctor, sync, theme"]
+        NEXUS --> COMMANDS["install, doctor, sync, postinstall"]
     end
 
     Go --> Runtime
@@ -248,7 +233,7 @@ Your customizations, instantly portable.
 ### 4. 🧠 AI Auto-Tuner (`ai-tuner`)
 Local AI system telemetry auditing.
 - Takes dynamic snapshots of `top`, `free -h`, and `vmstat`.
-- Pipes telemetry via the standard Ollama API directly into `qwen2.5-coder:7b` to get actionable system optimization advice displayed neatly in a Rofi UI.
+- Pipes telemetry via the standard Ollama API directly into `qwen3.5:4b` to get actionable system optimization advice displayed neatly in a Rofi UI.
 
 ### 5. 🏪 Aesthetic GUI App Store (`app-store`)
 Visual package management elevated.
@@ -268,15 +253,16 @@ Visual wallpaper selection automatically configured out of the box.
 
 ### 8. 💬 Nexus AI Chat (`nexus-chat`)
 Interactive local AI chat.
-- Select from installed Ollama models (qwen3, deepseek-r1, qwen2.5-coder) via Rofi.
+- Select from installed Ollama models (qwen3.5, deepseek-r1) via Rofi.
 - Choose mode: Normal Chat, Debate Mode, or Terminal Access.
 - Auto-starts Ollama service if needed, manages CPU power governor.
 
-### 9. 🧙 Post-Install Wizard (`post-install`)
-First-boot onboarding via terminal UI.
-- Built with Charmbracelet `huh` and `lipgloss` for a beautiful, responsive Catppuccin interface.
-- Syncs dotfiles directly via simple URL input, sets wallpaper, verifies ecosystem tools are working.
-- Runs automatically after first install, or invoke manually: `post-install`.
+### 9. 🧙 Mature Post-Install Wizard (`nexus postinstall`)
+First-boot onboarding via terminal UI featuring rigorous Arch Linux system hygiene.
+- Solves the **"Plasma Trap"** by injecting SDDM Session configs (`Session=hyprland`) and applying the Catppuccin Mocha SDDM Theme automatically.
+- Deep cleans redundant `makedepends` automatically via `sudo pacman -Rns $(pacman -Qtdq)`.
+- Re-generates global system caches (`fc-cache -fv`, `bat cache`) and XDG directories to guarantee zero broken fonts or folders on first boot.
+- Runs automatically after first install, or invoke manually: `./nexus postinstall`.
 
 ---
 
@@ -401,20 +387,19 @@ All models run **100% locally** via [Ollama](https://ollama.com) — no cloud, n
 
 | Model | Type | Purpose | RAM Required | Disk | Command |
 |-------|------|---------|-------------|------|---------|
-| `qwen3:30b-a3b` | **MoE** (3B active / 30B total) | Reasoning, debate, strategy, philosophy | 16GB min, 32GB ideal | ~18GB | `ollama run qwen3:30b-a3b` |
-| `deepseek-r1:7b` | Dense 7B | Chain-of-thought math & logic reasoning | 8GB min | ~5GB | `ollama run deepseek-r1:7b` |
-| `qwen2.5-coder:7b` | Dense 7B | Code generation, refactoring, debugging | 8GB min | ~5GB | `ollama run qwen2.5-coder:7b` |
+| `qwen3.5:4b` | **Hybrid MoE** | Reasoning, coding, general assistant default | 4GB min, 8GB ideal | ~2.7GB | `ollama run qwen3.5:4b` |
+| `qwen3.5:2b` | **Hybrid MoE** | Ultra-fast inference, short scripts, commands | 4GB min | ~1.5GB | `ollama run qwen3.5:2b` |
+| `deepseek-r1:1.5b` | Dense Nano | Distilled math & logic reasoning overhead-free | 4GB min | ~1.2GB | `ollama run deepseek-r1:1.5b` |
 
 <details>
-<summary>💡 What is MoE (Mixture of Experts)?</summary>
+<summary>💡 Ultra-Lightweight AI Philosophy</summary>
 
-Qwen3:30b uses a **Mixture of Experts** architecture — the model has 30 billion total parameters, but only ~3 billion activate per inference. This means:
-- **Speed**: Generates at near-7B speed despite being a 30B model
-- **Quality**: Produces 30B-quality outputs (comparable to GPT-4o in reasoning tasks)
-- **RAM**: Only loads the active expert parameters, so it fits in 16GB RAM
-- **Trade-off**: Needs ~18GB disk space for the full model weights
+Nexus leverages the newly released **Qwen 3.5** family and miniaturized **DeepSeek R1** variants to run flagship-tier reasoning and code generation on laptops without sacrificing system RAM. 
+- **Speed**: Generates at blinding speeds with minimal overhead
+- **RAM**: Barely utilizes 1GB to 3GB of active RAM, leaving your IDEs and Browsers untouched.
+- **Disk**: Minimal footprints compared to legacy 30B or older 7B models.
 
-This is why we chose it over a regular 30B dense model — you get flagship-tier reasoning on consumer hardware.
+This is why we transitioned away from bloated multi-gigabyte models — you get flawless logic execution while keeping your workstation entirely fluid.
 </details>
 
 All accessible via **Nexus** → AI section, or terminal `ollama run <model>`.

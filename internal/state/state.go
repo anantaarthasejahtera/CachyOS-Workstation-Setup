@@ -63,7 +63,7 @@ func CreateBTRFSSnapperSnapshot(description string) {
 		return // snapper not installed, ignore
 	}
 
-	cmd := exec.Command("sudo", "snapper", "create", "-d", fmt.Sprintf("Nexus: %s", description))
+	cmd := exec.Command("sudo", "-A", "snapper", "create", "-d", fmt.Sprintf("Nexus: %s", description))
 	// Run asynchronously or just don't handle error explicitly to avoid blocking
 	_ = cmd.Run()
 }

@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 	"os/exec"
@@ -9,141 +8,164 @@ import (
 	"strings"
 	"time"
 
-	"github.com/charmbracelet/huh"
-	"github.com/charmbracelet/lipgloss"
+	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 )
 
-var (
-	syncStyle = lipgloss.NewStyle().
-			Padding(1, 2).
-			Border(lipgloss.RoundedBorder()).
-			BorderForeground(lipgloss.Color("#cba6f7")). // Mocha Mauve/Accent
-			Foreground(lipgloss.Color("#cdd6f4"))        // Mocha Text
+func (v *syncCommand) run(cmd *cobra.Command, args []string) {
+	homeDir, _ := os.UserHomeDir()
+	configDir := filepath.Join(homeDir, ".config")
 
-	successStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#a6e3a1")).Bold(true) // Mocha Green
-	errorStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("#f38ba8")).Bold(true) // Mocha Red
-	infoStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("#89b4fa"))            // Mocha Blue
-)
+	// Use notify-send for background progress if not in a wizard
+	exec.Command("notify-send", "Nexus Sync", "☁️  Dotfiles Cloud Sync Initializing...").Start()
+
+	// Check if git is initialized
+	gitDir := filepath.Join(configDir, ".git")
+	if _, err := os.Stat(gitDir); os.IsNotExist(err) {
+		exec.Command("git", "-C", configDir, "init").Run()
+		ignoreContent := `
+# 1. Block everything by default in the root of ~/.config
+/*
+
+# 2. explicitly ALLOW critical dotfiles directories
+# Window Managers & UI
+!/hypr/
+!/waybar/
+!/rofi/
+!/mako/
+!/dunst/
+!/wlogout/
+!/swaylock/
+!/cachyos-hello/
+
+# Terminals & Shells
+!/ghostty/
+!/alacritty/
+!/kitty/
+!/wezterm/
+!/fish/
+!/nushell/
+!/starship.toml
+
+# Editors & Multiplexers
+!/nvim/
+!/helix/
+!/zed/
+!/tmux/
+!/zellij/
+
+# CLI Tools & Utilities
+!/git/
+!/lazygit/
+!/bat/
+!/yazi/
+!/ranger/
+!/fastfetch/
+!/btop/
+!/htop/
+!/cava/
+!/mpv/
+!/zathura/
+
+# Theming
+!/Kvantum/
+!/qt5ct/
+!/qt6ct/
+!/gtk-3.0/
+!/gtk-4.0/
+!/xsettingsd/
+
+# 3. Always exclude nested caches and logs just in case
+**/*.log
+**/*.pid
+**/.*
+**/.cache/
+**/Cache/
+**/GPUCache/
+`
+		os.WriteFile(filepath.Join(configDir, ".gitignore"), []byte(strings.TrimSpace(ignoreContent)), 0644)
+	}
+
+	// Add and commit
+	exec.Command("git", "-C", configDir, "add", ".").Run()
+	statusOut, _ := exec.Command("git", "-C", configDir, "status", "--porcelain").Output()
+	if len(statusOut) == 0 {
+		exec.Command("notify-send", "Nexus Sync", "✅ Everything is already up to date.").Start()
+		return
+	}
+
+	timestamp := time.Now().Format("2006-01-02 15:04:05")
+	commitMsg := fmt.Sprintf("chore: Auto-sync %s via Nexus", timestamp)
+	exec.Command("git", "-C", configDir, "commit", "-m", commitMsg).Run()
+
+	// Check for remote
+	remoteOut, _ := exec.Command("git", "-C", configDir, "remote", "-v").Output()
+	hasRemote := len(remoteOut) > 0
+
+	if !hasRemote {
+		if err := exec.Command("gh", "auth", "status").Run(); err != nil {
+			result, _ := pterm.DefaultInteractiveConfirm.
+				WithDefaultText("Belum terautentikasi ke GitHub. Login sekarang via browser?").
+				Show()
+			if result {
+				exec.Command("gh", "auth", "login", "-w").Run()
+			} else {
+				return
+			}
+		}
+
+		// Selection via Pterm
+		options := []string{
+			"📦 Buat Private Repo BARU (dotfiles)",
+			"🔗 Link ke Repo URL yang sudah ada",
+			"🚫 Lewati (Hanya Local Backup)",
+		}
+		selectedOption, _ := pterm.DefaultInteractiveSelect.
+			WithOptions(options).
+			WithDefaultText("Kemana kita harus upload dotfiles kamu?").
+			Show()
+
+		if strings.Contains(selectedOption, "Repo BARU") {
+			pterm.Info.Println("Creating private repository 'dotfiles'...")
+			if err := exec.Command("gh", "repo", "create", "dotfiles", "--private", "--source", configDir, "--remote", "origin", "--push").Run(); err == nil {
+				hasRemote = true
+				exec.Command("git", "-C", configDir, "branch", "-M", "main").Run()
+			}
+		} else if strings.Contains(selectedOption, "URL yang sudah ada") {
+			remoteUrl, _ := pterm.DefaultInteractiveTextInput.WithDefaultText("Masukkan URL GitHub (git@github.com:user/repo.git)").Show()
+			remoteUrl = strings.TrimSpace(remoteUrl)
+			if remoteUrl != "" {
+				exec.Command("git", "-C", configDir, "remote", "add", "origin", remoteUrl).Run()
+				exec.Command("git", "-C", configDir, "branch", "-M", "main").Run()
+				hasRemote = true
+			}
+		}
+	}
+
+	if hasRemote {
+		spinner, _ := pterm.DefaultSpinner.Start("Uploading dotfiles to GitHub...")
+		pushCmd := exec.Command("git", "-C", configDir, "push", "-u", "origin", "main")
+		pushCmd.Env = append(os.Environ(), "GIT_TERMINAL_PROMPT=0")
+		if err := pushCmd.Run(); err != nil {
+			spinner.Fail("Gagal upload ke Cloud. Pastikan SSH Key sudah di-setup di GitHub.")
+		} else {
+			spinner.Success("Dotfiles Cloud Sync Berhasil!")
+			exec.Command("notify-send", "Nexus Sync", "✅ Dotfiles Cloud Sync Berhasil!").Start()
+		}
+	}
+}
 
 var syncCmd = &cobra.Command{
 	Use:   "sync",
 	Short: "Backup and sync dotfiles locally and to cloud",
 	Long:  `Automatically backs up current dotfiles (.config) into a git-managed vault and pushes to a remote repository for disaster recovery.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		homeDir, _ := os.UserHomeDir()
-		configDir := filepath.Join(homeDir, ".config")
-
-		header := lipgloss.NewStyle().
-			Bold(true).
-			Foreground(lipgloss.Color("#cba6f7")).
-			Render("☁️  Dotfiles Cloud Sync")
-
-		fmt.Println(syncStyle.Render(header))
-		fmt.Println()
-
-		// Check if git is initialized
-		gitDir := filepath.Join(configDir, ".git")
-		if _, err := os.Stat(gitDir); os.IsNotExist(err) {
-			fmt.Println(infoStyle.Render("Initializing git repository in ~/.config..."))
-			exec.Command("git", "-C", configDir, "init").Run()
-
-			// Create a proper gitignore
-			ignoreList := []string{
-				".cache/",
-				"Nextcloud/",
-				"google-chrome/",
-				"Code/",
-				"1Password/",
-				"discord/",
-				"Slack/",
-				"go/",
-				"spotify/",
-				"BraveSoftware/",
-				"obs-studio/basic/profiles/",
-				"menus/",
-				"mimeapps.list",
-				"pulse/",
-				"dconf/",
-				"github-copilot/",
-				"gh/",
-			}
-			os.WriteFile(filepath.Join(configDir, ".gitignore"), []byte(strings.Join(ignoreList, "\n")), 0644)
-		}
-
-		// Check for remote
-		remoteOut, _ := exec.Command("git", "-C", configDir, "remote", "-v").Output()
-		if len(remoteOut) == 0 {
-			var remoteUrl string
-
-			form := huh.NewForm(
-				huh.NewGroup(
-					huh.NewInput().
-						Title("No remote repository found").
-						Description("Enter your private GitHub URL (e.g., git@github.com:user/dotfiles.git)\nLeave empty to skip remote push.").
-						Value(&remoteUrl),
-				),
-			).WithTheme(huh.ThemeCatppuccin())
-
-			err := form.Run()
-			if err != nil {
-				return // User aborted
-			}
-
-			remoteUrl = strings.TrimSpace(remoteUrl)
-			if remoteUrl != "" {
-				exec.Command("git", "-C", configDir, "remote", "add", "origin", remoteUrl).Run()
-				exec.Command("git", "-C", configDir, "branch", "-M", "main").Run()
-			}
-		}
-
-		// Add and commit
-		exec.Command("git", "-C", configDir, "add", ".").Run()
-
-		statusOut, _ := exec.Command("git", "-C", configDir, "status", "--porcelain").Output()
-		if len(statusOut) == 0 {
-			fmt.Println(successStyle.Render("✅ Everything is up to date. No changes to sync."))
-			exec.Command("notify-send", "Cloud Sync", "Everything is up to date.").Start()
-			fmt.Println("\nPress Enter to close...")
-			bufio.NewReader(os.Stdin).ReadBytes('\n')
-			return
-		}
-
-		timestamp := time.Now().Format("2006-01-02 15:04:05")
-		commitMsg := fmt.Sprintf("chore: Auto-sync %s via Nexus", timestamp)
-		exec.Command("git", "-C", configDir, "commit", "-m", commitMsg).Run()
-
-		// Push
-		hasRemote := false
-		newRemoteOut, _ := exec.Command("git", "-C", configDir, "remote", "-v").Output()
-		if len(newRemoteOut) > 0 {
-			hasRemote = true
-		}
-
-		if hasRemote {
-			fmt.Println(infoStyle.Render("🚀 Pushing to remote repository..."))
-			pushCmd := exec.Command("git", "-C", configDir, "push", "-u", "origin", "main")
-			pushCmd.Stdout = os.Stdout
-			pushCmd.Stderr = os.Stderr
-			if err := pushCmd.Run(); err != nil {
-				fmt.Println(errorStyle.Render("❌ Failed to push to remote. Check SSH keys or network."))
-				fmt.Println(infoStyle.Render("\n💡 Troubleshooting Tips:"))
-				fmt.Println(infoStyle.Render("  1. Private Repos: Use an SSH URL (git@github.com:...) or login via 'gh auth login'."))
-				fmt.Println(infoStyle.Render("  2. Wrong URL entered? Fix it by typing: git -C ~/.config remote remove origin"))
-				exec.Command("notify-send", "-u", "critical", "Cloud Sync", "Push failed.").Start()
-			} else {
-				fmt.Println(successStyle.Render("✅ Sync Complete!"))
-				exec.Command("notify-send", "Cloud Sync", "Dotfiles synced successfully.").Start()
-			}
-		} else {
-			fmt.Println(successStyle.Render("✅ Local backup committed (No remote configured)."))
-			exec.Command("notify-send", "Local Sync", "Dotfiles committed locally.").Start()
-		}
-
-		fmt.Println("\nPress Enter to close...")
-		bufio.NewReader(os.Stdin).ReadBytes('\n')
+		s := &syncCommand{}
+		s.run(cmd, args)
 	},
 }
+
+type syncCommand struct{}
 
 func init() {
 	rootCmd.AddCommand(syncCmd)

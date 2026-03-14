@@ -1,9 +1,38 @@
 package pacman
 
 import (
+	"io"
 	"os"
 	"os/exec"
+
+	"github.com/pterm/pterm"
 )
+
+var defaultLogger io.Writer = os.Stdout
+
+// CheckAndPromptSudo requests administrator privileges natively via terminal
+// to prevent silent hangs caused by missing GUI askpass environments.
+func CheckAndPromptSudo() error {
+	pterm.Warning.Println("🔒 Nexus requires administrator privileges to configure packages and system settings.")
+	cmd := exec.Command("sudo", "-v")
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
+// SetLogger allows redirecting output to a wizard or other writers
+func SetLogger(w io.Writer) {
+	defaultLogger = w
+}
+
+// Command wraps exec.Command and sets Stdout/Stderr to the defaultLogger
+func Command(name string, arg ...string) *exec.Cmd {
+	cmd := exec.Command(name, arg...)
+	cmd.Stdout = defaultLogger
+	cmd.Stderr = defaultLogger
+	return cmd
+}
 
 // IsInstalled checks if a package is already installed via pacman -Q
 func IsInstalled(pkgName string) bool {
@@ -13,7 +42,6 @@ func IsInstalled(pkgName string) bool {
 }
 
 // Install runs yay -S --noconfirm --needed for the given packages.
-// It dynamically filters packages that are already installed to speed up execution.
 func Install(packages ...string) error {
 	var toInstall []string
 	for _, pkg := range packages {
@@ -23,13 +51,12 @@ func Install(packages ...string) error {
 	}
 
 	if len(toInstall) == 0 {
-		return nil // Everything is already installed
+		return nil
 	}
 
+	// yay invokes sudo internally. Native terminal sudo caching handles this smoothly.
 	args := append([]string{"-S", "--noconfirm", "--needed"}, toInstall...)
-	cmd := exec.Command("yay", args...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	cmd := Command("yay", args...)
 	return cmd.Run()
 }
 
@@ -43,20 +70,16 @@ func Remove(packages ...string) error {
 	}
 
 	if len(toRemove) == 0 {
-		return nil // Nothing to remove
+		return nil
 	}
 
 	args := append([]string{"-Rns", "--noconfirm"}, toRemove...)
-	cmd := exec.Command("yay", args...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	cmd := Command("yay", args...)
 	return cmd.Run()
 }
 
-// Optimize mirrors (equivalent to the bash mirror checking logic, simplified for Go)
+// Optimize mirrors
 func OptimizeMirrors() error {
-	cmd := exec.Command("sudo", "rate-mirrors", "--allow-root", "--protocol", "https", "arch")
-	// For actual implementation, rates-mirrors output should be piped to /etc/pacman.d/mirrorlist
-	// Keeping it simple here as a stub for the migration plan.
+	cmd := Command("sudo", "rate-mirrors", "--allow-root", "--protocol", "https", "arch")
 	return cmd.Run()
 }

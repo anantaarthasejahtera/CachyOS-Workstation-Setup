@@ -1,18 +1,17 @@
 package modules
 
 import (
-	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 
 	"github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/internal/pacman"
 	"github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/internal/state"
+	"github.com/pterm/pterm"
 )
 
 // InstallDevAndEditors implements 04-dev.sh and 07-editors.sh logic.
 func InstallDevAndEditors() error {
-	fmt.Println("🌟 [Module 04 & 07: Dev] Setting up Development Environment...")
+	pterm.Info.Println("🌟 [Module 04 & 07: Dev] Setting up Development Environment...")
 
 	setupDocker()
 	setupGit()
@@ -22,21 +21,63 @@ func InstallDevAndEditors() error {
 	setupEditors()
 	setupOllama()
 
-	fmt.Println("✅ [Module 04 & 07: Dev] Development environment ready.")
+	pterm.Info.Println("✅ [Module 04 & 07: Dev] Development environment ready.")
 	return nil
 }
 
 func setupDocker() {
-	fmt.Println("-> Installing Docker Ecosystem...")
+	pterm.Info.Println("-> Installing Docker Ecosystem...")
 	pacman.Install("docker", "docker-compose", "docker-buildx", "lazydocker")
-	exec.Command("sudo", "systemctl", "enable", "--now", "docker.service").Run()
+	
+	// Ultra-Lightweight Adjustment: We do NOT enable docker.service by default.
+	// Users can start it via 'systemctl start docker' or utilize docker.socket activation
+	// to ensure 0 MB memory overhead when Docker is not in use.
+	pterm.Info.Println("   Note: Docker daemon is installed but disabled by default to save RAM.")
+
+	pterm.Info.Println("   Installing Docker Auto-Suspend (15m idle timeout)...")
+	setupDockerIdleTimeout := `
+	cat << 'EOF' | sudo tee /usr/local/bin/docker-idle-suspend.sh > /dev/null
+#!/usr/bin/env bash
+if systemctl is-active --quiet docker; then
+    if [ -z "$(docker ps -q)" ]; then
+        systemctl stop docker
+    fi
+fi
+EOF
+	sudo chmod +x /usr/local/bin/docker-idle-suspend.sh
+
+	cat << 'EOF' | sudo tee /etc/systemd/system/docker-idle.service > /dev/null
+[Unit]
+Description=Suspend Docker when idle
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/docker-idle-suspend.sh
+EOF
+
+	cat << 'EOF' | sudo tee /etc/systemd/system/docker-idle.timer > /dev/null
+[Unit]
+Description=Run Docker idle suspend every 15m
+
+[Timer]
+OnBootSec=15m
+OnUnitActiveSec=15m
+
+[Install]
+WantedBy=timers.target
+EOF
+
+	sudo systemctl daemon-reload
+	sudo systemctl enable --now docker-idle.timer
+	`
+	pacman.Command("bash", "-c", setupDockerIdleTimeout).Run()
 
 	user := os.Getenv("USER")
-	exec.Command("sudo", "usermod", "-aG", "docker", user).Run()
+	pacman.Command("sudo", "usermod", "-aG", "docker", user).Run()
 }
 
 func setupGit() {
-	fmt.Println("-> Setting up Git & GitHub CLI...")
+	pterm.Info.Println("-> Setting up Git & GitHub CLI...")
 	pacman.Remove("gitui") // Deprecated
 	pacman.Install("git-delta", "github-cli", "lazygit")
 
@@ -56,33 +97,33 @@ func setupGit() {
 	}
 
 	for k, v := range configs {
-		exec.Command("git", "config", "--global", k, v).Run()
+		pacman.Command("git", "config", "--global", k, v).Run()
 	}
 }
 
 func setupLanguages() {
 	// Node.js (fnm)
-	fmt.Println("-> Installing Node.js via fnm...")
+	pterm.Info.Println("-> Installing Node.js via fnm...")
 	pacman.Install("fnm")
 	// Since fnm requires shell sourcing, we execute its installation logic via bash
 	bashFnm := `eval "$(fnm env)" && fnm install --lts && fnm default lts-latest && corepack enable && corepack prepare pnpm@latest --activate`
-	exec.Command("bash", "-c", bashFnm).Run()
+	pacman.Command("bash", "-c", bashFnm).Run()
 
 	// Python (uv)
-	fmt.Println("-> Installing Python via uv...")
-	exec.Command("bash", "-c", `curl -LsSf https://astral.sh/uv/install.sh | sh`).Run()
+	pterm.Info.Println("-> Installing Python via uv...")
+	pacman.Command("bash", "-c", `curl -LsSf https://astral.sh/uv/install.sh | sh`).Run()
 
 	// Rust
-	fmt.Println("-> Installing Rust via rustup...")
-	exec.Command("bash", "-c", `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y`).Run()
+	pterm.Info.Println("-> Installing Rust via rustup...")
+	pacman.Command("bash", "-c", `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y`).Run()
 
 	// Go
-	fmt.Println("-> Installing Go...")
+	pterm.Info.Println("-> Installing Go...")
 	pacman.Install("go")
 }
 
 func setupCLITools() {
-	fmt.Println("-> Installing CLI Power Tools...")
+	pterm.Info.Println("-> Installing CLI Power Tools...")
 	pacman.Install(
 		"ripgrep", "fd", "bat", "eza", "fzf", "zoxide", "jq", "yq", "tree",
 		"tokei", "bottom", "dust", "duf", "procs", "hyperfine", "wget", "aria2",
@@ -92,9 +133,10 @@ func setupCLITools() {
 
 func setupEditors() {
 	// Antigravity (AI Editor) - Try AUR first, then fallback to Cursor
-	fmt.Println("-> Installing Antigravity Editor...")
+	pterm.Info.Println("-> Installing Antigravity Editor & Modern Tools (Ghostty, Zed)...")
+	pacman.Install("ghostty", "zed")
 	if !pacman.IsInstalled("antigravity-bin") {
-		pacman.Install("cursor-bin") // CachyOS uses cursor-bin as fallback if antigravity-bin is missing
+		pacman.Install("cursor-bin")
 	}
 
 	// VS Code Catppuccin Settings
@@ -115,12 +157,36 @@ func setupEditors() {
     "editor.minimap.enabled": false,
     "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font'",
     "window.titleBarStyle": "custom",
-    "files.autoSave": "afterDelay"
+    "files.autoSave": "afterDelay",
+    
+    // --- Phase V: Aggressive RAM & CPU Minimization ---
+    "git.autorefresh": false,
+    "telemetry.enableTelemetry": false,
+    "workbench.enableExperiments": false,
+    "extensions.ignoreRecommendations": true,
+    "update.mode": "none",
+    "search.followSymlinks": false,
+    "files.exclude": {
+        "**/node_modules": true,
+        "**/__pycache__": true,
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "**/.venv": true,
+        "**/*.pyc": true
+    },
+    // Prevent language servers from parsing heavy ignored folders
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/bower_components": true,
+        "**/*.code-search": true,
+        "**/dist": true,
+        "**/build": true
+    }
 }`
 	state.SafeWriteConfig(filepath.Join(vscodeDir, "settings.json"), []byte(vscSettings), 0644)
 
 	// Neovim & Lazy.nvim Catppuccin Setup
-	fmt.Println("-> Configuring Neovim...")
+	pterm.Info.Println("-> Configuring Neovim...")
 	pacman.Install("neovim")
 	nvimDir := filepath.Join(os.Getenv("HOME"), ".config/nvim")
 	os.MkdirAll(filepath.Join(nvimDir, "lua/plugins"), 0755)
@@ -156,10 +222,14 @@ require("lazy").setup({
 }
 
 func setupOllama() {
-	fmt.Println("-> Installing Ollama (Local LLM)...")
+	pterm.Info.Println("-> Installing Ollama (Local LLM)...")
 	// Try installing directly via curl as fallback if pacman fails (typical for arch/aur)
 	if !pacman.IsInstalled("ollama") {
-		exec.Command("bash", "-c", `curl -fsSL https://ollama.com/install.sh | sh`).Run()
+		pacman.Command("bash", "-c", `curl -fsSL https://ollama.com/install.sh | sh`).Run()
 	}
-	exec.Command("sudo", "systemctl", "enable", "--now", "ollama.service").Run()
+	
+	// Ultra-Lightweight Adjustment: Do NOT enable ollama.service by default.
+	// It consumes significant idle RAM. It will be started on-demand via Nexus Chat.
+	pterm.Info.Println("   Note: Ollama daemon installed but disabled by default to save RAM.")
+	pacman.Command("sudo", "systemctl", "disable", "ollama.service").Run()
 }

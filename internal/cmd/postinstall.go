@@ -1,25 +1,13 @@
 package cmd
 
 import (
-	"bufio"
-	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 
-	"github.com/charmbracelet/lipgloss"
+	"github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/internal/pacman"
+	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
-)
-
-var (
-	wizardStyle = lipgloss.NewStyle().
-			Padding(1, 2).
-			Border(lipgloss.RoundedBorder()).
-			BorderForeground(lipgloss.Color("#cba6f7")). // Mocha Mauve/Accent
-			Foreground(lipgloss.Color("#cdd6f4"))        // Mocha Text
-
-	w_headingStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#cba6f7")).Bold(true)
-	w_infoStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("#89b4fa"))
-	w_successStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#a6e3a1")).Bold(true)
 )
 
 var postInstallCmd = &cobra.Command{
@@ -27,50 +15,122 @@ var postInstallCmd = &cobra.Command{
 	Short: "First boot onboarding wizard",
 	Long:  `Guides the user through post-installation checks, wallpaper setup, and cloud sync.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		header := w_headingStyle.Render("🚀 Nexus Post-Install Wizard") + "\n" +
-			lipgloss.NewStyle().Foreground(lipgloss.Color("#6c7086")).Render("Welcome to your CachyOS Workstation")
-
-		fmt.Println(wizardStyle.Render(header))
-		fmt.Println()
-
-		// 1. Run Health Check
-		fmt.Println(w_infoStyle.Render("▶ [1/3] Running System Health Check..."))
-		healthCmd := exec.Command(os.Args[0], "doctor")
-		healthCmd.Stdout = os.Stdout
-		healthCmd.Stderr = os.Stderr
-		healthCmd.Run()
-
-		// 2. Set Wallpaper
-		fmt.Println("\n" + w_infoStyle.Render("▶ [2/3] Choose your first wallpaper"))
-		if _, err := exec.LookPath("waypaper"); err == nil {
-			fmt.Println("  Launching Waypaper. Pick a background and close the window.")
-			exec.Command("waypaper").Run()
-		} else {
-			fmt.Println("  Waypaper not found, skipping wallpaper setup.")
+		// Welcome Prompt
+		pterm.Info.Println("Selamat! Instalasi modul utama selesai.")
+		result, _ := pterm.DefaultInteractiveConfirm.
+			WithDefaultText("Apakah kamu ingin menjalankan Post-Install Wizard untuk optimasi akhir (Health Check, Wallpaper, Cloud Sync)?").
+			Show()
+		if !result {
+			return
 		}
 
-		// 3. Sync Dotfiles
-		fmt.Println("\n" + w_infoStyle.Render("▶ [3/3] Setting up Cloud Sync"))
+		steps := []string{"System Health Check", "Desktop Aesthetics", "Cloud Sync & Backups", "System Finalization"}
+		w, _ := NewWizard("Nexus Post-Install", len(steps))
+		defer w.Close()
+
+		w.Write([]byte("\n🚀 NEXUS POST-INSTALL WIZARD - Starting...\n"))
+
+		// 1. Run Health Check (Doctor)
+		w.UpdateProgress("🩺 Running System Health Check...")
+		doctorCmd := exec.Command(os.Args[0], "doctor")
+		doctorOutput, _ := doctorCmd.CombinedOutput()
+		w.Write(doctorOutput)
+
+		if doctorCmd.ProcessState.ExitCode() != 0 {
+			result, _ := pterm.DefaultInteractiveConfirm.
+				WithDefaultText("Nexus Doctor menemukan masalah pada sistem kamu. Lanjut ke setup berikutnya?").
+				Show()
+			if !result {
+				w.Write([]byte("Post-Install aborted due to doctor warnings.\n"))
+				return
+			}
+		} else {
+			w.Write([]byte("\n✅ [Intelligence] System health verified. Proceeding...\n"))
+		}
+
+		// 2. Set Wallpaper (Interactive)
+		w.UpdateProgress("🎨 Configuring Desktop Aesthetics...")
+		if os.Getenv("WAYLAND_DISPLAY") != "" || os.Getenv("DISPLAY") != "" {
+			if _, err := exec.LookPath("waypaper"); err == nil {
+				w.Write([]byte("   Launching Waypaper...\n"))
+				exec.Command("waypaper").Run()
+				w.Write([]byte("   ✅ Wallpaper configuration saved.\n"))
+			} else {
+				w.Write([]byte("   [!] Waypaper not found, skipping wallpaper setup.\n"))
+			}
+		} else {
+			w.Write([]byte("   [!] No active display (TTY mode). Run 'waypaper' later from GUI.\n"))
+		}
+
+		// 3. Sync Dotfiles (Interactive)
+		w.UpdateProgress("☁️  Finalizing Cloud Sync & Backups...")
 		syncCmd := exec.Command(os.Args[0], "sync")
-		syncCmd.Stdout = os.Stdout
-		syncCmd.Stderr = os.Stderr
-		syncCmd.Run()
+		// For sync, we might need real interactive input if it's not GUI-fied yet.
+		// But let's pipe its output to the wizard log anyway.
+		syncCmd.Stdout = w
+		syncCmd.Stderr = w
+		if err := syncCmd.Run(); err != nil {
+			w.Write([]byte("   [!] Cloud Sync failed or was cancelled.\n"))
+		} else {
+			w.Write([]byte("   ✅ Cloud Sync completed successfully.\n"))
+		}
 
-		finishBox := lipgloss.NewStyle().
-			Padding(1, 2).
-			Border(lipgloss.DoubleBorder()).
-			BorderForeground(lipgloss.Color("#a6e3a1")).
-			Render(
-				w_successStyle.Render("🎉 All set! Welcome to your new Ecosystem.") + "\n" +
-					"Remember: Press " + w_headingStyle.Render("Super + X") + " to open the Nexus Command Center at any time.",
-			)
+		// 4. System Finalization (Cleanups, Caches, SDDM, Shells)
+		w.UpdateProgress("⚙️  System Finalization & SDDM Configuration...")
+		
+		pacman.CheckAndPromptSudo()
 
-		fmt.Println("\n" + finishBox)
+		w.Write([]byte("   -> Setting up XDG User Directories...\n"))
+		exec.Command("xdg-user-dirs-update").Run()
 
-		fmt.Println("\nPress Enter to exit...")
-		reader := bufio.NewReader(os.Stdin)
-		reader.ReadBytes('\n')
+		w.Write([]byte("   -> Generating Font and Bat Caches...\n"))
+		exec.Command("fc-cache", "-fv").Run()
+		exec.Command("bat", "cache", "--build").Run()
+
+		w.Write([]byte("   -> Enforcing Fish Shell for User and Root...\n"))
+		user := os.Getenv("USER")
+		exec.Command("sudo", "chsh", "-s", "/usr/bin/fish", user).Run()
+		exec.Command("sudo", "chsh", "-s", "/usr/bin/fish", "root").Run()
+
+		w.Write([]byte("   -> Configuring SDDM & Hyprland Autostart...\n"))
+		if pacman.IsInstalled("hyprland") {
+			// Force SDDM to remember Hyprland
+			sudoWriteFile("/etc/sddm.conf.d/default-session.conf", "[Autologin]\nSession=hyprland\n")
+			// Apply Catppuccin Theme if installed
+			if pacman.IsInstalled("sddm-theme-catppuccin-git") {
+				sudoWriteFile("/etc/sddm.conf.d/theme.conf", "[Theme]\nCurrent=catppuccin-mocha\n")
+			}
+		}
+
+		w.Write([]byte("   -> Performing Deep Orphan Package Cleanup...\n"))
+		orphanCmd := exec.Command("sh", "-c", "pacman -Qtdq")
+		orphanOut, err := orphanCmd.Output()
+		if err == nil && len(strings.TrimSpace(string(orphanOut))) > 0 {
+			exec.Command("sh", "-c", "sudo pacman -Rns $(pacman -Qtdq) --noconfirm").Run()
+			w.Write([]byte("      ✅ Orphan packages removed gracefully.\n"))
+		} else {
+			w.Write([]byte("      ✅ No orphan packages found.\n"))
+		}
+
+		// Final Success Dialog
+		w.Write([]byte("\n✅ POST-INSTALL COMPLETE! Enjoy your new workstation.\n"))
+		
+		finishMsg := "🎉 Semua tahap instalasi dan optimasi sudah SELESAI!\n\nSistem kamu sekarang sudah 'Ready to Work'.\n\nTips:\n- Tekan Super + X untuk Command Center.\n- Tekan Super + Enter untuk Ghostty Terminal."
+		pterm.Info.Println(finishMsg)
+
+		reboot, _ := pterm.DefaultInteractiveConfirm.
+			WithDefaultText("⚙️  Semua tahap Workstation selesai. Reboot sistem sekarang?").
+			Show()
+		if reboot {
+			exec.Command("sudo", "reboot").Run()
+		}
 	},
+}
+
+// sudoWriteFile is a helper to securely write configuration files using sudo
+func sudoWriteFile(path, content string) {
+	cmd := exec.Command("sudo", "sh", "-c", "echo -e '"+content+"' > "+path)
+	cmd.Run()
 }
 
 func init() {
