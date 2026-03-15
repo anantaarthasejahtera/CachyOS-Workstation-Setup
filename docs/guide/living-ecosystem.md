@@ -20,7 +20,7 @@ Unlike static dotfiles that lock you into one visual style, the Dynamic Theming 
 
 Based on our strict snapshotting logic in `internal/state`, **Time Machine** is a UI implemented natively in Go to list and recover configurations.
 
-* Every time any of the 15 modules runs and edits a configuration file in `~/.config`, it first copies the existing file to `~/.config-backup/YYYYMMDD-HHMMSS/relative__path__file.ext`.
+* Every time any of the 6 modules runs and edits a configuration file in `~/.config`, it first copies the existing file to `~/.config-backup/YYYYMMDD-HHMMSS/relative__path__file.ext`.
 * The **Time Machine** lists these timestamped snapshots visually.
 * When selected, the user can choose to revert a single file (like a botched `hyprland.conf`) or rollback the entire snapshot natively.
 
@@ -43,7 +43,7 @@ Instead of writing complex symlinking scripts (like `stow`), `dotfiles-sync` tak
 The most advanced local observability tool.
 
 The `ai-tuner` is a utility spawned by `nexus doctor` that runs non-disruptive telemetry commands like `vmstat`, `free -h`, `df -h`, and `top -b -n 1`. It then constructs a strict system engineering prompt.
-This prompt is fired via standard `curl` locally to `http://127.0.0.1:11434/api/generate` pointing directly to `qwen2.5-coder:7b`.
+This prompt is fired via standard `curl` locally to `http://127.0.0.1:11434/api/generate` pointing directly to `qwen3.5:4b`.
 The resulting output is parsed and presented via Rofi, giving the user intelligent, contextual recommendations for `sysctl` value changes, OOM threshold warnings, or caching inefficiencies.
 
 ---

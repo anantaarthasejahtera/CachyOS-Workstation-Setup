@@ -1,14 +1,12 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-	"os/exec"
+	"strings"
 
 	"github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/internal/modules"
+	"github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/internal/pacman"
 	"github.com/anantaarthasejahtera/CachyOS-Workstation-Setup/internal/state"
-	"github.com/charmbracelet/huh"
-	"github.com/charmbracelet/lipgloss"
+	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 )
 
@@ -17,10 +15,9 @@ var installAll bool
 var installCmd = &cobra.Command{
 	Use:   "install",
 	Short: "Run the interactive workstation installer",
-	Long:  `Run the full installation of CachyOS Workstation Setup. Triggers the TUI menu unless --all is specified.`,
+	Long:  `Run the full installation of CachyOS Workstation Setup. Triggers the GUI menu unless --all is specified.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("🚀 Nexus Installer v2.0 (Powered by pure Go)")
-
+		// Removed CLI banner for a full GUI experience.
 		if installAll {
 			runNonInteractiveInstall()
 			return
@@ -31,83 +28,190 @@ var installCmd = &cobra.Command{
 }
 
 func runNonInteractiveInstall() {
-	fmt.Println("Executing non-interactive full installation...")
-	state.CreateBTRFSSnapperSnapshot("Pre-Nexus Full Install")
-
-	modules.InstallBaseSystem()
-	modules.InstallSystemAndSecurity()
-	modules.InstallDevAndEditors()
-	modules.InstallDesktopAndDotfiles()
-	modules.InstallAppsAndGaming()
-	modules.InstallMobile()
-	modules.InstallVM()
-
-	fmt.Println("\n🎉 All massive porting modules installed successfully!")
-
-	// Automatically trigger post-install wizard for repo cloud syncing
-	runPostInstallWizard()
-}
-
-func runInteractiveTUI() {
-	var selectedModules []string
-
-	form := huh.NewForm(
-		huh.NewGroup(
-			huh.NewMultiSelect[string]().
-				Title("Select CachyOS Workstation Modules to Install").
-				Options(
-					huh.NewOption("Base System (Base, Yay, GPU, Kernel, Security)", "base").Selected(true),
-					huh.NewOption("Development Tools (Docker, Go, Node, Python, Editors)", "dev").Selected(true),
-					huh.NewOption("Desktop Aesthetic (Hyprland, Waybar, Catppuccin)", "desktop").Selected(true),
-					huh.NewOption("Applications & Gaming (Steam, PCsX2, Zen Browser)", "apps").Selected(true),
-					huh.NewOption("Mobile Dev (Android SDK, Flutter)", "mobile"),
-					huh.NewOption("Virtualization (QEMU/KVM, Bottles)", "vm"),
-				).
-				Value(&selectedModules),
-		),
-	).WithTheme(huh.ThemeCatppuccin())
-
-	err := form.Run()
-	if err != nil {
-		fmt.Println("Installation aborted.")
-		os.Exit(1)
-	}
-
-	if len(selectedModules) == 0 {
-		fmt.Println("No modules selected. Exiting.")
+	if err := pacman.CheckAndPromptSudo(); err != nil {
+		pterm.Error.Println("❌ Sudo authentication failed. Cannot proceed.")
 		return
 	}
 
-	fmt.Printf("\nExecuting installation for: %v\n", selectedModules)
-	state.CreateBTRFSSnapperSnapshot("Pre-Nexus TUI Install")
+	modules_list := []struct {
+		id   string
+		name string
+		fn   func() error
+	}{
+		{"base", "Base System", modules.InstallBaseSystem},
+		{"security", "System Security", modules.InstallSystemAndSecurity},
+		{"dev", "Development & Editors", modules.InstallDevAndEditors},
+		{"desktop", "Desktop & Dotfiles", modules.InstallDesktopAndDotfiles},
+		{"apps", "Apps & Gaming", modules.InstallAppsAndGaming},
+		{"mobile", "Mobile Development", modules.InstallMobile},
+		{"vm", "Virtualization", modules.InstallVM},
+	}
 
-	for _, m := range selectedModules {
-		fmt.Printf("\n-> Executing Selection: %s...\n", m)
-		if m == "base" {
-			modules.InstallBaseSystem()
-			modules.InstallSystemAndSecurity()
-		} else if m == "dev" {
-			modules.InstallDevAndEditors()
-		} else if m == "desktop" {
-			modules.InstallDesktopAndDotfiles()
-		} else if m == "apps" {
-			modules.InstallAppsAndGaming()
-		} else if m == "mobile" {
-			modules.InstallMobile()
-		} else if m == "vm" {
-			modules.InstallVM()
+	w, err := NewWizard("Full Nexus Installation", len(modules_list))
+	if err != nil {
+		pterm.Error.Println("Error starting wizard:", err.Error())
+		return
+	}
+	defer w.Close()
+	pacman.SetLogger(w)
+
+	w.Write([]byte("\n🚀 Starting Full Non-Interactive Installation...\n"))
+	state.CreateBTRFSSnapperSnapshot("Pre-Nexus Full Install")
+
+	var errors []string
+	for _, m := range modules_list {
+		w.UpdateProgress("Installing " + m.name + "...")
+		if err := m.fn(); err != nil {
+			errors = append(errors, m.name+": "+err.Error())
+			w.Write([]byte("❌ Error installing " + m.name + ": " + err.Error() + "\n"))
+		} else {
+			w.Write([]byte("✅ " + m.name + " installed successfully.\n"))
 		}
 	}
 
-	fmt.Println("\n🎉 Installation completed successfully!")
+	if len(errors) > 0 {
+		w.Write([]byte("\n⚠️  Installation completed with errors:\n"))
+		for _, e := range errors {
+			w.Write([]byte("   - " + e + "\n"))
+		}
+	} else {
+		w.Write([]byte("\n🎉 All modules installed successfully!\n"))
+	}
 
-	// Automatically trigger post-install wizard for repo cloud syncing
-	runPostInstallWizard()
+	w.Close() // Close wizard before postinstall so it doesn't leave lingering windows
+	
+	// Summary Table
+	printSummaryTable(modules_list, errors)
+
+	if len(errors) > 0 {
+		result, _ := pterm.DefaultInteractiveConfirm.
+			WithDefaultText("Beberapa modul gagal diinstal. Lanjut ke Post-Install?").
+			Show()
+		if !result {
+			return
+		}
+	}
+
+	RunPostInstallSequence()
 }
 
+func printSummaryTable(modules []struct {
+	id   string
+	name string
+	fn   func() error
+}, errors []string) {
+	data := pterm.TableData{{"Module", "Status"}}
+	for _, m := range modules {
+		status := pterm.Green("✅ OK")
+		for _, e := range errors {
+			if strings.HasPrefix(e, m.name+":") {
+				status = pterm.Red("❌ FAIL")
+				break
+			}
+		}
+		data = append(data, []string{m.name, status})
+	}
+	pterm.DefaultTable.WithHasHeader().WithData(data).Render()
+}
+
+func runInteractiveTUI() {
+	// Step 1: Select Modules natively using Pterm interactive multiselect
+	options := []string{
+		"📦 Base System (Yay, GPU, Kernel, Security)",
+		"👨‍💻 Development Tools (Docker, Go, Node, Python, Editors)",
+		"🎨 Desktop Aesthetic (Hyprland, Waybar, Catppuccin)",
+		"🛒 Applications & Gaming (Steam, PCSX2, Zen Browser)",
+		"📱 Mobile Dev (Android SDK, Flutter)",
+		"🖥️ Virtualization (QEMU/KVM, Bottles)",
+	}
+
+	selectedOptions, _ := pterm.DefaultInteractiveMultiselect.
+		WithOptions(options).
+		WithDefaultOptions(options[:4]). // Default select the first 4 (base, dev, desktop, apps)
+		WithFilter(false).
+		Show("Select CachyOS Workstation Modules to Install")
+
+	if len(selectedOptions) == 0 {
+		pterm.Warning.Println("No modules selected. Installation aborted.")
+		return
+	}
+
+	if err := pacman.CheckAndPromptSudo(); err != nil {
+		pterm.Error.Println("❌ Sudo authentication failed. Cannot proceed.")
+		return
+	}
+
+	// Step 2: Run Wizard
+	w, err := NewWizard("Nexus Installation Wizard", len(selectedOptions))
+	if err != nil {
+		pterm.Error.Println("Error starting wizard:", err.Error())
+		return
+	}
+	defer w.Close()
+	pacman.SetLogger(w)
+
+	state.CreateBTRFSSnapperSnapshot("Pre-Nexus Wizard Install")
+
+	var errors []string
+	for _, m := range selectedOptions {
+		if strings.Contains(m, "Base System") {
+			w.UpdateProgress("Configuring Base System...")
+			if err := modules.InstallBaseSystem(); err != nil {
+				errors = append(errors, "Base System: "+err.Error())
+			}
+			if err := modules.InstallSystemAndSecurity(); err != nil {
+				errors = append(errors, "System Security: "+err.Error())
+			}
+		} else if strings.Contains(m, "Development Tools") {
+			w.UpdateProgress("Setting up Dev Tools...")
+			if err := modules.InstallDevAndEditors(); err != nil {
+				errors = append(errors, "Development Tools: "+err.Error())
+			}
+		} else if strings.Contains(m, "Desktop Aesthetic") {
+			w.UpdateProgress("Applying Desktop Aesthetics...")
+			if err := modules.InstallDesktopAndDotfiles(); err != nil {
+				errors = append(errors, "Desktop Aesthetic: "+err.Error())
+			}
+		} else if strings.Contains(m, "Applications & Gaming") {
+			w.UpdateProgress("Installing Apps & Gaming...")
+			if err := modules.InstallAppsAndGaming(); err != nil {
+				errors = append(errors, "Applications & Gaming: "+err.Error())
+			}
+		} else if strings.Contains(m, "Mobile Dev") {
+			w.UpdateProgress("Setting up Mobile Dev environment...")
+			if err := modules.InstallMobile(); err != nil {
+				errors = append(errors, "Mobile Dev: "+err.Error())
+			}
+		} else if strings.Contains(m, "Virtualization") {
+			w.UpdateProgress("Configuring Virtualization...")
+			if err := modules.InstallVM(); err != nil {
+				errors = append(errors, "Virtualization: "+err.Error())
+			}
+		}
+	}
+
+	w.Close() // Close before opening postinstall dialog
+
+	// Final summary
+	if len(errors) > 0 {
+		pterm.Warning.Println("Beberapa modul gagal diinstal:")
+		for _, e := range errors {
+			pterm.Error.Println("  - " + e)
+		}
+		result, _ := pterm.DefaultInteractiveConfirm.
+			WithDefaultText("Lanjut ke Post-Install Wizard?").
+			Show()
+		if !result {
+			return
+		}
+	}
+
+	RunPostInstallSequence()
+}
+
+// runPostInstallWizard logic moved to RunPostInstallSequence in postinstall.go
 func runPostInstallWizard() {
-	fmt.Println("\n" + lipgloss.NewStyle().Foreground(lipgloss.Color("#cba6f7")).Bold(true).Render("✨ Launching Final Post-Install Wizard..."))
-	exec.Command(os.Args[0], "postinstall").Run()
+	RunPostInstallSequence()
 }
 
 func init() {
