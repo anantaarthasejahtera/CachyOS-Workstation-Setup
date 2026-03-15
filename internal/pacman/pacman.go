@@ -4,6 +4,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/pterm/pterm"
 )
@@ -57,7 +58,12 @@ func Install(packages ...string) error {
 	// yay invokes sudo internally. Native terminal sudo caching handles this smoothly.
 	args := append([]string{"-S", "--noconfirm", "--needed"}, toInstall...)
 	cmd := Command("yay", args...)
-	return cmd.Run()
+	if err := cmd.Run(); err != nil {
+		pterm.Error.Prefix = pterm.Prefix{Text: "PACMAN", Style: pterm.NewStyle(pterm.BgRed, pterm.FgBlack)}
+		pterm.Error.Printf("Failed to install packages: %s (Exit: %v)\n", strings.Join(toInstall, ", "), err)
+		return err
+	}
+	return nil
 }
 
 // Remove runs yay -Rns --noconfirm only for installed packages
@@ -75,7 +81,12 @@ func Remove(packages ...string) error {
 
 	args := append([]string{"-Rns", "--noconfirm"}, toRemove...)
 	cmd := Command("yay", args...)
-	return cmd.Run()
+	if err := cmd.Run(); err != nil {
+		pterm.Error.Prefix = pterm.Prefix{Text: "PACMAN", Style: pterm.NewStyle(pterm.BgRed, pterm.FgBlack)}
+		pterm.Error.Printf("Failed to remove packages: %s (Exit: %v)\n", strings.Join(toRemove, ", "), err)
+		return err
+	}
+	return nil
 }
 
 // Optimize mirrors
