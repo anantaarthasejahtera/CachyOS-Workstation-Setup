@@ -44,7 +44,7 @@ jobs:
         run: go test -v ./...
 
       - name: Build Nexus CLI
-        run: go build -v ./cmd/nexus/...
+        run: go build -v .
 
   security:
     name: "🔐 Security Scan"

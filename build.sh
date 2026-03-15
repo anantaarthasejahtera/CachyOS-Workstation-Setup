@@ -9,7 +9,9 @@ echo "🚀 Compiling Nexus CLI (Go V2) for CachyOS Workstation Setup..."
 go mod tidy
 
 # Build the binary with size optimization flags
-go build -ldflags="-s -w" -o nexus ./cmd/nexus
+# main.go lives at project root (relocated from cmd/nexus/)
+go build -ldflags="-s -w" -o nexus .
 
 echo "✅ Build complete! Binary generated at ./nexus"
-echo "You can test it by running: ./nexus doctor"
+echo "   Size: $(du -h nexus | cut -f1)"
+echo "   Test: ./nexus doctor"

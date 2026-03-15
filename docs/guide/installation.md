@@ -11,10 +11,10 @@ curl -fsSL https://raw.githubusercontent.com/anantaarthasejahtera/CachyOS-Workst
 ```
 
 This will:
-1. Install base dependencies (like `git` and `go`).
+1. Install base dependencies (`git`, `curl`).
 2. Clone the repository into `~/.cache/cachy-workstation-setup`.
-3. Compile the `nexus` Go binary.
-4. Launch the **Bilingual TUI Installer** (`nexus install`).
+3. Download the **pre-built `nexus` binary** from the latest GitHub Release (or compile from source if unavailable).
+4. Launch the **Native Pterm TUI Installer** (`nexus install`).
 
 ### 🔧 Manual Install
 
