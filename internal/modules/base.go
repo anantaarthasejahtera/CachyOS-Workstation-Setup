@@ -2,6 +2,7 @@ package modules
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 	"runtime"
 	"strings"
@@ -50,9 +51,17 @@ func installGPUDrivers() {
 		pterm.Info.Println("-> Installing NVIDIA drivers...")
 		pacman.Install("nvidia-dkms", "nvidia-utils", "lib32-nvidia-utils", "nvidia-settings", "vulkan-icd-loader", "lib32-vulkan-icd-loader", "mesa", "lib32-mesa", "libva-nvidia-driver")
 
-		pterm.Info.Println("-> Enabling DRM KMS for NVIDIA...")
-		pacman.Command("sudo", "sed", "-i", `s/^MODULES=(/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm /`, "/etc/mkinitcpio.conf").Run()
-		pacman.Command("sudo", "mkinitcpio", "-P").Run()
+		// Idempotent DRM KMS injection — only modify if nvidia modules aren't already in MODULES=()
+		mkinitConf, err := os.ReadFile("/etc/mkinitcpio.conf")
+		if err == nil && !strings.Contains(string(mkinitConf), "nvidia_drm") {
+			pterm.Info.Println("-> Enabling DRM KMS for NVIDIA...")
+			pacman.Command("sudo", "sed", "-i", `s/^MODULES=(/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm /`, "/etc/mkinitcpio.conf").Run()
+			pacman.Command("sudo", "mkinitcpio", "-P").Run()
+		} else if err == nil {
+			pterm.Info.Println("-> NVIDIA DRM KMS already configured, skipping.")
+		} else {
+			pterm.Warning.Printf("-> Could not read /etc/mkinitcpio.conf: %v\n", err)
+		}
 
 		// Simplified Secure Boot warning for Go TUI console
 		pterm.Info.Println("⚠️  If Secure Boot is enabled, NVIDIA DKMS requires MOK key enrollment upon reboot.")

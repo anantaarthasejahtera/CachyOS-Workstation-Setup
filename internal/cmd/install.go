@@ -52,7 +52,10 @@ func runNonInteractiveInstall() {
 		pterm.Error.Println("Error starting wizard:", err.Error())
 		return
 	}
-	defer w.Close()
+	defer func() {
+		w.Close()
+		pacman.ResetLogger()
+	}()
 	pacman.SetLogger(w)
 
 	w.Write([]byte("\n🚀 Starting Full Non-Interactive Installation...\n"))
@@ -78,8 +81,10 @@ func runNonInteractiveInstall() {
 		w.Write([]byte("\n🎉 All modules installed successfully!\n"))
 	}
 
-	w.Close() // Close wizard before postinstall so it doesn't leave lingering windows
-	
+	// Close wizard and reset logger before postinstall dialog
+	w.Close()
+	pacman.ResetLogger()
+
 	// Summary Table
 	printSummaryTable(modules_list, errors)
 
@@ -147,7 +152,10 @@ func runInteractiveTUI() {
 		pterm.Error.Println("Error starting wizard:", err.Error())
 		return
 	}
-	defer w.Close()
+	defer func() {
+		w.Close()
+		pacman.ResetLogger()
+	}()
 	pacman.SetLogger(w)
 
 	state.CreateBTRFSSnapperSnapshot("Pre-Nexus Wizard Install")
@@ -190,7 +198,9 @@ func runInteractiveTUI() {
 		}
 	}
 
-	w.Close() // Close before opening postinstall dialog
+	// Close wizard and reset logger before postinstall dialog
+	w.Close()
+	pacman.ResetLogger()
 
 	// Final summary
 	if len(errors) > 0 {
@@ -206,11 +216,6 @@ func runInteractiveTUI() {
 		}
 	}
 
-	RunPostInstallSequence()
-}
-
-// runPostInstallWizard logic moved to RunPostInstallSequence in postinstall.go
-func runPostInstallWizard() {
 	RunPostInstallSequence()
 }
 

@@ -15,6 +15,21 @@ var defaultLogger io.Writer = os.Stdout
 // to prevent silent hangs caused by missing GUI askpass environments.
 func CheckAndPromptSudo() error {
 	pterm.Warning.Println("🔒 Nexus requires administrator privileges to configure packages and system settings.")
+	
+	// Create a GUI prompt if display is active to avoid TTY spinner clashing
+	if os.Getenv("WAYLAND_DISPLAY") != "" || os.Getenv("DISPLAY") != "" {
+		if _, err := exec.LookPath("zenity"); err == nil {
+			askpassPath := "/tmp/nexus_askpass.sh"
+			// Create a temporary askpass wrapper since SUDO_ASKPASS needs to be an executable script
+			os.WriteFile(askpassPath, []byte("#!/bin/sh\nzenity --password --title=\"Nexus\" --text=\"Administrator privileges required for system configuration:\""), 0755)
+			defer os.Remove(askpassPath)
+
+			cmd := exec.Command("sudo", "-A", "-v")
+			cmd.Env = append(os.Environ(), "SUDO_ASKPASS="+askpassPath)
+			return cmd.Run()
+		}
+	}
+
 	cmd := exec.Command("sudo", "-v")
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
@@ -25,6 +40,12 @@ func CheckAndPromptSudo() error {
 // SetLogger allows redirecting output to a wizard or other writers
 func SetLogger(w io.Writer) {
 	defaultLogger = w
+}
+
+// ResetLogger restores the default logger to os.Stdout.
+// Must be called after wizard closes to prevent writes to a dead writer.
+func ResetLogger() {
+	defaultLogger = os.Stdout
 }
 
 // Command wraps exec.Command and sets Stdout/Stderr to the defaultLogger
