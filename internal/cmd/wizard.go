@@ -17,8 +17,8 @@ type Wizard struct {
 	currentStep int
 	logFile     *os.File
 	startTime   time.Time
-	mu          sync.Mutex   // Guards concurrent writes from subprocess stdout/stderr
-	closeOnce   sync.Once    // Prevents double-close panics
+	mu          sync.Mutex // Guards concurrent writes from subprocess stdout/stderr
+	closeOnce   sync.Once  // Prevents double-close panics
 }
 
 // NewWizard initializes the Pterm-based progress and log views.
@@ -98,13 +98,23 @@ func containsOneOf(s string, patterns ...string) bool {
 // Close gracefully stops the TUI elements and closes the log stream.
 // Safe to call multiple times thanks to sync.Once.
 func (w *Wizard) Close() {
+	w.CloseWithStatus(false)
+}
+
+// CloseWithStatus gracefully stops TUI elements. If hadErrors is true,
+// the spinner shows a warning instead of a misleading success message.
+func (w *Wizard) CloseWithStatus(hadErrors bool) {
 	w.closeOnce.Do(func() {
 		if w.logFile != nil {
 			w.logFile.Close()
 		}
 		elapsed := time.Since(w.startTime).Round(time.Second)
 		if w.spinner != nil {
-			w.spinner.Success(fmt.Sprintf("All steps completed successfully in %s!", elapsed))
+			if hadErrors {
+				w.spinner.Warning(fmt.Sprintf("Completed with errors in %s. Check log for details.", elapsed))
+			} else {
+				w.spinner.Success(fmt.Sprintf("All steps completed successfully in %s!", elapsed))
+			}
 		}
 		pterm.Success.Printf("A complete installation log has been saved to /tmp/nexus_install.log (Total time: %s)\n", elapsed)
 	})

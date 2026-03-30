@@ -5,9 +5,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Version is set at build time via -ldflags.
+var Version = "dev"
+
 var rootCmd = &cobra.Command{
-	Use:   "nexus",
-	Short: "CachyOS Workstation Setup & Ecosystem Manager",
+	Use:     "nexus",
+	Short:   "CachyOS Workstation Setup & Ecosystem Manager",
+	Version: Version,
 	Long: `Nexus is the central orchestration tool for CachyOS Workstation Setup.
 It handles installation, configuration rollbacks, theme switching, and system health checks
 in a premium, type-safe environment.`,

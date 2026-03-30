@@ -52,8 +52,10 @@ func runNonInteractiveInstall() {
 		pterm.Error.Println("Error starting wizard:", err.Error())
 		return
 	}
+
+	var errors []string
 	defer func() {
-		w.Close()
+		w.CloseWithStatus(len(errors) > 0)
 		pacman.ResetLogger()
 	}()
 	pacman.SetLogger(w)
@@ -61,7 +63,6 @@ func runNonInteractiveInstall() {
 	w.Write([]byte("\n🚀 Starting Full Non-Interactive Installation...\n"))
 	state.CreateBTRFSSnapperSnapshot("Pre-Nexus Full Install")
 
-	var errors []string
 	for _, m := range modules_list {
 		w.UpdateProgress("Installing " + m.name + "...")
 		if err := m.fn(); err != nil {
@@ -82,7 +83,7 @@ func runNonInteractiveInstall() {
 	}
 
 	// Close wizard and reset logger before postinstall dialog
-	w.Close()
+	w.CloseWithStatus(len(errors) > 0)
 	pacman.ResetLogger()
 
 	// Summary Table
@@ -120,19 +121,39 @@ func printSummaryTable(modules []struct {
 }
 
 func runInteractiveTUI() {
-	// Step 1: Select Modules natively using Pterm interactive multiselect
-	options := []string{
-		"📦 Base System (Yay, GPU, Kernel, Security)",
-		"👨‍💻 Development Tools (Docker, Go, Node, Python, Editors)",
-		"🎨 Desktop Aesthetic (Hyprland, Waybar, Catppuccin)",
-		"🛒 Applications & Gaming (Steam, PCSX2, Zen Browser)",
-		"📱 Mobile Dev (Android SDK, Flutter)",
-		"🖥️ Virtualization (QEMU/KVM, Bottles)",
+	// Module registry: each option maps to a unique ID and install function
+	type moduleOption struct {
+		id      string
+		display string
+		fn      func() error
+	}
+
+	moduleRegistry := []moduleOption{
+		{"base", "📦 Base System (Yay, GPU, Kernel, Security)", func() error {
+			if err := modules.InstallBaseSystem(); err != nil {
+				return err
+			}
+			return modules.InstallSystemAndSecurity()
+		}},
+		{"dev", "👨‍💻 Development Tools (Docker, Go, Node, Python, Editors)", modules.InstallDevAndEditors},
+		{"desktop", "🎨 Desktop Aesthetic (Hyprland, Waybar, Catppuccin)", modules.InstallDesktopAndDotfiles},
+		{"apps", "🛒 Applications & Gaming (Steam, PCSX2, Zen Browser)", modules.InstallAppsAndGaming},
+		{"mobile", "📱 Mobile Dev (Android SDK, Flutter)", modules.InstallMobile},
+		{"vm", "🖥️ Virtualization (QEMU/KVM, Bottles)", modules.InstallVM},
+	}
+
+	var options []string
+	var defaultOptions []string
+	for i, m := range moduleRegistry {
+		options = append(options, m.display)
+		if i < 4 { // Default select the first 4 (base, dev, desktop, apps)
+			defaultOptions = append(defaultOptions, m.display)
+		}
 	}
 
 	selectedOptions, _ := pterm.DefaultInteractiveMultiselect.
 		WithOptions(options).
-		WithDefaultOptions(options[:4]). // Default select the first 4 (base, dev, desktop, apps)
+		WithDefaultOptions(defaultOptions).
 		WithFilter(false).
 		Show("Select CachyOS Workstation Modules to Install")
 
@@ -146,14 +167,24 @@ func runInteractiveTUI() {
 		return
 	}
 
+	// Build selected module list by matching display strings back to registry
+	selectedModules := make(map[string]moduleOption)
+	for _, sel := range selectedOptions {
+		for _, m := range moduleRegistry {
+			if m.display == sel {
+				selectedModules[m.id] = m
+				break
+			}
+		}
+	}
+
 	// Step 2: Run Wizard
-	w, err := NewWizard("Nexus Installation Wizard", len(selectedOptions))
+	w, err := NewWizard("Nexus Installation Wizard", len(selectedModules))
 	if err != nil {
 		pterm.Error.Println("Error starting wizard:", err.Error())
 		return
 	}
 	defer func() {
-		w.Close()
 		pacman.ResetLogger()
 	}()
 	pacman.SetLogger(w)
@@ -161,45 +192,19 @@ func runInteractiveTUI() {
 	state.CreateBTRFSSnapperSnapshot("Pre-Nexus Wizard Install")
 
 	var errors []string
-	for _, m := range selectedOptions {
-		if strings.Contains(m, "Base System") {
-			w.UpdateProgress("Configuring Base System...")
-			if err := modules.InstallBaseSystem(); err != nil {
-				errors = append(errors, "Base System: "+err.Error())
-			}
-			if err := modules.InstallSystemAndSecurity(); err != nil {
-				errors = append(errors, "System Security: "+err.Error())
-			}
-		} else if strings.Contains(m, "Development Tools") {
-			w.UpdateProgress("Setting up Dev Tools...")
-			if err := modules.InstallDevAndEditors(); err != nil {
-				errors = append(errors, "Development Tools: "+err.Error())
-			}
-		} else if strings.Contains(m, "Desktop Aesthetic") {
-			w.UpdateProgress("Applying Desktop Aesthetics...")
-			if err := modules.InstallDesktopAndDotfiles(); err != nil {
-				errors = append(errors, "Desktop Aesthetic: "+err.Error())
-			}
-		} else if strings.Contains(m, "Applications & Gaming") {
-			w.UpdateProgress("Installing Apps & Gaming...")
-			if err := modules.InstallAppsAndGaming(); err != nil {
-				errors = append(errors, "Applications & Gaming: "+err.Error())
-			}
-		} else if strings.Contains(m, "Mobile Dev") {
-			w.UpdateProgress("Setting up Mobile Dev environment...")
-			if err := modules.InstallMobile(); err != nil {
-				errors = append(errors, "Mobile Dev: "+err.Error())
-			}
-		} else if strings.Contains(m, "Virtualization") {
-			w.UpdateProgress("Configuring Virtualization...")
-			if err := modules.InstallVM(); err != nil {
-				errors = append(errors, "Virtualization: "+err.Error())
-			}
+	// Run in registry order to maintain dependency ordering
+	for _, m := range moduleRegistry {
+		if _, ok := selectedModules[m.id]; !ok {
+			continue
+		}
+		w.UpdateProgress("Installing " + m.display + "...")
+		if err := m.fn(); err != nil {
+			errors = append(errors, m.display+": "+err.Error())
 		}
 	}
 
 	// Close wizard and reset logger before postinstall dialog
-	w.Close()
+	w.CloseWithStatus(len(errors) > 0)
 	pacman.ResetLogger()
 
 	// Final summary
