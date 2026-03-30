@@ -19,9 +19,18 @@ var chatCmd = &cobra.Command{
 		fmt.Println(" Type /bye to exit. Conversation history is retained.")
 		fmt.Println("")
 
-		// Automatically wake up Ollama daemon
+		// Automatically wake up Ollama daemon (needs sudo for systemctl)
 		fmt.Println("Waking up AI daemon...")
-		exec.Command("sudo", "systemctl", "start", "ollama.service").Run()
+		if err := exec.Command("systemctl", "is-active", "--quiet", "ollama.service").Run(); err != nil {
+			// Only call sudo if service isn't already running
+			startCmd := exec.Command("sudo", "systemctl", "start", "ollama.service")
+			startCmd.Stdin = os.Stdin
+			startCmd.Stdout = os.Stdout
+			startCmd.Stderr = os.Stderr
+			if err := startCmd.Run(); err != nil {
+				fmt.Println("⚠️  Could not start Ollama daemon. Try: sudo systemctl start ollama.service")
+			}
+		}
 
 		// Connect directly to local Ollama REPL
 		ollamaCmd := exec.Command("ollama", "run", "qwen3.5:4b")

@@ -34,7 +34,7 @@ func init() {
 
 func runCommand(name string, arg ...string) (string, error) {
 	cmd := exec.Command(name, arg...)
-	
+
 	// Waybar execution environment often strips standard PATH
 	env := os.Environ()
 	hasPath := false

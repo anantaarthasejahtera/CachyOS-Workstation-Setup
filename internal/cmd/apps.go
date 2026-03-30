@@ -102,7 +102,7 @@ var appsCmd = &cobra.Command{
 					"FALSE", "keepassxc", "🔐 KeePassXC (Offline Password Manager)",
 					"FALSE", "flameshot", "⚡ Flameshot (Screenshots)",
 					"FALSE", "hyprpicker", "🎨 Hyprpicker (Color Picker for Wayland)",
-					"FALSE", "qbittoorent", "📥 qBittorrent (Torrent Client)",
+					"FALSE", "qbittorrent", "📥 qBittorrent (Torrent Client)",
 					"FALSE", "gparted", "💾 GParted (Partition Manager)",
 					"FALSE", "stow", "🔗 GNU Stow (Dotfiles Manager)",
 				}
@@ -179,7 +179,7 @@ var appsCmd = &cobra.Command{
 				fmt.Printf("\n✅ All packages installed successfully!\n")
 				exec.Command("notify-send", "App Store", "Installation completed successfully!").Start()
 			}
-			
+
 			// Return to terminal cleanly after a success, no enter needs pressing
 			return
 		}

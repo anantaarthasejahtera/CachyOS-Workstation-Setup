@@ -3,6 +3,7 @@ package cmd
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"os/exec"
 	"strings"
 
@@ -31,8 +32,14 @@ Telemetry:
 
 		fmt.Println("Thinking (querying local qwen3.5:4b)...")
 
-		// Wake up AI daemon
-		exec.Command("sudo", "systemctl", "start", "ollama.service").Run()
+		// Wake up AI daemon (check if already running first to avoid unnecessary sudo)
+		if err := exec.Command("systemctl", "is-active", "--quiet", "ollama.service").Run(); err != nil {
+			startCmd := exec.Command("sudo", "systemctl", "start", "ollama.service")
+			startCmd.Stdin = os.Stdin
+			startCmd.Stdout = os.Stdout
+			startCmd.Stderr = os.Stderr
+			startCmd.Run()
+		}
 
 		// Query Ollama local API via executable
 		ollamaCmd := exec.Command("ollama", "run", "qwen3.5:4b")
@@ -43,7 +50,7 @@ Telemetry:
 		ollamaCmd.Stderr = &out
 
 		err := ollamaCmd.Run()
-		
+
 		// Immediately put daemon back to sleep
 		exec.Command("sudo", "systemctl", "stop", "ollama.service").Run()
 
