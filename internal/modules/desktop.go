@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -14,18 +15,32 @@ import (
 func InstallDesktopAndDotfiles() error {
 	pterm.Info.Println("🌟 [Module 06-13: Desktop] Setting up Hyprland, Waybar & Dotfiles...")
 
-	setupTerminalAndShell()
-	setupDesktopAesthetic()
-	setupHyprlandAndWaybar()
+	var errs []string
+
+	if err := setupTerminalAndShell(); err != nil {
+		errs = append(errs, "terminal: "+err.Error())
+	}
+	if err := setupDesktopAesthetic(); err != nil {
+		errs = append(errs, "aesthetic: "+err.Error())
+	}
+	if err := setupHyprlandAndWaybar(); err != nil {
+		errs = append(errs, "hyprland: "+err.Error())
+	}
 	setupThunarConfig()
+
+	if len(errs) > 0 {
+		return fmt.Errorf("desktop module: %d error(s)", len(errs))
+	}
 
 	pterm.Info.Println("✅ [Module 06-13: Desktop] UI and Dotfiles configurations complete.")
 	return nil
 }
 
-func setupTerminalAndShell() {
+func setupTerminalAndShell() error {
 	pterm.Info.Println("-> Installing Terminal & Shell...")
-	pacman.Install("fish", "starship", "kitty")
+	if err := pacman.Install("fish", "starship", "kitty"); err != nil {
+		return err
+	}
 	// CachyOS/Arch recently restructured nerd-fonts. ttf-nerd-fonts-symbols-common can pull
 	// massive metapackages. We use specific minimal packages (~30MB) instead of 1.4GB metapackages.
 	pacman.Install("ttf-jetbrains-mono-nerd", "ttf-nerd-fonts-symbols")
@@ -53,11 +68,14 @@ func setupTerminalAndShell() {
 
 	// Set Fish as default
 	pacman.Command("sudo", "chsh", "-s", "/usr/bin/fish", os.Getenv("USER")).Run()
+	return nil
 }
 
-func setupDesktopAesthetic() {
+func setupDesktopAesthetic() error {
 	pterm.Info.Println("-> Installing Desktop Aesthetics (Catppuccin)...")
-	pacman.Install("papirus-icon-theme", "kvantum", "fastfetch", "cmatrix")
+	if err := pacman.Install("papirus-icon-theme", "kvantum", "fastfetch", "cmatrix"); err != nil {
+		return err
+	}
 	pacman.Install(
 		"catppuccin-gtk-theme-mocha", "papirus-folders-catppuccin-git",
 		"catppuccin-cursors-mocha", "kvantum-theme-catppuccin-git",
@@ -84,17 +102,20 @@ func setupDesktopAesthetic() {
 	writeConfig(filepath.Join(home, ".config/gtk-3.0/settings.ini"), gtkConf)
 	writeConfig(filepath.Join(home, ".config/gtk-4.0/settings.ini"), gtkConf)
 	writeConfig(filepath.Join(home, ".config/qt6ct/qt6ct.conf"), qtConf)
+	return nil
 }
 
-func setupHyprlandAndWaybar() {
+func setupHyprlandAndWaybar() error {
 	pterm.Info.Println("-> Installing Hyprland & Waybar ecosystem...")
-	pacman.Install(
+	if err := pacman.Install(
 		"hyprland", "swww", "hyprlock", "hypridle", "xdg-desktop-portal-hyprland",
 		"waybar", "rofi-wayland", "dunst", "grim", "slurp", "wl-clipboard",
 		"cliphist", "brightnessctl", "playerctl", "polkit-kde-agent",
 		"thunar", "nwg-look", "rofi-power-menu", "cava", "pavucontrol", "waypaper", "btop",
 		"wireguard-tools", // VPN Drag & Drop Support
-	)
+	); err != nil {
+		return err
+	}
 
 	pacman.Remove("xdg-desktop-portal-kde")
 
@@ -133,6 +154,7 @@ func setupHyprlandAndWaybar() {
 
 	os.MkdirAll(filepath.Join(home, ".config/waypaper"), 0755)
 	writeConfig(filepath.Join(home, ".config/waypaper/config.ini"), waypaperConf)
+	return nil
 }
 
 func setupThunarConfig() {
@@ -323,14 +345,14 @@ const fishConf = `
 # — CachyOS Fish Config — Aesthetic + Productive —
 set -g fish_greeting ""
 
-if command -v starship &>/dev/null
+if command -v starship 2>/dev/null
     starship init fish | source
 end
 
-if command -v fnm &>/dev/null
+if command -v fnm 2>/dev/null
     fnm env --use-on-cd --shell fish | source
 end
-if command -v zoxide &>/dev/null
+if command -v zoxide 2>/dev/null
     zoxide init fish | source
 end
 
@@ -362,7 +384,7 @@ alias lg='lazygit'
 
 set -gx FZF_DEFAULT_COMMAND 'fd --type f --hidden --follow --exclude .git'
 
-if command -v fastfetch &>/dev/null
+if command -v fastfetch 2>/dev/null
     fastfetch 2>/dev/null
 end
 `
@@ -423,12 +445,21 @@ exec-once = dunst
 exec-once = wl-paste --type text --watch cliphist store
 exec-once = /usr/lib/polkit-kde-authentication-agent-1
 exec-once = hypridle
-exec-once = post-install-wizard
+# NOTE: post-install-wizard removed — binary does not exist
 
 # — Environment —
 env = XCURSOR_SIZE,24
 env = XCURSOR_THEME,catppuccin-mocha-dark-cursors
 env = QT_QPA_PLATFORMTHEME,qt6ct
+
+# — Wayland-Native — Force all toolkits to use Wayland natively —
+env = GDK_BACKEND,wayland,x11
+env = QT_QPA_PLATFORM,wayland;xcb
+env = SDL_VIDEODRIVER,wayland
+env = CLUTTER_BACKEND,wayland
+env = MOZ_ENABLE_WAYLAND,1
+env = ELECTRON_OZONE_PLATFORM_HINT,auto
+env = _JAVA_AWT_WM_NONREPARENTING,1
 
 # — Input —
 input {
@@ -646,7 +677,6 @@ bindl = , XF86AudioPrev, exec, playerctl previous
 bindel = , XF86MonBrightnessUp, exec, brightnessctl set 5%+
 bindel = , XF86MonBrightnessDown, exec, brightnessctl set 5%-
 `
-
 
 const hyprlockConf = `
 # — Hyprlock — Catppuccin Mocha Lock Screen —
