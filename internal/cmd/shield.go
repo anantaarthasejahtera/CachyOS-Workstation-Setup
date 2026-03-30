@@ -15,16 +15,24 @@ var shieldCmd = &cobra.Command{
 		fmt.Println("🛡️  Nexus OS-Level Shield Manager")
 		fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 
-		// Check if adblock is active (presence of backup file implies stevenblack is active)
+		// Use dedicated marker to track shield state (hosts.bak can exist for other reasons)
+		markerPath := "/tmp/.nexus-shield-active"
 		isActive := false
-		if _, err := os.Stat("/etc/hosts.bak"); err == nil {
+		if _, err := os.Stat(markerPath); err == nil {
 			isActive = true
 		}
 
 		if isActive {
 			fmt.Println("Adblock is currently: [ACTIVE]")
-			fmt.Println("\n-> Restoring original /etc/hosts...")
-			exec.Command("sudo", "mv", "/etc/hosts.bak", "/etc/hosts").Run()
+			if _, err := os.Stat("/etc/hosts.bak"); err == nil {
+				fmt.Println("\n-> Restoring original /etc/hosts...")
+				exec.Command("sudo", "cp", "/etc/hosts.bak", "/etc/hosts").Run()
+			} else {
+				fmt.Println("\n-> No backup found. Fetching clean base hosts file...")
+				exec.Command("sudo", "bash", "-c",
+					`echo -e "127.0.0.1 localhost\n::1 localhost" > /etc/hosts`).Run()
+			}
+			os.Remove(markerPath)
 			fmt.Println("-> Shield disabled successfully.")
 		} else {
 			fmt.Println("Adblock is currently: [DISABLED]")
@@ -37,6 +45,7 @@ var shieldCmd = &cobra.Command{
 				fmt.Println("   ❌ Failed to fetch hosts file:", err)
 				return err
 			}
+			os.WriteFile(markerPath, []byte("active"), 0644)
 			fmt.Println("-> Shield enabled successfully. Zero CPU overhead adblocking active.")
 		}
 

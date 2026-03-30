@@ -32,21 +32,25 @@ var doctorCmd = &cobra.Command{
 		// 2. Check Services
 		fmt.Println("⚙️  System Services:")
 		services := map[string]string{
-			"docker":         "Docker Container Engine",
-			"ollama":         "Ollama AI Daemon",
-			"NetworkManager": "Network Manager",
-			"bluetooth":      "Bluetooth Service",
+			"docker.service":         "Docker Container Engine",
+			"ollama.service":         "Ollama AI Daemon",
+			"NetworkManager.service": "Network Manager",
+			"bluetooth.service":      "Bluetooth Service",
 		}
 		for svc, name := range services {
-			if pacman.IsInstalled(svc) || svc == "NetworkManager" || svc == "bluetooth" || svc == "ollama" {
-				err := exec.Command("systemctl", "is-active", "--quiet", svc).Run()
-				if err == nil {
-					fmt.Printf("  [🟢] %s is running\n", name)
-				} else {
-					fmt.Printf("  [🔴] %s is inactive/failed\n", name)
-				}
-			} else {
+			// Check if service unit exists first
+			unitCheck := exec.Command("systemctl", "list-unit-files", svc)
+			unitOut, _ := unitCheck.Output()
+			if !strings.Contains(string(unitOut), svc) {
 				fmt.Printf("  [⚪] %s is not installed\n", name)
+				continue
+			}
+
+			err := exec.Command("systemctl", "is-active", "--quiet", svc).Run()
+			if err == nil {
+				fmt.Printf("  [🟢] %s is running\n", name)
+			} else {
+				fmt.Printf("  [🔴] %s is inactive/failed\n", name)
 			}
 		}
 		fmt.Println("")
