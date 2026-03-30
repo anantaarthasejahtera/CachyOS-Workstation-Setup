@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -11,7 +12,9 @@ import (
 // InstallMobile implements 05-mobile.sh
 func InstallMobile() error {
 	pterm.Info.Println("🌟 [Module 05: Mobile] Installing Android & Flutter Development...")
-	pacman.Install("jdk17-openjdk", "kotlin", "gradle")
+	if err := pacman.Install("jdk17-openjdk", "kotlin", "gradle"); err != nil {
+		return fmt.Errorf("mobile dev packages: %w", err)
+	}
 	pacman.Command("sudo", "archlinux-java", "set", "java-17-openjdk").Run()
 
 	home := os.Getenv("HOME")
@@ -42,7 +45,9 @@ func InstallVM() error {
 	pterm.Info.Println("🌟 [Module 12: VM] Installing Virtualization (QEMU/KVM) & Bottles...")
 
 	pacman.Remove("qemu-full") // Deprecated
-	pacman.Install("qemu-desktop", "virt-manager", "libvirt", "edk2-ovmf", "dnsmasq", "iptables-nft", "swtpm", "spice-vdagent", "vde2", "bottles")
+	if err := pacman.Install("qemu-desktop", "virt-manager", "libvirt", "edk2-ovmf", "dnsmasq", "iptables-nft", "swtpm", "spice-vdagent", "vde2", "bottles"); err != nil {
+		return fmt.Errorf("vm packages: %w", err)
+	}
 
 	// Ultra-Lightweight Adjustment: Rely on socket activation.
 	// virt-manager will automatically wake libvirtd.socket when launched.

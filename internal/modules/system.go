@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -14,16 +15,34 @@ import (
 func InstallSystemAndSecurity() error {
 	pterm.Info.Println("🌟 [Module 02 & 03: System] Applying Performance Tuning & Security...")
 
-	setupKernelAndPerformance()
-	setupSecurity()
+	var errs []string
+
+	if err := setupKernelAndPerformance(); err != nil {
+		errs = append(errs, "kernel-perf: "+err.Error())
+	}
+	if err := setupSecurity(); err != nil {
+		errs = append(errs, "security: "+err.Error())
+	}
 	setupAdblock()
-	optimizeFstab()
+	if err := optimizeFstab(); err != nil {
+		errs = append(errs, "fstab: "+err.Error())
+	}
+
+	if len(errs) > 0 {
+		pterm.Warning.Println("⚠️ [Module 02 & 03: System] Completed with errors:")
+		for _, e := range errs {
+			pterm.Warning.Println("  - " + e)
+		}
+		return fmt.Errorf("system module: %d error(s)", len(errs))
+	}
 
 	pterm.Info.Println("✅ [Module 02 & 03: System] Deep system tuning and security applied.")
 	return nil
 }
 
-func setupKernelAndPerformance() {
+func setupKernelAndPerformance() error {
+	var errs []string
+
 	// CPU Specific
 	// We use regular exec.Command here because we need to capture output, not just log it.
 	cmd := exec.Command("sh", "-c", "lscpu | grep -i 'intel'")
@@ -35,7 +54,9 @@ func setupKernelAndPerformance() {
 	}
 
 	// EarlyOOM and GameMode
-	pacman.Install("earlyoom", "gamemode", "lib32-gamemode")
+	if err := pacman.Install("earlyoom", "gamemode", "lib32-gamemode"); err != nil {
+		errs = append(errs, "earlyoom: "+err.Error())
+	}
 	pacman.Command("sudo", "systemctl", "enable", "--now", "earlyoom.service").Run()
 
 	// Pipewire low latency
@@ -113,11 +134,17 @@ ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="1", ATTR{queue
 	pacman.Command("sudo", "journalctl", "--vacuum-size=256M").Run()
 	pacman.Command("sudo", "mkdir", "-p", "/etc/systemd/journald.conf.d").Run()
 	writeSystemFile("/etc/systemd/journald.conf.d/size.conf", "[Journal]\nSystemMaxUse=256M\n")
+
+	if len(errs) > 0 {
+		return fmt.Errorf("%d error(s)", len(errs))
+	}
+	return nil
 }
 
-func setupSecurity() {
-	// UFW
-	pacman.Install("ufw")
+func setupSecurity() error {
+	if err := pacman.Install("ufw"); err != nil {
+		return fmt.Errorf("ufw: %w", err)
+	}
 	if !pacman.IsInstalled("cachyos-snapper-support") && !pacman.IsInstalled("snapper") {
 		pacman.Install("timeshift")
 	}
@@ -165,13 +192,15 @@ __pycache__/
 	pterm.Info.Println("-> Purging non-essential background daemons (avahi, cups, ModemManager)...")
 	// Avahi: Local network auto-discovery (Airplay, Printers) - Constantly broadcasts mDNS
 	pacman.Command("sudo", "systemctl", "disable", "--now", "avahi-daemon.service", "avahi-daemon.socket").Run()
-	// NetworkManager Wait: Blocks boot sequence heavily 
+	// NetworkManager Wait: Blocks boot sequence heavily
 	pacman.Command("sudo", "systemctl", "disable", "NetworkManager-wait-online.service").Run()
 	// ModemManager: Huawei USB 4G stick support - Useless on wifi workstations
 	pacman.Command("sudo", "systemctl", "mask", "ModemManager.service").Run()
 	// CUPS: Local physical printing service
 	pacman.Command("sudo", "systemctl", "disable", "--now", "cups.service", "cups.socket").Run()
 	pacman.Command("sudo", "systemctl", "mask", "cups.service").Run() // Prevent auto-starting when opening print dialogs
+
+	return nil
 }
 
 // Helper to wrap sudo file writes safely
@@ -182,8 +211,15 @@ func writeSystemFile(path, content string) {
 	pacman.Command("sudo", "chmod", "0644", path).Run()
 }
 
-func optimizeFstab() {
+func optimizeFstab() error {
 	pterm.Info.Println("-> Optimizing /etc/fstab for SSD Longevity (BTRFS/EXT4)...")
+
+	// Backup fstab before modification to prevent data loss
+	pterm.Info.Println("   -> Backing up /etc/fstab...")
+	if err := pacman.Command("sudo", "cp", "/etc/fstab", "/etc/fstab.bak").Run(); err != nil {
+		return fmt.Errorf("fstab backup failed: %w", err)
+	}
+
 	// Convert relatime to noatime
 	pacman.Command("sudo", "sed", "-i", `s/relatime/noatime/g`, "/etc/fstab").Run()
 
@@ -194,6 +230,7 @@ awk '$3 ~ /^(ext4|btrfs)$/ {
     if ($4 !~ /discard=async/ && $3 == "btrfs") $4 = $4 ",discard=async"
 }1' /etc/fstab > /tmp/fstab.tmp && sudo mv /tmp/fstab.tmp /etc/fstab`
 	pacman.Command("bash", "-c", script).Run()
+	return nil
 }
 
 func setupAdblock() {
