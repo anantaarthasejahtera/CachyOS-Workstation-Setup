@@ -107,8 +107,15 @@ var rollbackCmd = &cobra.Command{
 				if f.IsDir() {
 					continue
 				}
-				realPath := filepath.Join(homeDir, ".config", strings.ReplaceAll(f.Name(), "__", "/"))
+				realPath := filepath.Clean(filepath.Join(homeDir, ".config", strings.ReplaceAll(f.Name(), "__", "/")))
 				srcPath := filepath.Join(snapshotDir, f.Name())
+
+				// Security: ensure restore target stays within ~/.config/
+				configDir := filepath.Join(homeDir, ".config")
+				rel, err := filepath.Rel(configDir, realPath)
+				if err != nil || strings.HasPrefix(rel, "..") {
+					continue // Skip paths that escape ~/.config/
+				}
 
 				// Ensure dest dir exists
 				os.MkdirAll(filepath.Dir(realPath), 0755)

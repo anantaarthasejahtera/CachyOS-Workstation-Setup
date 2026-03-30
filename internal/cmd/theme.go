@@ -159,12 +159,12 @@ func applyPermanentConfig(t themeInfo) {
 		// Gradient active workspace
 		reGradient := regexp.MustCompile(`linear-gradient\(135deg,\s*#[a-zA-Z0-9]+,\s*#[a-zA-Z0-9]+\)`)
 		wb = reGradient.ReplaceAllString(wb, fmt.Sprintf("linear-gradient(135deg, #%s, #%s)", t.col1, t.col2))
-		
+
 		// Clock Font Color (specifically targeting the #clock block)
 		reClock := regexp.MustCompile(`#clock \{\s*font-weight:\s*600;\s*color:\s*#[a-zA-Z0-9]+;`)
 		wb = reClock.ReplaceAllString(wb, fmt.Sprintf("#clock {\n    font-weight: 600;\n    color: #%s;", t.col1))
 
-		// Tooltip Border 
+		// Tooltip Border
 		reBorder := regexp.MustCompile(`border:\s*1px\s*solid\s*#[a-zA-Z0-9]+;`)
 		wb = reBorder.ReplaceAllString(wb, fmt.Sprintf("border: 1px solid #%s;", t.col1))
 

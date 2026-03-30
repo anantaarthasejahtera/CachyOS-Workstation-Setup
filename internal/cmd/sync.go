@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func (v *syncCommand) run(cmd *cobra.Command, args []string) {
+func runSync(cmd *cobra.Command, args []string) {
 	homeDir, _ := os.UserHomeDir()
 	configDir := filepath.Join(homeDir, ".config")
 
@@ -160,12 +160,10 @@ var syncCmd = &cobra.Command{
 	Short: "Backup and sync dotfiles locally and to cloud",
 	Long:  `Automatically backs up current dotfiles (.config) into a git-managed vault and pushes to a remote repository for disaster recovery.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		s := &syncCommand{}
-		s.run(cmd, args)
+		runSync(cmd, args)
 	},
 }
 
-type syncCommand struct{}
 
 func init() {
 	rootCmd.AddCommand(syncCmd)
