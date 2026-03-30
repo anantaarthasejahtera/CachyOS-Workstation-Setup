@@ -15,7 +15,7 @@ var defaultLogger io.Writer = os.Stdout
 // to prevent silent hangs caused by missing GUI askpass environments.
 func CheckAndPromptSudo() error {
 	pterm.Warning.Println("🔒 Nexus requires administrator privileges to configure packages and system settings.")
-	
+
 	// Create a GUI prompt if display is active to avoid TTY spinner clashing
 	if os.Getenv("WAYLAND_DISPLAY") != "" || os.Getenv("DISPLAY") != "" {
 		if _, err := exec.LookPath("zenity"); err == nil {

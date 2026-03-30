@@ -402,12 +402,7 @@ func executeAction(chosen string) {
 	}
 }
 
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
+
 
 func GetRofiTheme() string {
 	return fmt.Sprintf(`
