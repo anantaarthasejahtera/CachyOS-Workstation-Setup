@@ -15,14 +15,24 @@ import (
 func InstallAppsAndGaming() error {
 	pterm.Info.Println("🌟 [Module 10 & 11: Apps] Installing Applications & Gaming Suite...")
 
-	setupApps()
-	setupGaming()
+	var errs []string
+
+	if err := setupApps(); err != nil {
+		errs = append(errs, "apps: "+err.Error())
+	}
+	if err := setupGaming(); err != nil {
+		errs = append(errs, "gaming: "+err.Error())
+	}
+
+	if len(errs) > 0 {
+		return fmt.Errorf("apps module: %d error(s)", len(errs))
+	}
 
 	pterm.Info.Println("✅ [Module 10 & 11: Apps] Applications and Gaming suite installed.")
 	return nil
 }
 
-func setupApps() {
+func setupApps() error {
 	home := os.Getenv("HOME")
 	pterm.Info.Println("-> Configuring Core Applications...")
 	pacman.Remove("auto-cpufreq")
@@ -130,9 +140,10 @@ application/x-shellscript=nvim.desktop
 	}
 	os.MkdirAll(filepath.Join(home, ".config/tmux"), 0755)
 	state.SafeWriteConfig(filepath.Join(home, ".config/tmux/tmux.conf"), []byte(strings.TrimSpace(tmuxConf)+"\n"), 0644)
+	return nil
 }
 
-func setupGaming() {
+func setupGaming() error {
 	home := os.Getenv("HOME")
 	pterm.Info.Println("-> Configuring Gaming Suite & Emulators...")
 
@@ -224,6 +235,7 @@ func setupGaming() {
 	}
 
 	pterm.Info.Println("   Gaming Suite configuration complete.")
+	return nil
 }
 
 // -------------------------------------------------------------------------

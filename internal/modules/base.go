@@ -11,45 +11,62 @@ import (
 	"github.com/pterm/pterm"
 )
 
-// InstallBaseSystem implements 01-base.sh logic: system update, base-devel, GPU detection & drivers.
+// InstallBaseSystem implements 01-base.sh logic: base-devel, GPU detection & drivers.
+// NOTE: System-wide update (pacman -Syu) is intentionally NOT included here.
+// On CachyOS rolling release, full upgrades can break the system and should be
+// explicitly triggered by the user via the Rofi menu or `sudo pacman -Syu`.
 func InstallBaseSystem() error {
 	pterm.Info.Println("🌟 [Module 01: Base] Initializing System Foundation...")
 
-	pterm.Info.Println("-> Updating system...")
-	pacman.Command("sudo", "pacman", "-Syu", "--noconfirm").Run()
+	var errs []string
 
 	pterm.Info.Println("-> Installing base development tools...")
-	pacman.Install("base-devel", "git", "curl", "wget", "unzip", "zip", "cmake", "ninja", "meson", "pkgconf", "ccache")
+	if err := pacman.Install("base-devel", "git", "curl", "wget", "unzip", "zip", "cmake", "ninja", "meson", "pkgconf", "ccache"); err != nil {
+		errs = append(errs, "base-devel: "+err.Error())
+	}
 
-	installGPUDrivers()
+	if err := installGPUDrivers(); err != nil {
+		errs = append(errs, "gpu-drivers: "+err.Error())
+	}
 
 	// Ensure yay is installed
 	if !pacman.IsInstalled("yay") {
 		pterm.Info.Println("-> Installing yay (AUR helper)...")
 		installer := `cd /tmp && rm -rf yay-bin && git clone https://aur.archlinux.org/yay-bin.git && cd yay-bin && makepkg -si --noconfirm && rm -rf /tmp/yay-bin`
-		pacman.Command("bash", "-c", installer).Run()
+		if err := pacman.Command("bash", "-c", installer).Run(); err != nil {
+			errs = append(errs, "yay: "+err.Error())
+		}
 	}
 
 	optimizeMakepkg()
+
+	if len(errs) > 0 {
+		pterm.Warning.Println("⚠️ [Module 01: Base] Completed with errors:")
+		for _, e := range errs {
+			pterm.Warning.Println("  - " + e)
+		}
+		return fmt.Errorf("base module: %d error(s)", len(errs))
+	}
 
 	pterm.Info.Println("✅ [Module 01: Base] System foundation ready.")
 	return nil
 }
 
-func installGPUDrivers() {
+func installGPUDrivers() error {
 	pterm.Info.Println("-> Detecting GPU...")
 	out, err := exec.Command("sh", "-c", "lspci | grep -i 'vga\\|3d' | head -1").Output()
 	if err != nil {
 		pterm.Info.Println("   Warning: Could not detect GPU.")
-		return
+		return nil // Not having a detectable GPU is not an error
 	}
 
 	gpu := strings.ToLower(string(out))
 	pterm.Info.Printf("   Detected: %s", string(out))
 
+	var installErr error
 	if strings.Contains(gpu, "nvidia") {
 		pterm.Info.Println("-> Installing NVIDIA drivers...")
-		pacman.Install("nvidia-dkms", "nvidia-utils", "lib32-nvidia-utils", "nvidia-settings", "vulkan-icd-loader", "lib32-vulkan-icd-loader", "mesa", "lib32-mesa", "libva-nvidia-driver")
+		installErr = pacman.Install("nvidia-dkms", "nvidia-utils", "lib32-nvidia-utils", "nvidia-settings", "vulkan-icd-loader", "lib32-vulkan-icd-loader", "mesa", "lib32-mesa", "libva-nvidia-driver")
 
 		// Idempotent DRM KMS injection — only modify if nvidia modules aren't already in MODULES=()
 		mkinitConf, err := os.ReadFile("/etc/mkinitcpio.conf")
@@ -63,19 +80,19 @@ func installGPUDrivers() {
 			pterm.Warning.Printf("-> Could not read /etc/mkinitcpio.conf: %v\n", err)
 		}
 
-		// Simplified Secure Boot warning for Go TUI console
 		pterm.Info.Println("⚠️  If Secure Boot is enabled, NVIDIA DKMS requires MOK key enrollment upon reboot.")
 
 	} else if strings.Contains(gpu, "intel") {
 		pterm.Info.Println("-> Installing Intel GPU drivers...")
-		pacman.Install("mesa", "lib32-mesa", "intel-media-driver", "vulkan-intel", "lib32-vulkan-intel", "intel-gpu-tools", "libva-utils")
+		installErr = pacman.Install("mesa", "lib32-mesa", "intel-media-driver", "vulkan-intel", "lib32-vulkan-intel", "intel-gpu-tools", "libva-utils")
 	} else if strings.Contains(gpu, "amd") || strings.Contains(gpu, "radeon") {
 		pterm.Info.Println("-> Installing AMD GPU drivers...")
-		pacman.Install("mesa", "lib32-mesa", "vulkan-radeon", "lib32-vulkan-radeon", "libva-mesa-driver", "mesa-vdpau", "xf86-video-amdgpu")
+		installErr = pacman.Install("mesa", "lib32-mesa", "vulkan-radeon", "lib32-vulkan-radeon", "libva-mesa-driver", "mesa-vdpau")
 	} else {
 		pterm.Info.Println("-> Unknown GPU vendor. Installing generic mesa drivers...")
-		pacman.Install("mesa", "lib32-mesa", "vulkan-icd-loader", "lib32-vulkan-icd-loader")
+		installErr = pacman.Install("mesa", "lib32-mesa", "vulkan-icd-loader", "lib32-vulkan-icd-loader")
 	}
+	return installErr
 }
 
 func optimizeMakepkg() {

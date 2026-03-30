@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -13,22 +14,31 @@ import (
 func InstallDevAndEditors() error {
 	pterm.Info.Println("🌟 [Module 04 & 07: Dev] Setting up Development Environment...")
 
-	setupDocker()
+	var errs []string
+
+	if err := setupDocker(); err != nil {
+		errs = append(errs, "docker: "+err.Error())
+	}
 	setupGit()
 	setupLanguages()
 	setupCLITools()
-
 	setupEditors()
 	setupOllama()
+
+	if len(errs) > 0 {
+		return fmt.Errorf("dev module: %d error(s)", len(errs))
+	}
 
 	pterm.Info.Println("✅ [Module 04 & 07: Dev] Development environment ready.")
 	return nil
 }
 
-func setupDocker() {
+func setupDocker() error {
 	pterm.Info.Println("-> Installing Docker Ecosystem...")
-	pacman.Install("docker", "docker-compose", "docker-buildx", "lazydocker")
-	
+	if err := pacman.Install("docker", "docker-compose", "docker-buildx", "lazydocker"); err != nil {
+		return err
+	}
+
 	// Ultra-Lightweight Adjustment: We do NOT enable docker.service by default.
 	// Users can start it via 'systemctl start docker' or utilize docker.socket activation
 	// to ensure 0 MB memory overhead when Docker is not in use.
@@ -74,6 +84,7 @@ EOF
 
 	user := os.Getenv("USER")
 	pacman.Command("sudo", "usermod", "-aG", "docker", user).Run()
+	return nil
 }
 
 func setupGit() {
@@ -227,7 +238,7 @@ func setupOllama() {
 	if !pacman.IsInstalled("ollama") {
 		pacman.Command("bash", "-c", `curl -fsSL https://ollama.com/install.sh | sh`).Run()
 	}
-	
+
 	// Ultra-Lightweight Adjustment: Do NOT enable ollama.service by default.
 	// It consumes significant idle RAM. It will be started on-demand via Nexus Chat.
 	pterm.Info.Println("   Note: Ollama daemon installed but disabled by default to save RAM.")
