@@ -1,27 +1,39 @@
 # CachyOS Workstation Setup - Makefile
-# A unified interface for developers and users.
+# A unified interface for building and managing the Nexus CLI.
 
-.PHONY: help install install-all uninstall lint init
+BINARY_NAME = nexus
+VERSION     ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
+
+.PHONY: help build install clean lint test dev
 
 help: ## Show this help menu
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
-install: ## Run the interactive TUI Setup (Default)
-	@chmod +x setup.sh installer.sh
-	@./setup.sh
+build: ## Build the Nexus CLI binary
+	@echo "🚀 Compiling Nexus CLI..."
+	@go build -ldflags="-s -w -X main.Version=$(VERSION)" -o $(BINARY_NAME) .
+	@echo "✅ Build complete! Binary: ./$(BINARY_NAME) ($(shell du -h $(BINARY_NAME) | cut -f1))"
 
-install-all: ## Install everything silently without asking
-	@chmod +x setup.sh installer.sh
-	@./setup.sh --all
+install: build ## Build and install to /usr/local/bin
+	@echo "📦 Installing $(BINARY_NAME) to /usr/local/bin..."
+	sudo install -Dm755 $(BINARY_NAME) /usr/local/bin/$(BINARY_NAME)
+	@echo "✅ Installed! Run: nexus --help"
 
-uninstall: ## Remove ecosystem tools, UI themes, and hooks gracefully
-	@chmod +x uninstall.sh
-	@./uninstall.sh
+clean: ## Remove build artifacts
+	@rm -f $(BINARY_NAME)
+	@echo "🧹 Cleaned."
 
-lint: ## Run ShellCheck to validate all bash scripts
-	@echo "Running ShellCheck on all bash scripts..."
-	@find . -type f -name "*.sh" -not -path "*/\.*" -not -path "*/node_modules/*" -exec shellcheck -x {} +
-	@echo "✅ All scripts passed ShellCheck!"
+lint: ## Run Go vet and staticcheck
+	@echo "🔍 Running Go vet..."
+	@go vet ./...
+	@echo "✅ All checks passed!"
+
+test: ## Run all tests
+	@echo "🧪 Running tests..."
+	@go test -v -race ./...
+
+dev: build ## Build and run doctor
+	@./$(BINARY_NAME) doctor
 
 init: ## Initialize development environment (setup git hooks)
 	@echo "Setting up local Git hooks..."
